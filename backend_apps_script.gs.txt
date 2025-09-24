@@ -1,0 +1,104 @@
+// Copie este arquivo para um projeto do Google Apps Script (script.google.com)
+// e publique como Aplicativo da Web (Deploy > New deployment > Web app).
+// Permissão: Execute como "Você" e Acesso: "Qualquer pessoa com o link".
+
+/**
+ * CONFIGURAÇÃO
+ * Altere SHEET_NAME conforme necessário. Se SHEET_ID vier no corpo, será priorizado.
+ */
+const SHEET_NAME = 'Leads';
+
+/**
+ * Recebe POST com JSON (text/plain) e grava por etapa. Faz UPSERT por clientId.
+ */
+function doPost(e){
+  try{
+    const body = JSON.parse(e.postData.contents || '{}');
+    const meta = body._meta || {};
+    const clientId = String(meta.clientId || '').trim() || Utilities.getUuid();
+    const ts = new Date();
+    const step = Number(meta.step || 0);
+    const isFinal = !!meta.final;
+    const sheetId = meta.sheetId || null;
+    const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActive();
+    const sh = getOrCreateSheet(ss, SHEET_NAME);
+
+    // Colunas padrão
+    const columns = [
+      'timestamp','clientId','step','final','nome','telefone','email','instagram',
+      'renda','ocupacao','area','satisfacao_trabalho','ansiedade','estresse','impacto_emocional','page'
+    ];
+    ensureHeader(sh, columns);
+
+    const rowObj = {
+      timestamp: Utilities.formatDate(ts, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'),
+      clientId, step, final: isFinal,
+      nome: body.nome || '',
+      telefone: body.telefone || '',
+      email: body.email || '',
+      instagram: body.instagram || '',
+      renda: body.renda || '',
+      ocupacao: body.ocupacao || '',
+      area: body.area || '',
+      satisfacao_trabalho: body.satisfacao_trabalho || '',
+      ansiedade: body.ansiedade || '',
+      estresse: body.estresse || '',
+      impacto_emocional: body.impacto_emocional || '',
+      page: meta.page || ''
+    };
+
+    // UPSERT por clientId (atualiza linha existente; senão cria nova)
+    const idx = findRowIndexByClientId(sh, clientId);
+    if(idx > 0){
+      writeRow(sh, idx, columns, rowObj);
+    } else {
+      const newIdx = sh.getLastRow() + 1;
+      writeRow(sh, newIdx, columns, rowObj);
+    }
+
+    return jsonResponse({ ok: true, clientId });
+  }catch(err){
+    return jsonResponse({ ok:false, error: String(err) });
+  }
+}
+
+function doGet(){
+  return jsonResponse({ ok:true, message:'Web App ativo' });
+}
+
+// Utilitários
+function getOrCreateSheet(ss, name){
+  const sh = ss.getSheetByName(name);
+  return sh || ss.insertSheet(name);
+}
+
+function ensureHeader(sh, headers){
+  const firstRow = sh.getRange(1,1,1,sh.getMaxColumns()).getValues()[0];
+  const current = firstRow.slice(0, headers.length);
+  if(JSON.stringify(current) !== JSON.stringify(headers)){
+    sh.getRange(1,1,1,headers.length).setValues([headers]);
+  }
+}
+
+function writeRow(sh, rowIndex, headers, data){
+  const row = headers.map(h => data[h] !== undefined ? data[h] : '');
+  sh.getRange(rowIndex, 1, 1, headers.length).setValues([row]);
+}
+
+function findRowIndexByClientId(sh, clientId){
+  const last = sh.getLastRow();
+  if(last < 2) return -1;
+  const values = sh.getRange(2,1,last-1,2).getValues(); // col A: timestamp, col B: clientId
+  for(let i=0;i<values.length;i++){
+    if(String(values[i][1]) === clientId){
+      return i + 2;
+    }
+  }
+  return -1;
+}
+
+function jsonResponse(obj){
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+

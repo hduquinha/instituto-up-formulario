@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aula Gratuita de Inteligência Emocional | Instituto UP</title>
+  <meta name="description" content="Inscreva-se na aula gratuita de Inteligência Emocional com dinâmica de alto impacto e exercício guiado para controlar a ansiedade. Conduzida por Rodrigo Damaceno. 86% das vagas preenchidas." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root{
+        --bg:#0a0a14;
+        --bg2:#0f1020;
+        --text:#ffffff;
+        --muted:#c7c9d1;
+        --primary:#00BFFF; /* títulos */
+        --cta:#7CFC00;     /* botões */
+        --cta-dark:#57c800;
+        --card:#121226;
+        --border:#232345;
+        --bad:#ff4d4d;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        color:var(--text);
+        background: radial-gradient(1000px 400px at 50% -200px, rgba(0,191,255,.15), transparent 65%),
+                    linear-gradient(180deg, #0a0a14, #0a0a14 35%, #0f1020);
+      }
+      .container{max-width:1100px; margin:0 auto; padding:24px}
+      .hero{padding:32px 0}
+  .hero h1{margin:0 0 10px; font-size: clamp(28px, 3.6vw, 46px); color:var(--primary); line-height:1.12; letter-spacing:-.5px}
+  .hero p{margin:0 0 18px; color:var(--muted); font-size: clamp(15px, 1.45vw, 19px)}
+      .layout{display:grid; grid-template-columns: 1.2fr 1fr; gap:22px; align-items:start}
+      @media (max-width: 960px){ .layout{grid-template-columns: 1fr} }
+
+      /* Card Form */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px 20px 24px; box-shadow: 0 14px 50px -4px rgba(0,0,0,.55); position:relative; overflow:hidden}
+  .card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 85% 15%,rgba(0,191,255,.18),transparent 60%)}
+      .form-header{display:flex; gap:8px; justify-content:center; margin:6px 0 16px}
+      .dot{width:28px; height:28px; border-radius:50%; background:#1b1b33; color:#7c7ea1; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; border:1px solid #2a2a52}
+      .dot.active{background:var(--primary); color:#00131b; border-color:var(--primary)}
+      .dot.done{background:#1dd1a1; color:#00130b; border-color:#1dd1a1}
+      .form-step{display:none}
+      .form-step.active{display:block}
+      .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
+      .field label{font-size:14px; color:var(--muted)}
+      .field input,.field textarea,.field select{background:#0c0c1c; color:var(--text); border:1px solid #25254a; border-radius:12px; padding:12px 14px; outline:none}
+      .field input:focus,.field textarea:focus,.field select:focus{border-color:#3a3a7a; box-shadow: 0 0 0 3px rgba(0,191,255,.15)}
+      .error{color:var(--bad); font-size:12px; min-height:16px}
+      .actions{display:flex; justify-content:space-between; gap:12px; margin-top:8px}
+      .btn{appearance:none; border:1px solid #2d2d54; background:#121228; color:var(--text); padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600}
+      .btn:hover{background:#10102a}
+      .btn-primary{background:var(--cta); border-color:var(--cta); color:#041c00}
+      .btn-primary:hover{background:var(--cta-dark); border-color:var(--cta-dark); color:#eaffea}
+      .note{color:var(--muted); font-size:12px; margin-top:8px}
+
+      /* Benefits */
+      .section{padding:28px 0}
+      .section h2{color:var(--primary); margin:0 0 12px; font-size: clamp(22px, 2.8vw, 32px)}
+      .benefits{display:grid; gap:10px; margin:0; padding:0; list-style:none}
+  .benefits li{display:flex; align-items:flex-start; gap:10px; padding:11px 14px; background:#101022; border:1px solid #222245; border-radius:14px; line-height:1.35}
+      .check{color:#22e386; font-weight:700}
+      .cta-wrap{margin-top:16px}
+      .cta{appearance:none; background:var(--cta); color:#041c00; border:1px solid var(--cta); padding:14px 18px; border-radius:12px; font-weight:800; cursor:pointer}
+      .cta:hover{background:var(--cta-dark); border-color:var(--cta-dark); color:#eaffea}
+
+      /* Mentor */
+      .mentor{display:grid; grid-template-columns: 1fr 1.2fr; gap:18px; align-items:center}
+      @media (max-width: 960px){ .mentor{grid-template-columns:1fr} }
+      .mentor img{width:100%; height:auto; border-radius:12px; border:1px solid #222245}
+      .mentor h3{margin:8px 0 0; color:#b9bbff; font-weight:600}
+
+  .scarcity{background:#101022;border:1px solid #272752;padding:10px 14px;border-radius:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:6px}
+  .scarcity strong{color:#ffd977}
+  .scarcity-progress{height:10px;background:#181830;border:1px solid #2b2b56;border-radius:20px;overflow:hidden;position:relative}
+  .scarcity-progress span{display:block;height:100%;background:linear-gradient(90deg,#ff9d2f,#ff4d4d);width:86%;position:relative;box-shadow:0 0 6px 1px rgba(255,120,56,.45)}
+  .tag-live{display:inline-block;background:#ff4d4d;color:#fff;font-size:11px;font-weight:700;padding:4px 8px;border-radius:30px;letter-spacing:.5px;box-shadow:0 0 0 1px #ff6565;margin-right:6px}
+  .mini-deadline{font-size:11px;color:#9fa4c9;letter-spacing:.5px}
+  .cta-ribbon{background:#042b10;color:#6dff9f;font-size:11px;font-weight:600;padding:4px 10px;border:1px solid #0c5f2e;border-radius:40px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 0 0 1px #0c5f2e inset}
+  footer{color:var(--muted); font-size:12px; padding:20px 0 40px}
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container">
+        <div class="layout">
+          <div>
+            <h1>Aula Gratuita de Inteligência Emocional</h1>
+            <p><span class="tag-live">AO VIVO</span> Participe de uma experiência prática com <strong>dinâmica de alto impacto</strong> e um <strong>exercício guiado para controlar a ansiedade em poucos minutos</strong>. Aprenda a identificar gatilhos emocionais, regular o estado interno e aplicar protocolos simples para manter foco e equilíbrio em momentos de pressão.</p>
+            <div class="scarcity" aria-label="Indicador de vagas restantes">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                <div style="font-size:13px;font-weight:600;color:#cfd2ff;">86% das vagas preenchidas</div>
+                <div class="cta-ribbon">Vagas Limitadas</div>
+              </div>
+              <div class="scarcity-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="86"><span></span></div>
+              <div class="mini-deadline">Movimento alto hoje — confirme enquanto ainda há acesso.</div>
+            </div>
+          </div>
+          <div>
+            <div id="formCard" class="card">
+              <div class="form-header" id="progressDots" aria-label="Progresso do formulário">
+                <div class="dot" data-step="0">1</div>
+                <div class="dot" data-step="1">2</div>
+                <div class="dot" data-step="2">3</div>
+                <div class="dot" data-step="3">4</div>
+                <div class="dot" data-step="4">5</div>
+                <div class="dot" data-step="5">6</div>
+                <div class="dot" data-step="6">7</div>
+                <div class="dot" data-step="7">8</div>
+              </div>
+              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 8</div>
+
+              <form id="msForm" novalidate>
+                <!-- Etapa 1: Dados Pessoais -->
+                <div class="form-step active" data-step="0">
+                  <div class="field">
+                    <label for="nome">Nome Completo</label>
+                    <input id="nome" name="nome" type="text" placeholder="Seu nome completo" required />
+                    <div class="error" data-for="nome"></div>
+                  </div>
+                  <div class="field">
+                    <label for="cidade">Cidade</label>
+                    <input id="cidade" name="cidade" type="text" placeholder="Sua cidade" required />
+                    <div class="error" data-for="cidade"></div>
+                  </div>
+                  <div class="field">
+                    <label for="telefone">Telefone</label>
+                    <input id="telefone" name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" required />
+                    <div class="error" data-for="telefone"></div>
+                  </div>
+                  <div class="actions">
+                    <span></span>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                  <div class="note">Os dados são enviados a cada etapa para garantir captura parcial.</div>
+                </div>
+
+                <!-- Etapa 2: Informações Adicionais -->
+                <div class="form-step" data-step="1">
+                  <div class="field">
+                    <label for="idade">Idade</label>
+                    <input id="idade" name="idade" type="number" min="0" max="120" placeholder="Sua idade" />
+                  </div>
+                  <div class="field">
+                    <label for="profissao">Profissão</label>
+                    <input id="profissao" name="profissao" type="text" placeholder="Ex.: Designer, Professor" />
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 3: Nível de Ansiedade -->
+                <div class="form-step" data-step="2">
+                  <div class="field">
+                    <label>Como está seu nível de ansiedade?</label>
+                    <label><input type="radio" name="ansiedade" value="Muito ansioso" required /> Muito ansioso</label>
+                    <label><input type="radio" name="ansiedade" value="Ansioso" /> Ansioso</label>
+                    <label><input type="radio" name="ansiedade" value="Controlado" /> Controlado</label>
+                    <label><input type="radio" name="ansiedade" value="Pouco ansioso" /> Pouco ansioso</label>
+                    <label><input type="radio" name="ansiedade" value="Não tenho ansiedade" /> Não tenho ansiedade</label>
+                    <label><input type="radio" name="ansiedade" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="ansiedade" value="Não quero responder" /> Não quero responder</label>
+                    <div class="error" data-for="ansiedade"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 4: Qualidade do Sono -->
+                <div class="form-step" data-step="3">
+                  <div class="field">
+                    <label>Como está sua qualidade do sono?</label>
+                    <label><input type="radio" name="sono" value="Muito Boa" required /> Muito Boa</label>
+                    <label><input type="radio" name="sono" value="Boa" /> Boa</label>
+                    <label><input type="radio" name="sono" value="Regular" /> Regular</label>
+                    <label><input type="radio" name="sono" value="Ruim" /> Ruim</label>
+                    <label><input type="radio" name="sono" value="Muito ruim" /> Muito ruim</label>
+                    <label><input type="radio" name="sono" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="sono" value="Não quero responder" /> Não quero responder</label>
+                    <div class="error" data-for="sono"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 5: Relacionamento Amoroso -->
+                <div class="form-step" data-step="4">
+                  <div class="field">
+                    <label>Como está seu relacionamento amoroso?</label>
+                    <label><input type="radio" name="relacionamento" value="Muito Bom" required /> Muito Bom</label>
+                    <label><input type="radio" name="relacionamento" value="Bom" /> Bom</label>
+                    <label><input type="radio" name="relacionamento" value="Regular" /> Regular</label>
+                    <label><input type="radio" name="relacionamento" value="Ruim" /> Ruim</label>
+                    <label><input type="radio" name="relacionamento" value="Muito ruim" /> Muito ruim</label>
+                    <label><input type="radio" name="relacionamento" value="Não tenho" /> Não tenho</label>
+                    <label><input type="radio" name="relacionamento" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="relacionamento" value="Não quero responder" /> Não quero responder</label>
+                    <div class="error" data-for="relacionamento"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 6: Saúde Física -->
+                <div class="form-step" data-step="5">
+                  <div class="field">
+                    <label>Como está sua saúde física?</label>
+                    <label><input type="radio" name="saude_fisica" value="Muito Boa" required /> Muito Boa</label>
+                    <label><input type="radio" name="saude_fisica" value="Boa" /> Boa</label>
+                    <label><input type="radio" name="saude_fisica" value="Regular" /> Regular</label>
+                    <label><input type="radio" name="saude_fisica" value="Ruim" /> Ruim</label>
+                    <label><input type="radio" name="saude_fisica" value="Muito ruim" /> Muito ruim</label>
+                    <label><input type="radio" name="saude_fisica" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="saude_fisica" value="Não quero responder" /> Não quero responder</label>
+                    <div class="error" data-for="saude_fisica"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 7: Vida Financeira -->
+                <div class="form-step" data-step="6">
+                  <div class="field">
+                    <label>Como está sua vida financeira?</label>
+                    <label><input type="radio" name="vida_financeira" value="Muito Boa" required /> Muito Boa</label>
+                    <label><input type="radio" name="vida_financeira" value="Boa" /> Boa</label>
+                    <label><input type="radio" name="vida_financeira" value="Regular" /> Regular</label>
+                    <label><input type="radio" name="vida_financeira" value="Ruim" /> Ruim</label>
+                    <label><input type="radio" name="vida_financeira" value="Muito ruim" /> Muito ruim</label>
+                    <label><input type="radio" name="vida_financeira" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="vida_financeira" value="Não quero responder" /> Não quero responder</label>
+                    <div class="error" data-for="vida_financeira"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 8: Áreas de Melhoria -->
+                <div class="form-step" data-step="7">
+                  <div class="field">
+                    <label>Qual área você quer melhorar? (Marque quantas desejar)</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Relacionamento amoroso" data-required-group="areas_melhoria" /> Relacionamento amoroso</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Saúde emocional" data-required-group="areas_melhoria" /> Saúde emocional</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Saúde física" data-required-group="areas_melhoria" /> Saúde física</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Vida financeira" data-required-group="areas_melhoria" /> Vida financeira</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Todas as anteriores" data-required-group="areas_melhoria" /> Todas as anteriores</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Não sei" data-required-group="areas_melhoria" /> Não sei</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Não quero responder" data-required-group="areas_melhoria" /> Não quero responder</label>
+                    <div class="error" data-for="areas_melhoria"></div>
+                  </div>
+                  <div class="note">Finalize para enviar o registro final.</div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="submit" class="btn btn-primary">FINALIZAR</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <h2>O que você vai experimentar na aula:</h2>
+          <ul class="benefits">
+            <li><span class="check">✓</span> Dinâmica de alto impacto para desbloquear presença e estado emocional</li>
+            <li><span class="check">✓</span> Exercício guiado para reduzir ansiedade aplicável em 3–5 minutos</li>
+            <li><span class="check">✓</span> Identificação de gatilhos e circuito rápido de autorregulação</li>
+            <li><span class="check">✓</span> Técnica de respiração + foco cognitivo para retomar clareza</li>
+            <li><span class="check">✓</span> Mini plano de 5 passos para manter equilíbrio nos próximos 7 dias</li>
+          </ul>
+          <div class="cta-wrap">
+            <button id="ctaTop" class="cta">QUERO CONTROLAR MINHA ANSIEDADE</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container mentor">
+          <div>
+            <img src="https://via.placeholder.com/480x320?text=Rodrigo+Damaceno" alt="Foto de Rodrigo Damaceno" />
+          </div>
+          <div>
+            <h2>Quem conduz a experiência?</h2>
+            <h3>Rodrigo Damaceno</h3>
+            <p>Facilitador em inteligência emocional e performance humana, Rodrigo já ajudou participantes a reconhecer padrões reativos, reorganizar estado interno e aplicar protocolos simples de regulação em cenários de pressão. Nesta aula você não recebe teoria solta: você pratica, sente mudança fisiológica real e sai com um exercício replicável para momentos de ansiedade.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <small>Esta inscrição é exclusiva para a aula gratuita. Não há oferta de outro produto nesta página.</small>
+      </div>
+    </footer>
+
+    <script>
+      // =============================================
+      // Configurações & Opções Avançadas
+      // =============================================
+      // Cole aqui a URL do seu Webhook do n8n (ex.: https://seu-n8n.tld/webhook/abcd-1234)
+      // IMPORTANTE: enquanto estiver em modo "Listen" no n8n use a URL com /webhook-test/
+      const N8N_WEBHOOK_URL = 'https://up-n8n.welzbd.easypanel.host/webhook-test/02c9ee4e-33d0-41d8-a4bc-0c1ed88dfe84';
+      // Você também pode passar ?endpoint=https://... na URL da página para testar sem editar o arquivo.
+      // URL de redirecionamento opcional após sucesso (deixe vazio se não quiser redirecionar)
+      const REDIRECT_URL = '';// ex: 'https://seusite.com/obrigado'
+      // Tempo (ms) antes de redirecionar automaticamente (se REDIRECT_URL não for vazio)
+      const REDIRECT_DELAY = 3200;
+
+      // Campos esperados para padronizar o payload (ordem e existência estável)
+      const EXPECTED_FIELDS = [
+        'nome','cidade','telefone','idade','profissao',
+        'ansiedade','sono','relacionamento','saude_fisica','vida_financeira','areas_melhoria'
+      ];
+      // Se true: quando usuário apaga conteúdo de um campo texto/number, enviamos null (limpa no acumulado)
+      // Se false: ignoramos campo vazio e preservamos valor anterior já capturado
+      const NULLIFY_ON_EMPTY = false;
+
+      // Captura UTMs & origem / primeira visita
+      const utmData = (function(){
+        const p = new URLSearchParams(location.search);
+        const obj = {};
+        ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(k=>{ if(p.get(k)) obj[k]=p.get(k); });
+        if(document.referrer) obj.referrer = document.referrer;
+        obj.landing_first_visit = (function(){
+          try{
+            const k='lp:firstVisit';
+            let v=localStorage.getItem(k);
+            if(!v){ v=new Date().toISOString(); localStorage.setItem(k,v);} return v;
+          }catch{return new Date().toISOString();}
+        })();
+        return obj;
+      })();
+      function getEndpoint(){
+        const u = new URL(location.href);
+        const p = u.searchParams.get('endpoint');
+        return (p && p.trim()) || N8N_WEBHOOK_URL;
+      }
+
+      const form = document.getElementById('msForm');
+      const steps = Array.from(document.querySelectorAll('.form-step'));
+      const dots = Array.from(document.querySelectorAll('#progressDots .dot'));
+      const formCard = document.getElementById('formCard');
+      const ctaTop = document.getElementById('ctaTop');
+      // Adiciona elemento de status
+      let sendStatus = document.getElementById('sendStatus');
+      if(!sendStatus){
+        sendStatus = document.createElement('div');
+        sendStatus.id = 'sendStatus';
+        sendStatus.style.cssText = 'margin:8px 0 2px;font-size:12px;color:#8aa0ff;min-height:16px;';
+        formCard.insertBefore(sendStatus, formCard.firstChild.nextSibling);
+      }
+
+  let current = 0;
+  const clientId = getOrCreateClientId();
+  // Objeto acumulador para enviar sempre todas as respostas já dadas
+  const allData = {}; // cada etapa mescla suas respostas aqui
+
+  // Máscara de telefone dinâmica (formato brasileiro)
+  (function(){
+    const telInput = document.getElementById('telefone');
+    if(!telInput) return;
+    telInput.addEventListener('input', ()=>{
+      const digits = telInput.value.replace(/\D+/g,'').slice(0,11);
+      let out = digits;
+      if(digits.length > 10){
+        out = `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
+      } else if(digits.length > 6){
+        out = `(${digits.slice(0,2)}) ${digits.slice(2,6)}-${digits.slice(6)}`;
+      } else if(digits.length > 2){
+        out = `(${digits.slice(0,2)}) ${digits.slice(2)}`;
+      } else if(digits.length > 0){
+        out = '('+digits;
+      }
+      telInput.value = out;
+    });
+  })();
+
+      function showStep(n){
+        current = Math.max(0, Math.min(steps.length-1, n));
+        steps.forEach((el, idx)=>{
+          el.classList.toggle('active', idx === current);
+        });
+        dots.forEach((d, idx)=>{
+          d.classList.remove('active','done');
+          if(idx < current) d.classList.add('done');
+          if(idx === current) d.classList.add('active');
+        });
+        const pt = document.getElementById('progressText');
+        if(pt) pt.textContent = `Etapa ${current+1} de ${steps.length}`;
+      }
+
+      function collectStepData(){
+        const section = steps[current];
+        const inputs = section.querySelectorAll('input, textarea, select');
+        const stepData = {};
+        const checkboxGroups = {};
+        inputs.forEach(el => {
+          const key = el.name || el.id;
+          if(!key) return;
+          if(el.type === 'radio'){
+            if(el.checked) stepData[key] = el.value;
+          } else if(el.type === 'checkbox'){
+            if(!checkboxGroups[key]) checkboxGroups[key] = [];
+            if(el.checked) checkboxGroups[key].push(el.value || true);
+          } else {
+            if(el.value === ''){
+              if(NULLIFY_ON_EMPTY) stepData[key] = null; // só limpa se flag ativa
+            } else {
+              stepData[key] = el.value;
+            }
+          }
+        });
+        Object.entries(checkboxGroups).forEach(([k,v])=>{ stepData[k] = v; });
+        // Mescla (limpeza com null também sobrescreve)
+        Object.entries(stepData).forEach(([k,v])=>{ allData[k] = v; });
+        // Normaliza payload completo
+        const payload = {};
+        EXPECTED_FIELDS.forEach(f=>{
+          if(f === 'areas_melhoria'){
+            const val = allData[f];
+            payload[f] = Array.isArray(val) ? val : (val == null ? [] : [val]);
+          } else {
+            payload[f] = (f in allData) ? allData[f] : null;
+          }
+        });
+        // Metadados / tracking
+        payload._step = current + 1;
+        payload.clientId = clientId;
+        payload.timestamp = new Date().toISOString();
+        payload.page = location.href;
+        Object.entries(utmData).forEach(([k,v])=>{ payload[k]=v; });
+        return payload;
+      }
+
+      function setStatus(msg, type='info'){
+        const colors = { info:'#8aa0ff', ok:'#74e39d', err:'#ff6b6b' };
+        sendStatus.style.color = colors[type] || colors.info;
+        sendStatus.textContent = msg || '';
+      }
+
+      async function sendPartial(data){
+        // Envia os dados desta etapa ao seu backend
+        // Troque a URL N8N_WEBHOOK_URL pela sua URL real (n8n). Ou use ?endpoint= na URL da página.
+        try{
+          const endpoint = getEndpoint();
+          if(!endpoint || endpoint.startsWith('PASTE_')){
+            console.warn('Defina a URL do Webhook do n8n em N8N_WEBHOOK_URL ou via ?endpoint=');
+            setStatus('Webhook n8n não configurado', 'err');
+            return;
+          }
+          setStatus('Enviando etapa ' + data._step + '...', 'info');
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if(!res.ok){
+            const txt = await res.text().catch(()=>res.statusText);
+            console.warn('Resposta não OK do n8n', res.status, txt);
+            setStatus('Falha ('+res.status+') ao enviar etapa '+data._step, 'err');
+          } else {
+            setStatus('Etapa '+data._step+' salva ✔', 'ok');
+          }
+        }catch(err){
+          // Se falhar, apenas registramos no console e seguimos.
+          console.warn('Falha ao enviar etapa:', err);
+          setStatus('Erro ao enviar etapa '+data._step, 'err');
+        }
+      }
+
+      // Navegação Próximo/Voltar
+      form.addEventListener('click', async (e)=>{
+        const nextBtn = e.target.closest('[data-next]');
+        const backBtn = e.target.closest('[data-back]');
+        if(nextBtn){
+          if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
+          const payload = collectStepData();
+          await sendPartial(payload);
+          showStep(current + 1);
+        }
+        if(backBtn){
+          showStep(current - 1);
+        }
+      });
+
+      // Envio final (poderia também disparar uma última captura)
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+  if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
+        const payload = collectStepData();
+        payload._final = true;
+        await sendPartial(payload);
+        showSuccessModal();
+        form.reset();
+        // Limpa acumulado (mantém clientId e utmData):
+        EXPECTED_FIELDS.forEach(f=> delete allData[f]);
+        showStep(0);
+      });
+
+      // CTA: rolar ao topo e focar formulário
+      ctaTop.addEventListener('click', ()=>{
+        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      // Inicializa
+      showStep(0);
+
+      // Modal de sucesso
+      function showSuccessModal(){
+        let modal = document.getElementById('successModal');
+        if(!modal){
+          modal = document.createElement('div');
+          modal.id = 'successModal';
+          modal.innerHTML = `
+            <div style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999;">
+              <div style="background:#121226;border:1px solid #2a2a52;padding:32px 28px;max-width:440px;width:92%;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.45);text-align:center;font-family:inherit;animation:pop .35s ease;">
+                <h2 style="margin:0 0 10px;font-size:24px;color:#74e39d;">Inscrição feita com sucesso!</h2>
+                <p style="margin:0 0 14px;color:#c7c9d1;font-size:14px;line-height:1.5;">Suas informações foram registradas com segurança.<br/>Você receberá orientações em breve.</p>
+                ${REDIRECT_URL ? `<p style='margin:0 0 16px;font-size:12px;color:#8aa0ff;'>Vamos te redirecionar automaticamente...</p>` : ''}
+                <button id="closeSuccessModal" style="background:#7CFC00;color:#041c00;border:1px solid #7CFC00;padding:12px 18px;border-radius:10px;font-weight:700;cursor:pointer;">Fechar</button>
+              </div>
+            </div>`;
+          document.body.appendChild(modal);
+          if(REDIRECT_URL){ setTimeout(()=>{ try{ modal.remove(); }catch{} location.href = REDIRECT_URL; }, REDIRECT_DELAY); }
+          modal.addEventListener('click', (e)=>{
+            if(e.target.id==='closeSuccessModal' || e.target===modal.firstChild){
+              modal.remove();
+              if(REDIRECT_URL) location.href = REDIRECT_URL;
+            }
+          });
+        }
+      }
+
+      function getOrCreateClientId(){
+        try{
+          const key = 'lp:clientId';
+          const existing = localStorage.getItem(key);
+          if(existing) return existing;
+          const id = cryptoRandomId();
+          localStorage.setItem(key, id);
+          return id;
+        }catch{
+          return cryptoRandomId();
+        }
+      }
+
+      function cryptoRandomId(){
+        try{
+          const arr = new Uint8Array(16);
+          (self.crypto || window.crypto).getRandomValues(arr);
+          return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+        }catch{
+          return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        }
+      }
+    </script>
+  </body>
+</html>
