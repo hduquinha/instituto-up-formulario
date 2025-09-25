@@ -48,6 +48,18 @@
       .layout{display:grid; grid-template-columns: 1.2fr 1fr; gap:22px; align-items:start}
       @media (max-width: 960px){ .layout{grid-template-columns: 1fr} }
 
+  /* Evento & Contagem Regressiva */
+  .event-banner{background:#0f1819;border:1px solid #1e3335; padding:14px 18px; border-radius:18px; display:flex; flex-direction:column; gap:10px; margin:0 0 20px; position:relative}
+  .event-time{font-size:.85rem; font-weight:600; letter-spacing:.5px; color:#d7f5f7; display:flex; align-items:center; gap:8px}
+  .event-time:before{content:"\23F0"; font-size:1rem; opacity:.9}
+  .countdown{display:flex; gap:10px; flex-wrap:wrap}
+  .cd-seg{background:#132326; border:1px solid #204347; padding:10px 12px 8px; border-radius:14px; min-width:70px; text-align:center; box-shadow:0 0 0 1px #1a3d41 inset}
+  .cd-seg span{display:block; font-size:1.25rem; font-weight:700; letter-spacing:1px; color:var(--primary); line-height:1}
+  .cd-seg small{display:block; font-size:.6rem; letter-spacing:.8px; text-transform:uppercase; color:#7ea5a9; margin-top:4px; font-weight:600}
+  .live-status{font-size:.8rem; font-weight:600; letter-spacing:.6px; color:#fff; background:#ff4d4d; padding:8px 14px; border-radius:40px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 0 0 1px #ff6b6b, 0 0 14px -2px rgba(255,77,77,.6);}
+  .live-status:before{content:"\1F525";}
+  .event-ended{background:#272d2e; color:#c5d1d2; box-shadow:none; border:1px solid #343f41}
+
       /* Card Form */
   .card{background:var(--card); border:1px solid var(--card-border); border-radius:22px; padding:28px 26px 34px; box-shadow:0 8px 40px -6px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03); position:relative; overflow:hidden}
   .card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 88% 12%,rgba(var(--primary-rgb),.22),transparent 60%)}
@@ -112,6 +124,16 @@
           <div>
             <h1>Aula Gratuita de Inteligência Emocional</h1>
             <p><span class="tag-live">AO VIVO</span> Participe de uma experiência prática com <strong>dinâmica de alto impacto</strong> e um <strong>exercício guiado para controlar a ansiedade em poucos minutos</strong>. Aprenda a identificar gatilhos emocionais, regular o estado interno e aplicar protocolos simples para manter foco e equilíbrio em momentos de pressão.</p>
+            <div class="event-banner" aria-labelledby="eventoInfo" aria-live="polite">
+              <div id="eventoInfo" class="event-time">Segunda, 29/09 • 19:29 às 21:29 (horário de Brasília)</div>
+              <div id="countdownWrapper" class="countdown" aria-label="Contagem regressiva para o início da aula">
+                <div class="cd-seg"><span id="cdDays">00</span><small>dias</small></div>
+                <div class="cd-seg"><span id="cdHours">00</span><small>horas</small></div>
+                <div class="cd-seg"><span id="cdMinutes">00</span><small>min</small></div>
+                <div class="cd-seg"><span id="cdSeconds">00</span><small>seg</small></div>
+              </div>
+              <div id="liveStatus" class="live-status" hidden>AULA AO VIVO AGORA</div>
+            </div>
             <div class="scarcity" aria-label="Indicador de vagas restantes">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
                 <div style="font-size:13px;font-weight:600;color:#cfd2ff;">86% das vagas preenchidas</div>
@@ -156,9 +178,6 @@
                   <div class="actions">
                     <span></span>
                     <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                  <div class="note">Os dados são enviados a cada etapa para garantir captura parcial.</div>
-                </div>
 
                 <!-- Etapa 2: Informações Adicionais -->
                 <div class="form-step" data-step="1">
@@ -390,6 +409,69 @@
       const dots = Array.from(document.querySelectorAll('#progressDots .dot'));
       const formCard = document.getElementById('formCard');
       const ctaTop = document.getElementById('ctaTop');
+      // ======================= Contagem Regressiva =======================
+      // Definição do evento: 29/09 (ano atual ou próximo se data já passou) 19:29-21:29 America/Sao_Paulo
+      (function initCountdown(){
+        const tz = 'America/Sao_Paulo';
+        const now = new Date();
+        const year = now.getFullYear();
+        // Ajustar mês: JS Date usa 0-based (Setembro = 8)
+        let start = new Date(Date.UTC(year, 8, 29, 19, 29, 0));
+        let end   = new Date(Date.UTC(year, 8, 29, 21, 29, 0));
+        // Converter para offset horário de Brasília aproximado usando Intl (para evitar DST problemas básicos)
+        function toLocalLike(d){
+          try{
+            // Obter partes formatadas no fuso desejado
+            const fmt = new Intl.DateTimeFormat('en-CA', {timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            const parts = fmt.formatToParts(d).reduce((o,p)=>{o[p.type]=p.value;return o;},{});
+            return new Date(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}-03:00`); // Brasil (fixo -03:00 simplificado)
+          }catch{return d;}
+        }
+        start = toLocalLike(start);
+        end = toLocalLike(end);
+        if(now > end){
+          // Se já passou neste ano, programar para o ano seguinte
+            start = toLocalLike(new Date(Date.UTC(year+1, 8, 29, 19, 29, 0)));
+            end   = toLocalLike(new Date(Date.UTC(year+1, 8, 29, 21, 29, 0)));
+        }
+        const elDays = document.getElementById('cdDays');
+        const elHours = document.getElementById('cdHours');
+        const elMinutes = document.getElementById('cdMinutes');
+        const elSeconds = document.getElementById('cdSeconds');
+        const liveEl = document.getElementById('liveStatus');
+        const wrapper = document.getElementById('countdownWrapper');
+        if(!elDays || !liveEl) return;
+        function pad(n){return String(n).padStart(2,'0');}
+        function tick(){
+          const nowTick = new Date();
+          if(nowTick >= start && nowTick <= end){
+            // Ao vivo
+            wrapper.hidden = true;
+            liveEl.hidden = false;
+            return;
+          }
+          if(nowTick > end){
+            wrapper.hidden = false;
+            liveEl.hidden = false;
+            liveEl.textContent = 'AULA ENCERRADA';
+            liveEl.classList.add('event-ended');
+            return;
+          }
+          const diff = start - nowTick;
+          const totalSeconds = Math.floor(diff/1000);
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          elDays.textContent = pad(days);
+          elHours.textContent = pad(hours);
+          elMinutes.textContent = pad(minutes);
+          elSeconds.textContent = pad(seconds);
+        }
+        tick();
+        setInterval(tick, 1000);
+      })();
+      // =================== Fim Contagem Regressiva =======================
       // Adiciona elemento de status
       let sendStatus = document.getElementById('sendStatus');
       if(!sendStatus){
