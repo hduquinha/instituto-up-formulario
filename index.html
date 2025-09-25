@@ -378,7 +378,9 @@
       }
 
   let current = 0;
-  const clientId = getOrCreateClientId();
+  let clientId = getOrCreateClientId();
+  // Número da tentativa (inscrição) neste dispositivo
+  let attemptNumber = getAttemptNumber();
   // Objeto acumulador para enviar sempre todas as respostas já dadas
   const allData = {}; // cada etapa mescla suas respostas aqui
 
@@ -515,6 +517,7 @@
         payload.clientId = clientId;
         payload.timestamp = new Date().toISOString();
         payload.page = location.href;
+        payload.attempt_number = attemptNumber;
         Object.entries(utmData).forEach(([k,v])=>{ payload[k]=v; });
         return payload;
       }
@@ -639,6 +642,35 @@
         }catch{
           return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
         }
+      }
+
+      function getAttemptNumber(){
+        try{
+          const key='lp:attemptCounter';
+          let v=parseInt(localStorage.getItem(key)||'0',10);
+          if(v===0){ v=1; localStorage.setItem(key,'1'); }
+          return v;
+        }catch{return 1;}
+      }
+
+      function incrementAttemptNumber(){
+        try{
+          const key='lp:attemptCounter';
+          let v=parseInt(localStorage.getItem(key)||'0',10)+1;
+          localStorage.setItem(key,String(v));
+          return v;
+        }catch{return 1;}
+      }
+
+      function startNewRegistration(){
+        clientId = cryptoRandomId();
+        try{ localStorage.setItem('lp:clientId', clientId); }catch{}
+        attemptNumber = incrementAttemptNumber();
+        for(const k in allData) delete allData[k];
+        form.reset();
+        showStep(0);
+        setStatus('Nova inscrição iniciada','info');
+        window.scrollTo({top:0,behavior:'smooth'});
       }
     </script>
   </body>
