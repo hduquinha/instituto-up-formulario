@@ -56,6 +56,7 @@
   .hero-points li{background:#0f1819; border:1px solid #1f3335; padding:12px 16px; border-radius:14px; font-size:.95rem; font-weight:500; letter-spacing:.3px; line-height:1.35; position:relative}
   .hero-points li:before{content:'+'; position:absolute; left:12px; top:50%; transform:translateY(-50%); background:linear-gradient(135deg,rgba(var(--primary-rgb),.2),rgba(var(--primary-rgb),.05)); width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:800; color:var(--primary); border:1px solid #224c50; box-shadow:0 0 0 1px #173538 inset}
   .hero-points li{padding-left:50px}
+  .event-datetime{margin:-6px 0 24px; font-size:.75rem; letter-spacing:.65px; font-weight:600; color:#9bd5da; text-transform:uppercase; background:rgba(var(--primary-rgb),.08); display:inline-block; padding:8px 14px; border:1px solid #1d3f43; border-radius:40px; box-shadow:0 0 0 1px #153438 inset}
   .form-title{margin:0 0 14px; text-align:center; font-size:1.15rem; letter-spacing:.8px; font-weight:700; color:#ffffff; background:linear-gradient(90deg,rgba(var(--primary-rgb),.15),rgba(var(--primary-rgb),.05)); border:1px solid #1d3d41; padding:12px 18px; border-radius:16px; text-transform:uppercase; box-shadow:0 0 0 1px #1a3235 inset}
   /* Countdown pós-formulário */
   .after-form-countdown{padding:10px 0 0;}
@@ -82,6 +83,12 @@
   .final-actions{display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; margin-top:4px}
   .btn-sec{background:#173337; border:2px solid #1f4d52; color:#b8dadd; font-weight:600}
   .btn-sec:hover{background:#1d4045;}
+  .cal-actions{display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 18px; align-items:center}
+  .btn-cal{background:#1a3b3f; border:2px solid #23646b; color:#bdf3f7; font-weight:600; padding:12px 18px; border-radius:14px; font-size:.8rem; letter-spacing:.5px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; text-decoration:none}
+  .btn-cal:hover{background:#215157; color:#fff}
+  .btn-cal svg{width:16px; height:16px; fill:currentColor}
+  .ics-link{font-size:.65rem; letter-spacing:.6px; color:#7fb9be; text-decoration:underline; cursor:pointer}
+  .ics-link:hover{color:#bde9ed}
   @media (max-width:600px){ .final-modal{padding:30px 22px 36px;} }
 
       /* Card Form */
@@ -156,6 +163,7 @@
             <div class="prep-callout" aria-label="Preparação recomendada">
               <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
             </div>
+            <div class="event-datetime">Aula ao vivo: 29/09 • 19:29 às 21:29 (horário de Brasília)</div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... mais foco</li>
               <li><strong>menos estresse</strong> ... mais qualidade de sono</li>
@@ -354,7 +362,7 @@
 
       <div class="after-form-countdown" aria-live="polite">
         <div class="countdown-banner" id="afterCountdown" data-date="2025-09-29T19:29:00-03:00">
-          <h3>Contagem para o Encontro</h3>
+          <h3>Encontro 29/09 • 19:29 – 21:29</h3>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
             <div class="cd-box"><span id="afHours">00</span><small>Horas</small></div>
@@ -661,6 +669,7 @@
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h2 id="modalTitle">Inscrição Confirmada</h2>
+            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">29/09</span> • <span style="color:#ffffff">19:29 às 21:29</span> (Brasília)</p>
             <p>Para extrair o máximo do encontro, já deixe ao seu lado:</p>
             <ul class="prep-list">
               <li>Papel para anotar insights</li>
@@ -668,6 +677,17 @@
               <li>Fone de ouvido para focar</li>
               <li>Um lugar tranquilo e sem interrupções</li>
             </ul>
+            <div class="cal-actions" aria-label="Adicionar ao calendário">
+              <button type="button" class="btn-cal" id="btnGCal" title="Adicionar ao Google Calendar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-5 2v2h-4V5h4M5 19V8h14v11H5m7-9a4 4 0 0 0-4 4h2a2 2 0 1 1 2 2 1 1 0 0 1-1-1H9a3 3 0 1 0 3 3 1 1 0 0 1 2 0 3 3 0 1 0-3-3 1 1 0 0 1 1-1 2 2 0 1 1 2-2 4 4 0 0 0-4-4Z"/></svg>
+                Google Calendar
+              </button>
+              <button type="button" class="btn-cal" id="btnICS" title="Baixar arquivo .ics">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0m1 17h-2v-2h2Zm0-4h-2V7h2Z"/></svg>
+                Arquivo .ICS
+              </button>
+              <span class="ics-link" id="rawICS" hidden>Copiar ICS</span>
+            </div>
             <p style="font-size:.78rem;color:#8fb8bc;letter-spacing:.4px;margin-top:-4px">(Dica: silenciar notificações e avisar quem mora com você ajuda muito.)</p>
             <div class="final-actions">
               <button type="button" class="btn btn-sec" id="finalClose">Fechar</button>
@@ -682,6 +702,40 @@
         ov.addEventListener('click', e=>{ if(e.target === ov) close(); });
         ov.querySelector('#finalClose').addEventListener('click', close);
         ov.querySelector('#finalOk').addEventListener('click', close);
+
+        // ===== Calendar Helpers =====
+        const startLocal = new Date('2025-09-29T19:29:00-03:00');
+        const endLocal = new Date(startLocal.getTime() + 2*60*60*1000);
+        function toICSDate(d){
+          // Convert to UTC and format YYYYMMDDTHHMMSSZ
+          const y = d.getUTCFullYear();
+          const m = String(d.getUTCMonth()+1).padStart(2,'0');
+          const day = String(d.getUTCDate()).padStart(2,'0');
+            const h = String(d.getUTCHours()).padStart(2,'0');
+          const min = String(d.getUTCMinutes()).padStart(2,'0');
+          const s = String(d.getUTCSeconds()).padStart(2,'0');
+          return `${y}${m}${day}T${h}${min}${s}Z`;
+        }
+        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (29/09 19:29-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
+        const blob = new Blob([icsContent], {type:'text/calendar'});
+        const icsUrl = URL.createObjectURL(blob);
+        const btnICS = ov.querySelector('#btnICS');
+        btnICS.addEventListener('click', ()=>{
+          const a = document.createElement('a');
+          a.href = icsUrl; a.download = 'encontro-up.ics';
+          document.body.appendChild(a); a.click(); a.remove();
+        });
+        const gStart = toICSDate(startLocal).replace(/Z$/,'');
+        const gEnd = toICSDate(endLocal).replace(/Z$/,'');
+        const text = encodeURIComponent('Encontro UP | Construindo Uma Vida Mais Leve');
+        const details = encodeURIComponent('Aula gratuita de Inteligência Emocional. Prepare papel, caneta, fone e um lugar tranquilo.');
+        const locationTxt = encodeURIComponent('Online');
+        const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${gStart}/${gEnd}&details=${details}&location=${locationTxt}&ctz=America/Sao_Paulo`;
+        ov.querySelector('#btnGCal').addEventListener('click', ()=>{ window.open(gcalUrl, '_blank','noopener'); });
+        // Copy raw ICS if needed
+        const raw = ov.querySelector('#rawICS');
+        raw.addEventListener('click', async ()=>{
+          try{ await navigator.clipboard.writeText(icsContent); raw.textContent='Copiado!'; setTimeout(()=>raw.textContent='Copiar ICS',2000);}catch{raw.textContent='Falha'; setTimeout(()=>raw.textContent='Copiar ICS',2000);} });
       }
 
 
