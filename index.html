@@ -44,6 +44,9 @@
       .container{max-width:1100px; margin:0 auto; padding:24px}
       .hero{padding:40px 0 28px}
   .hero h1{margin:0 0 14px; font-size: clamp(2.15rem, 4.2vw, 3.1rem); color:var(--primary); line-height:1.1; letter-spacing:-.5px; text-shadow:0 3px 14px rgba(var(--primary-rgb),.28)}
+  .hero h1.hero-title{color:var(--primary);} /* manter primário como base */
+  .hero-title .t-white{color:#ffffff;}
+  .hero-title .t-accent{color:var(--primary);}
   .hero p{margin:0 0 22px; color:var(--muted); font-size: clamp(1rem, 1.6vw, 1.25rem); max-width:860px}
       .layout{display:grid; grid-template-columns: 1.2fr 1fr; gap:22px; align-items:start}
       @media (max-width: 960px){ .layout{grid-template-columns: 1fr} }
@@ -122,13 +125,13 @@
       <div class="container">
         <div class="layout">
           <div>
-            <h1>Encontro UP | Construindo Uma Vida Mais Leve</h1>
+            <h1 class="hero-title"><span class="t-accent">Encontro UP</span> | <span class="t-white">Construindo Uma Vida Mais Leve</span></h1>
             <ul class="hero-points" aria-label="Benefícios principais">
-              <li><strong>menos ansiedade</strong> ... + foco</li>
-              <li><strong>menos estresse</strong> ... + qualidade de sono</li>
-              <li>+ comunicação <strong>assertiva</strong></li>
-              <li>+ relacionamentos <strong>saudáveis</strong></li>
-              <li>+ saúde <strong>física e emocional</strong></li>
+              <li><strong>menos ansiedade</strong> ... mais foco</li>
+              <li><strong>menos estresse</strong> ... mais qualidade de sono</li>
+              <li>mais comunicação <strong>assertiva</strong></li>
+              <li>mais relacionamentos <strong>saudáveis</strong></li>
+              <li>mais saúde <strong>física e emocional</strong></li>
             </ul>
             <div class="scarcity" aria-label="Indicador de vagas restantes">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
