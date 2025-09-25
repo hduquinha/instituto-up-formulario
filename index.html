@@ -92,6 +92,12 @@
       .cta-wrap{margin-top:16px}
   .cta{appearance:none; background:var(--primary); color:#002b30; border:2px solid var(--primary); padding:18px 26px; border-radius:16px; font-weight:800; cursor:pointer; font-size:1.05rem; letter-spacing:.6px; box-shadow:0 6px 18px -4px rgba(var(--primary-rgb),.45)}
   .cta:hover{background:#1e919b; border-color:#1e919b; color:#e9feff}
+    /* Nova lista de tópicos de transformação */
+    .transform-list{display:grid; gap:14px; margin:0; padding:0; list-style:none;}
+    .transform-item{position:relative; padding:18px 20px 18px 56px; background:#0f1819; border:1px solid #1f3335; border-radius:18px; font-size:1rem; font-weight:600; letter-spacing:.3px; line-height:1.35;}
+    .transform-item:before{content:""; position:absolute; left:18px; top:50%; width:26px; height:26px; border-radius:8px; background:linear-gradient(135deg, rgba(var(--primary-rgb),.15), rgba(var(--primary-rgb),.05)); border:1px solid #225055; transform:translateY(-50%); box-shadow:0 0 0 1px #193a3d inset, 0 4px 10px -4px rgba(0,0,0,.6);}
+    .transform-item:after{content:"+"; position:absolute; left:26px; top:50%; transform:translate(-50%,-50%); font-weight:800; color:var(--primary); font-size:1.05rem; text-shadow:0 0 6px rgba(var(--primary-rgb),.55);}
+    .transform-accent{color:var(--primary); font-weight:700;}
 
       /* Mentor */
       .mentor{display:grid; grid-template-columns: 1fr 1.2fr; gap:18px; align-items:center}
@@ -320,19 +326,16 @@
     </header>
 
     <main>
-      <section class="section">
+      <section class="section" aria-labelledby="transformTitle">
         <div class="container">
-          <h2>O que você vai experimentar na aula:</h2>
-          <ul class="benefits">
-            <li><span class="check">✓</span> Dinâmica de alto impacto para desbloquear presença e estado emocional</li>
-            <li><span class="check">✓</span> Exercício guiado para reduzir ansiedade aplicável em 3–5 minutos</li>
-            <li><span class="check">✓</span> Identificação de gatilhos e circuito rápido de autorregulação</li>
-            <li><span class="check">✓</span> Técnica de respiração + foco cognitivo para retomar clareza</li>
-            <li><span class="check">✓</span> Mini plano de 5 passos para manter equilíbrio nos próximos 7 dias</li>
+          <h2 id="transformTitle">Transformações que você busca</h2>
+          <ul class="transform-list">
+            <li class="transform-item"><span class="transform-accent">menos ansiedade</span> ... + foco</li>
+            <li class="transform-item"><span class="transform-accent">menos estresse</span> ... + qualidade de sono</li>
+            <li class="transform-item">+ comunicação <span class="transform-accent">assertiva</span></li>
+            <li class="transform-item">+ relacionamentos <span class="transform-accent">saudáveis</span></li>
+            <li class="transform-item">+ saúde <span class="transform-accent">física e emocional</span></li>
           </ul>
-          <div class="cta-wrap">
-            <button id="ctaTop" class="cta">QUERO CONTROLAR MINHA ANSIEDADE</button>
-          </div>
         </div>
       </section>
 
@@ -410,7 +413,6 @@
       const steps = Array.from(document.querySelectorAll('.form-step'));
       const dots = Array.from(document.querySelectorAll('#progressDots .dot'));
       const formCard = document.getElementById('formCard');
-      const ctaTop = document.getElementById('ctaTop');
       // ======================= Contagem Regressiva =======================
       // Definição do evento: 29/09 (ano atual ou próximo se data já passou) 19:29-21:29 America/Sao_Paulo
       (function initCountdown(){
@@ -687,10 +689,7 @@
         setTimeout(()=> location.reload(), 600);
       });
 
-      // CTA: rolar ao topo e focar formulário
-      ctaTop.addEventListener('click', ()=>{
-        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      // (CTA removido conforme solicitação)
 
       // Inicializa
       showStep(0);
