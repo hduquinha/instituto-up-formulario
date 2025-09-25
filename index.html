@@ -353,7 +353,14 @@
       function getEndpoint(){
         const u = new URL(location.href);
         const p = u.searchParams.get('endpoint');
-        return (p && p.trim()) || N8N_WEBHOOK_URL;
+        if(p && p.trim()) return p.trim();
+        // Se estiver em domínio Vercel e N8N_WEBHOOK_URL não foi alterada manualmente, usa proxy serverless
+        const host = location.hostname;
+        const isVercel = host.endsWith('.vercel.app');
+        if(isVercel){
+          return '/api/n8n-proxy';
+        }
+        return N8N_WEBHOOK_URL;
       }
 
       const form = document.getElementById('msForm');
