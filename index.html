@@ -416,6 +416,66 @@
         if(pt) pt.textContent = `Etapa ${current+1} de ${steps.length}`;
       }
 
+      // Validação da etapa atual
+      function validateCurrent(){
+        const section = steps[current];
+        if(!section) return true;
+        let valid = true;
+        // Limpa mensagens antigas
+        section.querySelectorAll('.error').forEach(el=> el.textContent='');
+        // Agrupar radios por name para checar uma vez
+        const radiosChecked = new Set();
+        // Checkboxes agrupados por data-required-group
+        const requiredGroups = {};
+        const inputs = section.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+          const name = input.name || input.id;
+          if(!name) return;
+          const errorEl = section.querySelector(`.error[data-for="${name}"]`);
+
+          // Campos de texto/number/email/tel/select com required
+          if((input.tagName === 'INPUT' || input.tagName === 'TEXTAREA' || input.tagName === 'SELECT') && input.type !== 'radio' && input.type !== 'checkbox'){
+            if(input.hasAttribute('required') && !input.value.trim()){
+              if(errorEl) errorEl.textContent = 'Campo obrigatório';
+              valid = false;
+            }
+          }
+
+          // Radios: validar apenas uma vez por grupo (name)
+          if(input.type === 'radio'){
+            if(!radiosChecked.has(name)){
+              radiosChecked.add(name);
+              const group = section.querySelectorAll(`input[type=radio][name="${name}"]`);
+              const oneChecked = Array.from(group).some(r=> r.checked);
+              if(!oneChecked){
+                if(errorEl) errorEl.textContent = 'Selecione uma opção';
+                valid = false;
+              }
+            }
+          }
+
+          // Checkboxes pertencentes a um grupo obrigatório
+          if(input.type === 'checkbox' && input.dataset.requiredGroup){
+            const g = input.dataset.requiredGroup;
+            if(!requiredGroups[g]) requiredGroups[g] = [];
+            requiredGroups[g].push(input);
+          }
+        });
+
+        // Validar grupos de checkbox marcados como obrigatórios (pelo menos 1)
+        Object.entries(requiredGroups).forEach(([group, list])=>{
+          const any = list.some(cb => cb.checked);
+            if(!any){
+              // Usa data-for com o mesmo nome do primeiro checkbox (name comum)
+              const name = list[0].name || list[0].id;
+              const errorEl = section.querySelector(`.error[data-for="${name}"]`) || section.querySelector(`.error[data-for="${group}"]`);
+              if(errorEl) errorEl.textContent = 'Marque ao menos uma opção';
+              valid = false;
+            }
+        });
+        return valid;
+      }
+
       function collectStepData(){
         const section = steps[current];
         const inputs = section.querySelectorAll('input, textarea, select');
