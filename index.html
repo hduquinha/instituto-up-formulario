@@ -378,11 +378,9 @@
       }
 
   let current = 0;
-  let clientId = getOrCreateClientId();
-  // Número da tentativa (inscrição) neste dispositivo
-  let attemptNumber = getAttemptNumber();
-  // Objeto acumulador para enviar sempre todas as respostas já dadas
-  const allData = {}; // cada etapa mescla suas respostas aqui
+  // Novo clientId a cada carregamento (permite múltiplas inscrições no mesmo dispositivo)
+  let clientId = cryptoRandomId();
+  const allData = {}; // acumulador
 
   // Máscara de telefone dinâmica (formato brasileiro)
   (function(){
@@ -517,7 +515,6 @@
         payload.clientId = clientId;
         payload.timestamp = new Date().toISOString();
         payload.page = location.href;
-        payload.attempt_number = attemptNumber;
         Object.entries(utmData).forEach(([k,v])=>{ payload[k]=v; });
         return payload;
       }
@@ -580,11 +577,8 @@
         const payload = collectStepData();
         payload._final = true;
         await sendPartial(payload);
-        showSuccessModal();
-        form.reset();
-        // Limpa acumulado (mantém clientId e utmData):
-        EXPECTED_FIELDS.forEach(f=> delete allData[f]);
-        showStep(0);
+        setStatus('Inscrição concluída, recarregando...', 'ok');
+        setTimeout(()=> location.reload(), 600);
       });
 
       // CTA: rolar ao topo e focar formulário
@@ -595,44 +589,8 @@
       // Inicializa
       showStep(0);
 
-      // Modal de sucesso
-      function showSuccessModal(){
-        let modal = document.getElementById('successModal');
-        if(!modal){
-          modal = document.createElement('div');
-          modal.id = 'successModal';
-          modal.innerHTML = `
-            <div style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999;">
-              <div style="background:#121226;border:1px solid #2a2a52;padding:32px 28px;max-width:440px;width:92%;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.45);text-align:center;font-family:inherit;animation:pop .35s ease;">
-                <h2 style="margin:0 0 10px;font-size:24px;color:#74e39d;">Inscrição feita com sucesso!</h2>
-                <p style="margin:0 0 14px;color:#c7c9d1;font-size:14px;line-height:1.5;">Suas informações foram registradas com segurança.<br/>Você receberá orientações em breve.</p>
-                ${REDIRECT_URL ? `<p style='margin:0 0 16px;font-size:12px;color:#8aa0ff;'>Vamos te redirecionar automaticamente...</p>` : ''}
-                <button id="closeSuccessModal" style="background:#7CFC00;color:#041c00;border:1px solid #7CFC00;padding:12px 18px;border-radius:10px;font-weight:700;cursor:pointer;">Fechar</button>
-              </div>
-            </div>`;
-          document.body.appendChild(modal);
-          if(REDIRECT_URL){ setTimeout(()=>{ try{ modal.remove(); }catch{} location.href = REDIRECT_URL; }, REDIRECT_DELAY); }
-          modal.addEventListener('click', (e)=>{
-            if(e.target.id==='closeSuccessModal' || e.target===modal.firstChild){
-              modal.remove();
-              if(REDIRECT_URL) location.href = REDIRECT_URL;
-            }
-          });
-        }
-      }
+      // Modal de sucesso removido: usamos reload simples.
 
-      function getOrCreateClientId(){
-        try{
-          const key = 'lp:clientId';
-          const existing = localStorage.getItem(key);
-          if(existing) return existing;
-          const id = cryptoRandomId();
-          localStorage.setItem(key, id);
-          return id;
-        }catch{
-          return cryptoRandomId();
-        }
-      }
 
       function cryptoRandomId(){
         try{
@@ -644,34 +602,6 @@
         }
       }
 
-      function getAttemptNumber(){
-        try{
-          const key='lp:attemptCounter';
-          let v=parseInt(localStorage.getItem(key)||'0',10);
-          if(v===0){ v=1; localStorage.setItem(key,'1'); }
-          return v;
-        }catch{return 1;}
-      }
-
-      function incrementAttemptNumber(){
-        try{
-          const key='lp:attemptCounter';
-          let v=parseInt(localStorage.getItem(key)||'0',10)+1;
-          localStorage.setItem(key,String(v));
-          return v;
-        }catch{return 1;}
-      }
-
-      function startNewRegistration(){
-        clientId = cryptoRandomId();
-        try{ localStorage.setItem('lp:clientId', clientId); }catch{}
-        attemptNumber = incrementAttemptNumber();
-        for(const k in allData) delete allData[k];
-        form.reset();
-        showStep(0);
-        setStatus('Nova inscrição iniciada','info');
-        window.scrollTo({top:0,behavior:'smooth'});
-      }
     </script>
   </body>
 </html>
