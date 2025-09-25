@@ -56,6 +56,33 @@
   .hero-points li{background:#0f1819; border:1px solid #1f3335; padding:12px 16px; border-radius:14px; font-size:.95rem; font-weight:500; letter-spacing:.3px; line-height:1.35; position:relative}
   .hero-points li:before{content:'+'; position:absolute; left:12px; top:50%; transform:translateY(-50%); background:linear-gradient(135deg,rgba(var(--primary-rgb),.2),rgba(var(--primary-rgb),.05)); width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:800; color:var(--primary); border:1px solid #224c50; box-shadow:0 0 0 1px #173538 inset}
   .hero-points li{padding-left:50px}
+  .form-title{margin:0 0 14px; text-align:center; font-size:1.15rem; letter-spacing:.8px; font-weight:700; color:#ffffff; background:linear-gradient(90deg,rgba(var(--primary-rgb),.15),rgba(var(--primary-rgb),.05)); border:1px solid #1d3d41; padding:12px 18px; border-radius:16px; text-transform:uppercase; box-shadow:0 0 0 1px #1a3235 inset}
+  /* Countdown pós-formulário */
+  .after-form-countdown{padding:10px 0 0;}
+  .countdown-banner{margin:34px auto 0; background:#0f1819; border:1px solid #1e3335; padding:18px 20px 22px; border-radius:22px; max-width:760px; box-shadow:0 6px 28px -8px rgba(0,0,0,.6)}
+  .countdown-banner h3{margin:0 0 14px; font-size:1.05rem; letter-spacing:.6px; color:var(--primary); text-transform:uppercase}
+  .countdown-numbers{display:flex; gap:14px; flex-wrap:wrap}
+  .cd-box{background:#132326; border:1px solid #204347; padding:12px 16px 10px; border-radius:16px; min-width:82px; text-align:center; box-shadow:0 0 0 1px #1a3d41 inset}
+  .cd-box span{display:block; font-size:1.55rem; font-weight:700; letter-spacing:1px; color:var(--primary); line-height:1}
+  .cd-box small{display:block; font-size:.6rem; letter-spacing:.8px; text-transform:uppercase; color:#7ea5a9; margin-top:6px; font-weight:600}
+  .countdown-live{margin-top:16px; background:#ff4d4d; color:#fff; padding:10px 16px; border-radius:40px; display:inline-flex; align-items:center; gap:8px; font-size:.72rem; font-weight:700; letter-spacing:.7px; box-shadow:0 0 0 1px #ff6b6b,0 0 14px -2px rgba(255,77,77,.55)}
+  .countdown-ended{margin-top:16px; background:#2a2f31; color:#d5e2e3; padding:10px 16px; border-radius:40px; font-size:.7rem; font-weight:600; letter-spacing:.6px; border:1px solid #394548}
+  @media (max-width:600px){ .cd-box{min-width:68px; padding:10px 12px 8px;} .cd-box span{font-size:1.3rem;} }
+  .prep-callout{background:#122325;border:1px solid #1f3b3f; padding:14px 16px 14px 52px; border-radius:16px; position:relative; font-size:.82rem; line-height:1.45; color:#b7cfd2; margin:0 0 26px; max-width:640px}
+  .prep-callout:before{content:"📌"; position:absolute; left:16px; top:14px; font-size:1.2rem}
+  .prep-callout strong{color:#fff}
+  /* Modal Final */
+  .final-overlay{position:fixed; inset:0; background:rgba(0,0,0,.78); display:flex; align-items:center; justify-content:center; padding:20px; z-index:999; backdrop-filter:blur(6px);}
+  .final-modal{background:#0f1718; border:1px solid #204044; width:100%; max-width:520px; border-radius:26px; padding:34px 32px 40px; position:relative; box-shadow:0 12px 56px -10px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04)}
+  .final-modal h2{margin:0 0 14px; font-size:1.55rem; line-height:1.1; letter-spacing:.5px; color:var(--primary);}
+  .final-modal p{margin:0 0 16px; font-size:.95rem; color:#d0e5e8; line-height:1.5}
+  .prep-list{list-style:none; margin:14px 0 24px; padding:0; display:grid; gap:10px}
+  .prep-list li{background:#132628; border:1px solid #21484d; padding:12px 14px 12px 48px; border-radius:14px; font-size:.8rem; position:relative; font-weight:500; letter-spacing:.3px; color:#c0dee1}
+  .prep-list li:before{content:'✔'; position:absolute; left:16px; top:50%; transform:translateY(-50%); background:#1d4348; width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:.9rem; color:var(--primary); font-weight:700; box-shadow:0 0 0 1px #29666d inset}
+  .final-actions{display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; margin-top:4px}
+  .btn-sec{background:#173337; border:2px solid #1f4d52; color:#b8dadd; font-weight:600}
+  .btn-sec:hover{background:#1d4045;}
+  @media (max-width:600px){ .final-modal{padding:30px 22px 36px;} }
 
       /* Card Form */
   .card{background:var(--card); border:1px solid var(--card-border); border-radius:22px; padding:28px 26px 34px; box-shadow:0 8px 40px -6px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03); position:relative; overflow:hidden}
@@ -126,6 +153,9 @@
         <div class="layout">
           <div>
             <h1 class="hero-title"><span class="t-accent">Encontro UP</span> | <span class="t-white">Construindo Uma Vida Mais Leve</span></h1>
+            <div class="prep-callout" aria-label="Preparação recomendada">
+              <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
+            </div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... mais foco</li>
               <li><strong>menos estresse</strong> ... mais qualidade de sono</li>
@@ -144,6 +174,7 @@
           </div>
           <div>
             <div id="formCard" class="card">
+              <h2 class="form-title" id="formTitle">GARANTA SUA VAGA AGORA</h2>
               <div class="form-header" id="progressDots" aria-label="Progresso do formulário">
                 <div class="dot" data-step="0">1</div>
                 <div class="dot" data-step="1">2</div>
@@ -321,6 +352,20 @@
     <main>
       <!-- seção de transformações removida conforme solicitação -->
 
+      <div class="after-form-countdown" aria-live="polite">
+        <div class="countdown-banner" id="afterCountdown" data-date="2025-09-29T19:29:00-03:00">
+          <h3>Contagem para o Encontro</h3>
+          <div class="countdown-numbers" aria-label="Tempo restante">
+            <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
+            <div class="cd-box"><span id="afHours">00</span><small>Horas</small></div>
+            <div class="cd-box"><span id="afMinutes">00</span><small>Min</small></div>
+            <div class="cd-box"><span id="afSeconds">00</span><small>Seg</small></div>
+          </div>
+          <div id="afLive" class="countdown-live" hidden>AO VIVO AGORA</div>
+          <div id="afEnded" class="countdown-ended" hidden>EVENTO ENCERRADO</div>
+        </div>
+      </div>
+
       <section class="section">
         <div class="container mentor">
           <div>
@@ -334,12 +379,6 @@
         </div>
       </section>
     </main>
-
-    <footer>
-      <div class="container">
-        <small>Esta inscrição é exclusiva para a aula gratuita. Não há oferta de outro produto nesta página.</small>
-      </div>
-    </footer>
 
     <script>
       // =============================================
@@ -605,8 +644,8 @@
         const payload = collectStepData();
         payload._final = true;
         await sendPartial(payload);
-        setStatus('Inscrição concluída, recarregando...', 'ok');
-        setTimeout(()=> location.reload(), 600);
+        // Mostrar modal final de preparação em vez de recarregar direto
+        showFinalModal();
       });
 
       // (CTA removido conforme solicitação)
@@ -614,7 +653,36 @@
       // Inicializa
       showStep(0);
 
-      // Modal de sucesso removido: usamos reload simples.
+      function showFinalModal(){
+        if(document.getElementById('finalOverlay')) return;
+        const ov = document.createElement('div');
+        ov.className = 'final-overlay';
+        ov.id = 'finalOverlay';
+        ov.innerHTML = `
+          <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <h2 id="modalTitle">Inscrição Confirmada</h2>
+            <p>Para extrair o máximo do encontro, já deixe ao seu lado:</p>
+            <ul class="prep-list">
+              <li>Papel para anotar insights</li>
+              <li>Caneta (ou lápis) funcionando</li>
+              <li>Fone de ouvido para focar</li>
+              <li>Um lugar tranquilo e sem interrupções</li>
+            </ul>
+            <p style="font-size:.78rem;color:#8fb8bc;letter-spacing:.4px;margin-top:-4px">(Dica: silenciar notificações e avisar quem mora com você ajuda muito.)</p>
+            <div class="final-actions">
+              <button type="button" class="btn btn-sec" id="finalClose">Fechar</button>
+              <button type="button" class="btn btn-primary" id="finalOk">Tudo pronto</button>
+            </div>
+          </div>`;
+        document.body.appendChild(ov);
+        function close(){
+          ov.classList.add('hide');
+          setTimeout(()=>{ ov.remove(); location.reload(); }, 300);
+        }
+        ov.addEventListener('click', e=>{ if(e.target === ov) close(); });
+        ov.querySelector('#finalClose').addEventListener('click', close);
+        ov.querySelector('#finalOk').addEventListener('click', close);
+      }
 
 
       function cryptoRandomId(){
@@ -626,6 +694,46 @@
           return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
         }
       }
+
+      // ================= Contagem pós-formulário =================
+      (function initAfterCountdown(){
+        const root = document.getElementById('afterCountdown');
+        if(!root) return;
+        const startStr = root.getAttribute('data-date');
+        const start = new Date(startStr); // 29/09 19:29 -03
+        const end = new Date(start.getTime() + (2*60 + 0)*60*1000); // +2h (19:29 -> 21:29)
+        const dEl = document.getElementById('afDays');
+        const hEl = document.getElementById('afHours');
+        const mEl = document.getElementById('afMinutes');
+        const sEl = document.getElementById('afSeconds');
+        const liveEl = document.getElementById('afLive');
+        const endedEl = document.getElementById('afEnded');
+        function pad(n){return String(n).padStart(2,'0');}
+        function tick(){
+          const now = new Date();
+            if(now >= start && now <= end){
+              liveEl.hidden = false; endedEl.hidden = true;
+              return;
+            }
+            if(now > end){
+              liveEl.hidden = true; endedEl.hidden = false;
+              return;
+            }
+          const diff = start - now;
+          const total = Math.max(0, Math.floor(diff/1000));
+          const days = Math.floor(total / 86400);
+          const hours = Math.floor((total % 86400)/3600);
+          const mins = Math.floor((total % 3600)/60);
+          const secs = total % 60;
+          dEl.textContent = pad(days);
+          hEl.textContent = pad(hours);
+          mEl.textContent = pad(mins);
+          sEl.textContent = pad(secs);
+        }
+        tick();
+        setInterval(tick,1000);
+      })();
+      // ============================================================
 
     </script>
   </body>
