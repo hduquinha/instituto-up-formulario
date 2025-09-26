@@ -404,18 +404,44 @@
       // Campos esperados para padronizar o payload (ordem e existência estável)
       const EXPECTED_FIELDS = [
         'nome','cidade','telefone','idade','profissao',
-        'ansiedade','sono','relacionamento','saude_fisica','vida_financeira','areas_melhoria'
+        'ansiedade','sono','relacionamento','saude_fisica','vida_financeira','areas_melhoria',
+        // Campos de tracking e segmentação
+        'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment'
       ];
       // Se true: quando usuário apaga conteúdo de um campo texto/number, enviamos null (limpa no acumulado)
       // Se false: ignoramos campo vazio e preservamos valor anterior já capturado
       const NULLIFY_ON_EMPTY = false;
 
-      // Captura UTMs & origem / primeira visita
+      // Captura UTMs & origem / primeira visita + parâmetros específicos da bio
       const utmData = (function(){
         const p = new URLSearchParams(location.search);
         const obj = {};
+        // UTMs tradicionais
         ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(k=>{ if(p.get(k)) obj[k]=p.get(k); });
-        if(document.referrer) obj.referrer = document.referrer;
+        
+        // Parâmetros específicos para identificar tráfego da bio/WhatsApp
+        const source = p.get('source') || p.get('src') || p.get('origem');
+        if(source) obj.traffic_source = source;
+        
+        const bio = p.get('bio') || p.get('whatsapp') || p.get('wa');
+        if(bio) obj.from_bio = bio;
+        
+        // Detecta automaticamente se veio do WhatsApp pelo referrer
+        const ref = document.referrer;
+        if(ref) {
+          obj.referrer = ref;
+          if(ref.includes('whatsapp') || ref.includes('wa.me')) {
+            obj.is_whatsapp_traffic = true;
+            obj.traffic_source = obj.traffic_source || 'whatsapp';
+          }
+        }
+        
+        // Marca especificamente tráfego da bio
+        if(source === 'bio' || bio || p.get('utm_source') === 'whatsapp' || p.get('utm_source') === 'bio') {
+          obj.is_bio_traffic = true;
+          obj.audience_segment = 'bio_whatsapp';
+        }
+        
         obj.landing_first_visit = (function(){
           try{
             const k='lp:firstVisit';
