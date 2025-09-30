@@ -526,6 +526,22 @@
         let valid = true;
         // Limpa mensagens antigas
         section.querySelectorAll('.error').forEach(el=> el.textContent='');
+        
+        // Verificação especial para telefone já cadastrado (primeira etapa)
+        if(current === 0){
+          const telefoneInput = section.querySelector('#telefone');
+          if(telefoneInput && telefoneInput.value.trim()){
+            const digits = telefoneInput.value.replace(/\D+/g,'');
+            if(digits.length >= 10){
+              if(isPhoneAlreadyRegistered(digits)){
+                const errorEl = section.querySelector('.error[data-for="telefone"]');
+                if(errorEl) errorEl.textContent = 'Este telefone já foi cadastrado';
+                valid = false;
+              }
+            }
+          }
+        }
+        
         // Agrupar radios por name para checar uma vez
         const radiosChecked = new Set();
         // Checkboxes agrupados por data-required-group
@@ -541,6 +557,17 @@
             if(input.hasAttribute('required') && !input.value.trim()){
               if(errorEl) errorEl.textContent = 'Campo obrigatório';
               valid = false;
+            }
+            // Validação específica para telefone
+            if(input.type === 'tel' && input.value.trim()){
+              const digits = input.value.replace(/\D+/g,'');
+              if(digits.length < 10 || digits.length > 11){
+                if(errorEl) errorEl.textContent = 'Telefone deve ter 10 ou 11 dígitos';
+                valid = false;
+              } else if(digits.length === 11 && digits[2] !== '9'){
+                if(errorEl) errorEl.textContent = 'Celular deve começar com 9 após o DDD';
+                valid = false;
+              }
             }
           }
 
@@ -680,6 +707,12 @@
         const payload = collectStepData();
         payload._final = true;
         await sendPartial(payload);
+        
+        // Registrar telefone como usado após envio bem-sucedido
+        if(payload.telefone){
+          addRegisteredPhone(payload.telefone);
+        }
+        
         // Mostrar modal final de preparação em vez de recarregar direto
         showFinalModal();
       });
@@ -775,6 +808,35 @@
         }catch{
           return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
         }
+      }
+
+      // ================= Controle de telefones únicos =================
+      function getRegisteredPhones(){
+        try{
+          const phones = localStorage.getItem('up:registeredPhones');
+          return phones ? JSON.parse(phones) : [];
+        }catch{
+          return [];
+        }
+      }
+
+      function addRegisteredPhone(phone){
+        try{
+          const phones = getRegisteredPhones();
+          const digits = phone.replace(/\D+/g,'');
+          if(!phones.includes(digits)){
+            phones.push(digits);
+            localStorage.setItem('up:registeredPhones', JSON.stringify(phones));
+          }
+        }catch{
+          console.warn('Erro ao salvar telefone registrado');
+        }
+      }
+
+      function isPhoneAlreadyRegistered(phone){
+        const phones = getRegisteredPhones();
+        const digits = phone.replace(/\D+/g,'');
+        return phones.includes(digits);
       }
 
       // ================= Contagem pós-formulário =================
