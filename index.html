@@ -365,14 +365,13 @@
       <div class="after-form-countdown" aria-live="polite">
         <div class="countdown-banner" id="afterCountdown" data-date="2025-10-07T19:29:00-03:00">
           <h3>Encontro 07/10 • 19:29 – 21:29</h3>
-          <div id="afLive" class="countdown-live" hidden>AO VIVO EM:</div>
+          <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
             <div class="cd-box"><span id="afHours">00</span><small>Horas</small></div>
             <div class="cd-box"><span id="afMinutes">00</span><small>Min</small></div>
             <div class="cd-box"><span id="afSeconds">00</span><small>Seg</small></div>
           </div>
-          
           <div id="afEnded" class="countdown-ended" hidden>EVENTO ENCERRADO</div>
         </div>
       </div>
@@ -795,13 +794,17 @@
         function tick(){
           const now = new Date();
             if(now >= start && now <= end){
-              liveEl.hidden = false; endedEl.hidden = true;
+              // Durante a live (07/10 19:29 - 21:29) - esconder tudo
+              liveEl.hidden = true; endedEl.hidden = true;
               return;
             }
             if(now > end){
+              // Após o fim da live
               liveEl.hidden = true; endedEl.hidden = false;
               return;
             }
+          // Antes da live - mostrar "AO VIVO EM" + countdown
+          liveEl.hidden = false; endedEl.hidden = true;
           const diff = start - now;
           const total = Math.max(0, Math.floor(diff/1000));
           const days = Math.floor(total / 86400);
