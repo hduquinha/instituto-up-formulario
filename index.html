@@ -163,7 +163,7 @@
             <div class="prep-callout" aria-label="Preparação recomendada">
               <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
             </div>
-            <div class="event-datetime">Aula ao vivo: 07/10 • 19:29 às 21:29 (horário de Brasília)</div>
+            <div class="event-datetime">Aula ao vivo: 15/10 • 19:00 às 21:30 (horário de Brasília)</div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... <strong>mais foco</strong></li>
               <li><strong>menos estresse</strong> ... <strong>mais qualidade de sono</strong></li>
@@ -363,8 +363,8 @@
       <!-- seção de transformações removida conforme solicitação -->
 
       <div class="after-form-countdown" aria-live="polite">
-        <div class="countdown-banner" id="afterCountdown" data-date="2025-10-07T19:29:00-03:00">
-          <h3>Encontro 07/10 • 19:29 – 21:29</h3>
+        <div class="countdown-banner" id="afterCountdown" data-date="2025-10-15T19:00:00-03:00">
+          <h3>Encontro 15/10 • 19:00 – 21:30</h3>
           <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
@@ -644,6 +644,15 @@
         payload._step = current + 1;
         payload.clientId = clientId;
         payload.timestamp = new Date().toISOString();
+        payload.data_preenchimento = new Date().toLocaleString('pt-BR', {
+          timeZone: 'America/Sao_Paulo',
+          day: '2-digit',
+          month: '2-digit', 
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
         payload.page = location.href;
         Object.entries(utmData).forEach(([k,v])=>{ payload[k]=v; });
         return payload;
@@ -730,7 +739,7 @@
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h2 id="modalTitle">Inscrição Confirmada</h2>
-            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">07/10</span> • <span style="color:#ffffff">19:29 às 21:29</span> (Brasília)</p>
+            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">15/10</span> • <span style="color:#ffffff">19:00 às 21:30</span> (Brasília)</p>
             <p>Para extrair o máximo do encontro, já deixe ao seu lado:</p>
             <ul class="prep-list">
               <li>Papel para anotar insights</li>
@@ -765,8 +774,8 @@
         ov.querySelector('#finalOk').addEventListener('click', close);
 
         // ===== Calendar Helpers =====
-        const startLocal = new Date('2025-10-07T19:29:00-03:00');
-        const endLocal = new Date(startLocal.getTime() + 2*60*60*1000);
+        const startLocal = new Date('2025-10-15T19:00:00-03:00');
+        const endLocal = new Date(startLocal.getTime() + 2.5*60*60*1000);
         function toICSDate(d){
           // Convert to UTC and format YYYYMMDDTHHMMSSZ
           const y = d.getUTCFullYear();
@@ -777,7 +786,7 @@
           const s = String(d.getUTCSeconds()).padStart(2,'0');
           return `${y}${m}${day}T${h}${min}${s}Z`;
         }
-        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (07/10 19:29-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
+        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (15/10 19:29-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
         const blob = new Blob([icsContent], {type:'text/calendar'});
         const icsUrl = URL.createObjectURL(blob);
         const btnICS = ov.querySelector('#btnICS');
