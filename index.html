@@ -179,15 +179,16 @@
               <div class="scarcity-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="86"><span></span></div>
               <div class="mini-deadline">Movimento alto hoje — confirme enquanto ainda há acesso.</div>
             </div>
-            
-            <div style="background:#0f1819; border:1px solid #1f3335; padding:16px 18px; border-radius:18px; margin-bottom:18px; text-align:center;">
-              <div style="font-size:.75rem; color:#94b4b8; letter-spacing:.6px; text-transform:uppercase; margin-bottom:6px;">Investimento</div>
-              <div style="font-size:1.8rem; font-weight:700; color:#27abb6; letter-spacing:.5px;">R$ 147,00</div>
-              <div style="font-size:.7rem; color:#8fb8bc; margin-top:4px;">Aula gratuita de Inteligência Emocional</div>
-            </div>
           </div>
           <div>
             <div id="formCard" class="card">
+              <div style="text-align:center; margin:-4px 0 16px; padding:10px 14px; background:rgba(var(--primary-rgb),.08); border:1px solid #1d3f43; border-radius:12px;">
+                <div style="font-size:.7rem; color:#8fb8bc; letter-spacing:.6px; text-transform:uppercase; margin-bottom:4px;">Investimento</div>
+                <div style="display:flex; align-items:center; justify-content:center; gap:12px;">
+                  <span style="font-size:1.1rem; color:#8fb8bc; text-decoration:line-through; opacity:.7;">R$ 147,00</span>
+                  <span style="font-size:1.4rem; font-weight:700; color:var(--primary); letter-spacing:.5px;">ACESSO LIBERADO</span>
+                </div>
+              </div>
               <h2 class="form-title" id="formTitle">GARANTA SUA VAGA AGORA</h2>
               <div class="form-header" id="progressDots" aria-label="Progresso do formulário">
                 <div class="dot" data-step="0">1</div>
@@ -198,8 +199,9 @@
                 <div class="dot" data-step="5">6</div>
                 <div class="dot" data-step="6">7</div>
                 <div class="dot" data-step="7">8</div>
+                <div class="dot" data-step="8">9</div>
               </div>
-              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 8</div>
+              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 9</div>
 
               <form id="msForm" novalidate>
                 <!-- Etapa 1: Dados Pessoais -->
@@ -281,8 +283,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 5: Relacionamento Amoroso -->
-                <div class="form-step" data-step="4">
+                <!-- Etapa 8: Relacionamento Amoroso -->
+                <div class="form-step" data-step="7">
                   <div class="field">
                     <label>Como está seu relacionamento amoroso?</label>
                     <label><input type="radio" name="relacionamento" value="Muito Bom" required /> Muito Bom</label>
@@ -320,8 +322,28 @@
                   </div>
                 </div>
 
-                <!-- Etapa 7: Vida Financeira -->
+                <!-- Etapa 7: Relacionamentos Familiares -->
                 <div class="form-step" data-step="6">
+                  <div class="field">
+                    <label>Como está a qualidade dos seus relacionamentos familiares?</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Muito Boa" required /> Muito Boa</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Boa" /> Boa</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Regular" /> Regular</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Ruim" /> Ruim</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Muito ruim" /> Muito ruim</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Não tenho família próxima" /> Não tenho família próxima</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="relacionamentos_familiares" value="Não quero responder" /> Não quero responder</label>
+                    <div class="error" data-for="relacionamentos_familiares"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 9: Vida Financeira -->
+                <div class="form-step" data-step="8">
                   <div class="field">
                     <label>Como está sua vida financeira?</label>
                     <label><input type="radio" name="vida_financeira" value="Muito Boa" required /> Muito Boa</label>
@@ -339,8 +361,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 8: Áreas de Melhoria -->
-                <div class="form-step" data-step="7">
+                <!-- Etapa 9: Áreas de Melhoria -->
+                <div class="form-step" data-step="8">
                   <div class="field">
                     <label>Qual área você quer melhorar? (Marque quantas desejar)</label>
                     <label><input type="checkbox" name="areas_melhoria" value="Relacionamento amoroso" data-required-group="areas_melhoria" /> Relacionamento amoroso</label>
@@ -412,7 +434,7 @@
       // Campos esperados para padronizar o payload (ordem e existência estável)
       const EXPECTED_FIELDS = [
         'nome','cidade','telefone','idade','profissao',
-        'ansiedade','sono','relacionamento','saude_fisica','vida_financeira','areas_melhoria',
+        'ansiedade','sono','relacionamentos_familiares','relacionamento','saude_fisica','vida_financeira','areas_melhoria',
         // Campos de tracking e segmentação
         'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment'
       ];
