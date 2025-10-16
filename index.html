@@ -163,7 +163,7 @@
             <div class="prep-callout" aria-label="Preparação recomendada">
               <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
             </div>
-            <div class="event-datetime">Aula ao vivo: 15/10 • 19:00 às 21:30 (horário de Brasília)</div>
+            <div class="event-datetime">Aula ao vivo: 21/10 • 19:00 às 21:30 (horário de Brasília)</div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... <strong>mais foco</strong></li>
               <li><strong>menos estresse</strong> ... <strong>mais qualidade de sono</strong></li>
@@ -178,6 +178,12 @@
               </div>
               <div class="scarcity-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="86"><span></span></div>
               <div class="mini-deadline">Movimento alto hoje — confirme enquanto ainda há acesso.</div>
+            </div>
+            
+            <div style="background:#0f1819; border:1px solid #1f3335; padding:16px 18px; border-radius:18px; margin-bottom:18px; text-align:center;">
+              <div style="font-size:.75rem; color:#94b4b8; letter-spacing:.6px; text-transform:uppercase; margin-bottom:6px;">Investimento</div>
+              <div style="font-size:1.8rem; font-weight:700; color:#27abb6; letter-spacing:.5px;">R$ 147,00</div>
+              <div style="font-size:.7rem; color:#8fb8bc; margin-top:4px;">Aula gratuita de Inteligência Emocional</div>
             </div>
           </div>
           <div>
@@ -363,8 +369,8 @@
       <!-- seção de transformações removida conforme solicitação -->
 
       <div class="after-form-countdown" aria-live="polite">
-        <div class="countdown-banner" id="afterCountdown" data-date="2025-10-15T19:00:00-03:00">
-          <h3>Encontro 15/10 • 19:00 – 21:30</h3>
+        <div class="countdown-banner" id="afterCountdown" data-date="2025-10-21T19:00:00-03:00">
+          <h3>Encontro 21/10 • 19:00 – 21:30</h3>
           <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
@@ -739,7 +745,7 @@
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h2 id="modalTitle">Inscrição Confirmada</h2>
-            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">15/10</span> • <span style="color:#ffffff">19:00 às 21:30</span> (Brasília)</p>
+            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">21/10</span> • <span style="color:#ffffff">19:00 às 21:30</span> (Brasília)</p>
             <p>Para extrair o máximo do encontro, já deixe ao seu lado:</p>
             <ul class="prep-list">
               <li>Papel para anotar insights</li>
@@ -774,7 +780,7 @@
         ov.querySelector('#finalOk').addEventListener('click', close);
 
         // ===== Calendar Helpers =====
-        const startLocal = new Date('2025-10-15T19:00:00-03:00');
+  const startLocal = new Date('2025-10-21T19:00:00-03:00');
         const endLocal = new Date(startLocal.getTime() + 2.5*60*60*1000);
         function toICSDate(d){
           // Convert to UTC and format YYYYMMDDTHHMMSSZ
@@ -786,7 +792,7 @@
           const s = String(d.getUTCSeconds()).padStart(2,'0');
           return `${y}${m}${day}T${h}${min}${s}Z`;
         }
-        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (15/10 19:29-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
+  const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (21/10 19:00-21:30 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
         const blob = new Blob([icsContent], {type:'text/calendar'});
         const icsUrl = URL.createObjectURL(blob);
         const btnICS = ov.querySelector('#btnICS');
