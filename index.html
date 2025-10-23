@@ -780,6 +780,23 @@
         }
       });
 
+      // Prevenir Enter de submeter o formulário, exceto na última etapa
+      form.addEventListener('keydown', async (e)=>{
+        if(e.key === 'Enter' && e.target.type !== 'submit'){
+          e.preventDefault();
+          // Se não estiver na última etapa, simula clique no botão PRÓXIMO
+          if(current < steps.length - 1){
+            if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
+            const payload = collectStepData();
+            await sendPartial(payload);
+            showStep(current + 1);
+          } else {
+            // Se estiver na última etapa, submete o formulário
+            form.requestSubmit();
+          }
+        }
+      });
+
       // Envio final (poderia também disparar uma última captura)
       form.addEventListener('submit', async (e)=>{
         e.preventDefault();
