@@ -476,8 +476,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 13: Sintomas Físicos -->
-                <div class="form-step" data-step="12">
+                <!-- Etapa 12: Sintomas Físicos -->
+                <div class="form-step" data-step="11">
                   <div class="field">
                     <label>Quais sintomas físicos sente com mais frequência? (marque todas)</label>
                     <label><input type="checkbox" name="sintomas_fisicos" value="Tensão muscular" data-required-group="sintomas_fisicos" /> Tensão muscular</label>
@@ -490,6 +490,8 @@
                     <div class="field" id="sintomas_fisicos_outros_wrapper" hidden>
                       <input id="sintomas_fisicos_outros" name="sintomas_fisicos_outros" type="text" placeholder="Descreva outro sintoma" />
                     </div>
+                    <label><input type="checkbox" name="sintomas_fisicos" value="Não sei" data-required-group="sintomas_fisicos" /> Não sei</label>
+                    <label><input type="checkbox" name="sintomas_fisicos" value="Não quero responder" data-required-group="sintomas_fisicos" /> Não quero responder</label>
                     <div class="error" data-for="sintomas_fisicos"></div>
                   </div>
                   <div class="actions">
@@ -498,8 +500,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 14: Sintomas Emocionais -->
-                <div class="form-step" data-step="13">
+                <!-- Etapa 13: Sintomas Emocionais -->
+                <div class="form-step" data-step="12">
                   <div class="field">
                     <label>Quais sinais emocionais percebe em você? (marque todas)</label>
                     <label><input type="checkbox" name="sintomas_emocionais" value="Ansiedade constante" data-required-group="sintomas_emocionais" /> Ansiedade constante</label>
@@ -512,6 +514,8 @@
                     <div class="field" id="sintomas_emocionais_outros_wrapper" hidden>
                       <input id="sintomas_emocionais_outros" name="sintomas_emocionais_outros" type="text" placeholder="Descreva outro sinal" />
                     </div>
+                    <label><input type="checkbox" name="sintomas_emocionais" value="Não sei" data-required-group="sintomas_emocionais" /> Não sei</label>
+                    <label><input type="checkbox" name="sintomas_emocionais" value="Não quero responder" data-required-group="sintomas_emocionais" /> Não quero responder</label>
                     <div class="error" data-for="sintomas_emocionais"></div>
                   </div>
                   <div class="actions">
@@ -520,44 +524,18 @@
                   </div>
                 </div>
 
-                <!-- Etapa 15: Impacto na Rotina -->
-                <div class="form-step" data-step="14">
+                <!-- Etapa 14: Impacto e Tentativas -->
+                <div class="form-step" data-step="13">
                   <div class="field">
                     <label>Como esses desafios impactam sua rotina?</label>
                     <label><input type="radio" name="impacto_rotina" value="Consigo seguir, mas com muito esforço" required /> Consigo seguir, mas com muito esforço</label>
                     <label><input type="radio" name="impacto_rotina" value="Oscilo entre dias bons e ruins" /> Oscilo entre dias bons e ruins</label>
                     <label><input type="radio" name="impacto_rotina" value="Estou no limite físico e emocional" /> Estou no limite físico e emocional</label>
                     <label><input type="radio" name="impacto_rotina" value="Já precisei parar atividades por causa disso" /> Já precisei parar atividades por causa disso</label>
+                    <label><input type="radio" name="impacto_rotina" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="impacto_rotina" value="Não quero responder" /> Não quero responder</label>
                     <div class="error" data-for="impacto_rotina"></div>
                   </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 16: Tempo Lidando com o Desafio -->
-                <div class="form-step" data-step="15">
-                  <div class="field">
-                    <label for="tempo_desafio">Há quanto tempo convive com esses desafios?</label>
-                    <select id="tempo_desafio" name="tempo_desafio" required>
-                      <option value="" disabled selected>Selecione</option>
-                      <option value="Menos de 3 meses">Menos de 3 meses</option>
-                      <option value="De 3 a 12 meses">De 3 a 12 meses</option>
-                      <option value="De 1 a 3 anos">De 1 a 3 anos</option>
-                      <option value="Mais de 3 anos">Mais de 3 anos</option>
-                      <option value="Desde sempre">Desde sempre</option>
-                    </select>
-                    <div class="error" data-for="tempo_desafio"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 17: O que já tentou -->
-                <div class="form-step" data-step="16">
                   <div class="field">
                     <label>O que já tentou para lidar com isso? (marque todas)</label>
                     <label><input type="checkbox" name="tentativas_anteriores" value="Psicoterapia" data-required-group="tentativas_anteriores" /> Psicoterapia</label>
@@ -570,6 +548,8 @@
                     <div class="field" id="tentativas_anteriores_outros_wrapper" hidden>
                       <input id="tentativas_anteriores_outros" name="tentativas_anteriores_outros" type="text" placeholder="Cite outra tentativa" />
                     </div>
+                    <label><input type="checkbox" name="tentativas_anteriores" value="Não sei" data-required-group="tentativas_anteriores" /> Não sei</label>
+                    <label><input type="checkbox" name="tentativas_anteriores" value="Não quero responder" data-required-group="tentativas_anteriores" /> Não quero responder</label>
                     <div class="error" data-for="tentativas_anteriores"></div>
                   </div>
                   <div class="actions">
@@ -578,126 +558,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 18: Rede de Apoio -->
-                <div class="form-step" data-step="17">
-                  <div class="field">
-                    <label>Como está seu apoio hoje?</label>
-                    <label><input type="radio" name="apoio_atual" value="Tenho acompanhamento profissional e familiar" required /> Tenho acompanhamento profissional e familiar</label>
-                    <label><input type="radio" name="apoio_atual" value="Tenho apoio emocional, mas não profissional" /> Tenho apoio emocional, mas não profissional</label>
-                    <label><input type="radio" name="apoio_atual" value="Busco sozinho(a) soluções" /> Busco sozinho(a) soluções</label>
-                    <label><input type="radio" name="apoio_atual" value="Não tenho rede de apoio" /> Não tenho rede de apoio</label>
-                    <div class="error" data-for="apoio_atual"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 19: Autoconhecimento Emocional -->
-                <div class="form-step" data-step="18">
-                  <div class="field">
-                    <label>Como avalia seu autoconhecimento emocional hoje?</label>
-                    <label><input type="radio" name="autoconhecimento_emocional" value="Baixo" required /> Baixo</label>
-                    <label><input type="radio" name="autoconhecimento_emocional" value="Médio" /> Médio</label>
-                    <label><input type="radio" name="autoconhecimento_emocional" value="Alto" /> Alto</label>
-                    <div class="error" data-for="autoconhecimento_emocional"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 20: Impacto das Emoções -->
-                <div class="form-step" data-step="19">
-                  <div class="field">
-                    <label>Quanto as emoções influenciam suas decisões no trabalho e na vida pessoal?</label>
-                    <label><input type="radio" name="impacto_emocoes_trabalho" value="1" required /> 1 - Impacto mínimo</label>
-                    <label><input type="radio" name="impacto_emocoes_trabalho" value="2" /> 2</label>
-                    <label><input type="radio" name="impacto_emocoes_trabalho" value="3" /> 3</label>
-                    <label><input type="radio" name="impacto_emocoes_trabalho" value="4" /> 4</label>
-                    <label><input type="radio" name="impacto_emocoes_trabalho" value="5" /> 5 - Impacto muito alto</label>
-                    <div class="error" data-for="impacto_emocoes_trabalho"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 21: Objetivo e Resultado Desejado -->
-                <div class="form-step" data-step="20">
-                  <div class="field">
-                    <label for="objetivo_principal">Qual mudança mais urgente deseja alcançar nos próximos 90 dias?</label>
-                    <textarea id="objetivo_principal" name="objetivo_principal" rows="3" placeholder="Ex.: Reduzir crises de ansiedade, dormir melhor, ser mais presente com a família" required></textarea>
-                    <div class="error" data-for="objetivo_principal"></div>
-                  </div>
-                  <div class="field">
-                    <label for="resultado_desejado">Como quer se sentir quando resolver esse desafio?</label>
-                    <textarea id="resultado_desejado" name="resultado_desejado" rows="3" placeholder="Ex.: Mais confiante, com clareza nas decisões, em paz com meu ritmo" required></textarea>
-                    <div class="error" data-for="resultado_desejado"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 22: Confiança Atual -->
-                <div class="form-step" data-step="21">
-                  <div class="field">
-                    <label>Quão confiante se sente para mudar esse cenário com apoio correto?</label>
-                    <label><input type="radio" name="nivel_confianca" value="Estou pronto(a), só preciso do método certo" required /> Estou pronto(a), só preciso do método certo</label>
-                    <label><input type="radio" name="nivel_confianca" value="Quero, mas ainda tenho dúvidas se vou conseguir" /> Quero, mas ainda tenho dúvidas se vou conseguir</label>
-                    <label><input type="radio" name="nivel_confianca" value="Me sinto travado(a) e preciso de acompanhamento próximo" /> Me sinto travado(a) e preciso de acompanhamento próximo</label>
-                    <label><input type="radio" name="nivel_confianca" value="Não sei por onde começar" /> Não sei por onde começar</label>
-                    <div class="error" data-for="nivel_confianca"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 23: Suporte e Foco Prioritário -->
-                <div class="form-step" data-step="22">
-                  <div class="field">
-                    <label>Que tipo de suporte acredita que mais ajudaria agora?</label>
-                    <label><input type="checkbox" name="suporte_necessario" value="Orientação prática com exercícios" data-required-group="suporte_necessario" /> Orientação prática com exercícios</label>
-                    <label><input type="checkbox" name="suporte_necessario" value="Acompanhamento em grupo" data-required-group="suporte_necessario" /> Acompanhamento em grupo</label>
-                    <label><input type="checkbox" name="suporte_necessario" value="Sessões individuais" data-required-group="suporte_necessario" /> Sessões individuais</label>
-                    <label><input type="checkbox" name="suporte_necessario" value="Materiais para seguir no meu ritmo" data-required-group="suporte_necessario" /> Materiais para seguir no meu ritmo</label>
-                    <label><input type="checkbox" name="suporte_necessario" value="Ainda não sei" data-required-group="suporte_necessario" /> Ainda não sei</label>
-                    <label><input type="checkbox" name="suporte_necessario" value="Outro formato" data-required-group="suporte_necessario" data-other-input="suporte_necessario_outros" /> Outro formato</label>
-                    <div class="field" id="suporte_necessario_outros_wrapper" hidden>
-                      <input id="suporte_necessario_outros" name="suporte_necessario_outros" type="text" placeholder="Descreva o suporte ideal" />
-                    </div>
-                    <div class="error" data-for="suporte_necessario"></div>
-                  </div>
-                  <div class="field">
-                    <label>Quais frentes precisam ser foco imediato?</label>
-                    <div class="note">Escolha até 3 prioridades.</div>
-                    <label><input type="checkbox" name="foco_principal" value="Regulação emocional" data-required-group="foco_principal" /> Regulação emocional</label>
-                    <label><input type="checkbox" name="foco_principal" value="Gestão do estresse" data-required-group="foco_principal" /> Gestão do estresse</label>
-                    <label><input type="checkbox" name="foco_principal" value="Organização e produtividade" data-required-group="foco_principal" /> Organização e produtividade</label>
-                    <label><input type="checkbox" name="foco_principal" value="Relações familiares" data-required-group="foco_principal" /> Relações familiares</label>
-                    <label><input type="checkbox" name="foco_principal" value="Relacionamento amoroso" data-required-group="foco_principal" /> Relacionamento amoroso</label>
-                    <label><input type="checkbox" name="foco_principal" value="Saúde física e energia" data-required-group="foco_principal" /> Saúde física e energia</label>
-                    <label><input type="checkbox" name="foco_principal" value="Outro foco" data-required-group="foco_principal" data-other-input="foco_principal_outros" /> Outro foco</label>
-                    <div class="field" id="foco_principal_outros_wrapper" hidden>
-                      <input id="foco_principal_outros" name="foco_principal_outros" type="text" placeholder="Conte outra prioridade" />
-                    </div>
-                    <div class="error" data-for="foco_principal"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 24: Observações e Origem -->
-                <div class="form-step" data-step="23">
+                <!-- Etapa 15: Observações Finais -->
+                <div class="form-step" data-step="14">
                   <div class="field">
                     <label>Como conheceu o Instituto UP?</label>
                     <label><input type="radio" name="como_conheceu" value="Instagram" required /> Instagram</label>
@@ -707,6 +569,8 @@
                     <div class="field" id="como_conheceu_outro_wrapper" hidden>
                       <input id="como_conheceu_outro" name="como_conheceu_outro" type="text" placeholder="Conte rapidamente onde nos encontrou" />
                     </div>
+                    <label><input type="radio" name="como_conheceu" value="Não sei" /> Não sei</label>
+                    <label><input type="radio" name="como_conheceu" value="Não quero responder" /> Não quero responder</label>
                     <div class="error" data-for="como_conheceu"></div>
                   </div>
                   <div class="field">
@@ -775,16 +639,14 @@
       const EXPECTED_FIELDS = [
         'nome','cidade','telefone','idade',
         'ansiedade','sono','vida_financeira','saude_fisica','relacionamentos_familiares','relacionamento','areas_melhoria',
-        'profissao_area','gatilhos_ansiedade','gatilhos_ansiedade_outros','pressao_principal','pressao_principal_outro',
-        'sintomas_fisicos','sintomas_fisicos_outros','sintomas_emocionais','sintomas_emocionais_outros','impacto_rotina','tempo_desafio',
-        'tentativas_anteriores','tentativas_anteriores_outros','apoio_atual','autoconhecimento_emocional','impacto_emocoes_trabalho',
-        'objetivo_principal','resultado_desejado','nivel_confianca','suporte_necessario','suporte_necessario_outros',
-        'foco_principal','foco_principal_outros',
+        'profissao_area','gatilhos_ansiedade','gatilhos_ansiedade_outros',
+        'sintomas_fisicos','sintomas_fisicos_outros','sintomas_emocionais','sintomas_emocionais_outros',
+        'impacto_rotina','tentativas_anteriores','tentativas_anteriores_outros',
         'como_conheceu','como_conheceu_outro','comentarios_adicionais',
         // Campos de tracking e segmentação
         'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment'
       ];
-      const ARRAY_FIELDS = new Set(['areas_melhoria','gatilhos_ansiedade','sintomas_fisicos','sintomas_emocionais','tentativas_anteriores','suporte_necessario','foco_principal']);
+      const ARRAY_FIELDS = new Set(['areas_melhoria','gatilhos_ansiedade','sintomas_fisicos','sintomas_emocionais','tentativas_anteriores']);
       // Se true: quando usuário apaga conteúdo de um campo texto/number, enviamos null (limpa no acumulado)
       // Se false: ignoramos campo vazio e preservamos valor anterior já capturado
       const NULLIFY_ON_EMPTY = false;
