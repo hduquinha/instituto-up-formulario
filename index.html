@@ -113,6 +113,9 @@
       .btn-primary{background:var(--primary); border-color:var(--primary); color:#002b30; text-shadow:0 1px 0 rgba(255,255,255,.25)}
       .btn-primary:hover{background:#1e919b; border-color:#1e919b; color:#e6feff}
       .note{color:var(--muted); font-size:.7rem; margin-top:6px; letter-spacing:.5px}
+  .option-shortcuts{display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 0}
+  .fill-option{border:1px solid #2a3f42; background:#142325; color:#9fc8cc; font-size:.7rem; padding:6px 10px; border-radius:10px; cursor:pointer; letter-spacing:.4px}
+  .fill-option:hover{background:#1d3336; color:#ffffff}
 
       /* Benefits */
       .section{padding:28px 0}
@@ -249,17 +252,8 @@
                 <div class="dot" data-step="12">13</div>
                 <div class="dot" data-step="13">14</div>
                 <div class="dot" data-step="14">15</div>
-                <div class="dot" data-step="15">16</div>
-                <div class="dot" data-step="16">17</div>
-                <div class="dot" data-step="17">18</div>
-                <div class="dot" data-step="18">19</div>
-                <div class="dot" data-step="19">20</div>
-                <div class="dot" data-step="20">21</div>
-                <div class="dot" data-step="21">22</div>
-                <div class="dot" data-step="22">23</div>
-                <div class="dot" data-step="23">24</div>
               </div>
-              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 24</div>
+              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 15</div>
 
               <form id="msForm" novalidate>
                 <!-- Etapa 1: Dados Pessoais -->
@@ -414,34 +408,41 @@
                   </div>
                 </div>
 
-                <!-- Etapa 9: Áreas Prioritárias -->
+                <!-- Etapa 9: Áreas para Melhorar -->
                 <div class="form-step" data-step="8">
                   <div class="field">
-                    <label>Quais áreas deseja evoluir nos próximos 90 dias? (marque quantas desejar)</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Autogestão emocional" data-required-group="areas_melhoria" /> Autogestão emocional</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Gestão do estresse e da ansiedade" data-required-group="areas_melhoria" /> Gestão do estresse e da ansiedade</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Comunicação e feedback" data-required-group="areas_melhoria" /> Comunicação e feedback</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Liderança e desenvolvimento de equipe" data-required-group="areas_melhoria" /> Liderança e desenvolvimento de equipe</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Relacionamentos pessoais e familiares" data-required-group="areas_melhoria" /> Relacionamentos pessoais e familiares</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Produtividade e foco" data-required-group="areas_melhoria" /> Produtividade e foco</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Vida financeira e carreira" data-required-group="areas_melhoria" /> Vida financeira e carreira</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Não sei ainda" data-required-group="areas_melhoria" /> Não sei ainda</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Prefiro não responder" data-required-group="areas_melhoria" /> Prefiro não responder</label>
+                    <label>Quais áreas você quer melhorar? (marque quantas desejar)</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Saúde emocional" data-required-group="areas_melhoria" /> Saúde emocional</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Saúde física" data-required-group="areas_melhoria" /> Saúde física</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Relações familiares" data-required-group="areas_melhoria" /> Relações familiares</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Relação amorosa" data-required-group="areas_melhoria" /> Relação amorosa</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Área financeira" data-required-group="areas_melhoria" /> Área financeira</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Área profissional" data-required-group="areas_melhoria" /> Área profissional</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Nível de ansiedade/estresse" data-required-group="areas_melhoria" /> Nível de ansiedade/estresse</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Qualidade do sono" data-required-group="areas_melhoria" /> Qualidade do sono</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Comunicação" data-required-group="areas_melhoria" /> Comunicação</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Liderança" data-required-group="areas_melhoria" /> Liderança</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Não sei" data-required-group="areas_melhoria" /> Não sei</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Não quero responder" data-required-group="areas_melhoria" /> Não quero responder</label>
                     <div class="error" data-for="areas_melhoria"></div>
                   </div>
-                  <div class="note">Avance para detalhar seu contexto profissional e de liderança.</div>
+                  <div class="note">Avance para informar brevemente seu trabalho ou profissão.</div>
                   <div class="actions">
                     <button type="button" class="btn" data-back>VOLTAR</button>
                     <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
                   </div>
                 </div>
 
-                <!-- Etapa 10: Contexto Profissional -->
+                <!-- Etapa 10: Trabalho ou Profissão -->
                 <div class="form-step" data-step="9">
                   <div class="field">
-                    <label for="profissao_area">Descreva seu contexto profissional ou principal atividade</label>
-                    <input id="profissao_area" name="profissao_area" type="text" placeholder="Ex.: Analista em home office, empreendedora no ramo de beleza, estudante" required />
-                    <div class="note">Isso nos ajuda a entender como está sua rotina hoje.</div>
+                    <label for="profissao_area">Qual é o seu trabalho ou profissão?</label>
+                    <input id="profissao_area" name="profissao_area" type="text" placeholder="Ex.: Professor(a), Empreendedor(a), Analista, Estudante" required />
+                    <div class="note">Se preferir não informar, escolha uma das opções abaixo.</div>
+                    <div class="option-shortcuts" data-target="profissao_area">
+                      <button type="button" class="fill-option" data-target="profissao_area" data-value="Não sei">Não sei</button>
+                      <button type="button" class="fill-option" data-target="profissao_area" data-value="Não quero responder">Não quero responder</button>
+                    </div>
                     <div class="error" data-for="profissao_area"></div>
                   </div>
                   <div class="actions">
@@ -465,28 +466,9 @@
                     <div class="field" id="gatilhos_ansiedade_outros_wrapper" hidden>
                       <input id="gatilhos_ansiedade_outros" name="gatilhos_ansiedade_outros" type="text" placeholder="Descreva outro gatilho" />
                     </div>
+                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Não sei" data-required-group="gatilhos_ansiedade" /> Não sei</label>
+                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Não quero responder" data-required-group="gatilhos_ansiedade" /> Não quero responder</label>
                     <div class="error" data-for="gatilhos_ansiedade"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 12: Pressão Atual -->
-                <div class="form-step" data-step="11">
-                  <div class="field">
-                    <label>Qual é a pressão mais urgente que sente hoje?</label>
-                    <label><input type="radio" name="pressao_principal" value="Excesso de responsabilidades" required /> Excesso de responsabilidades</label>
-                    <label><input type="radio" name="pressao_principal" value="Medo de não dar conta" /> Medo de não dar conta</label>
-                    <label><input type="radio" name="pressao_principal" value="Dificuldade em manter foco/organização" /> Dificuldade em manter foco/organização</label>
-                    <label><input type="radio" name="pressao_principal" value="Conflitos em relacionamentos" /> Conflitos em relacionamentos</label>
-                    <label><input type="radio" name="pressao_principal" value="Questões financeiras" /> Questões financeiras</label>
-                    <label><input type="radio" name="pressao_principal" value="Outra pressão" data-other-input="pressao_principal_outro" /> Outra pressão</label>
-                    <div class="field" id="pressao_principal_outro_wrapper" hidden>
-                      <input id="pressao_principal_outro" name="pressao_principal_outro" type="text" placeholder="Conte qual pressão sente" />
-                    </div>
-                    <div class="error" data-for="pressao_principal"></div>
                   </div>
                   <div class="actions">
                     <button type="button" class="btn" data-back>VOLTAR</button>
@@ -899,6 +881,21 @@
       telInput.value = out;
     });
   })();
+
+    (function initFillOptions(){
+      const buttons = document.querySelectorAll('.fill-option');
+      buttons.forEach(btn =>{
+        btn.addEventListener('click', ()=>{
+          const targetId = btn.dataset.target;
+          const value = btn.dataset.value || '';
+          if(!targetId) return;
+          const target = document.getElementById(targetId);
+          if(!target) return;
+          target.value = value;
+          target.focus();
+        });
+      });
+    })();
 
       function handleOtherToggle(element){
         const targetId = element.dataset.otherInput;
