@@ -248,8 +248,17 @@
                 <div class="dot" data-step="11">12</div>
                 <div class="dot" data-step="12">13</div>
                 <div class="dot" data-step="13">14</div>
+                <div class="dot" data-step="14">15</div>
+                <div class="dot" data-step="15">16</div>
+                <div class="dot" data-step="16">17</div>
+                <div class="dot" data-step="17">18</div>
+                <div class="dot" data-step="18">19</div>
+                <div class="dot" data-step="19">20</div>
+                <div class="dot" data-step="20">21</div>
+                <div class="dot" data-step="21">22</div>
+                <div class="dot" data-step="22">23</div>
               </div>
-              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 14</div>
+              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 23</div>
 
               <form id="msForm" novalidate>
                 <!-- Etapa 1: Dados Pessoais -->
@@ -281,11 +290,6 @@
                     <label for="idade">Idade</label>
                     <input id="idade" name="idade" type="number" min="0" max="120" placeholder="Sua idade" required />
                     <div class="error" data-for="idade"></div>
-                  </div>
-                  <div class="field">
-                    <label for="profissao">Profissão (resumo)</label>
-                    <input id="profissao" name="profissao" type="text" placeholder="Ex.: Designer, Coordenador de RH" required />
-                    <div class="error" data-for="profissao"></div>
                   </div>
                   <div class="actions">
                     <button type="button" class="btn" data-back>VOLTAR</button>
@@ -409,44 +413,103 @@
                   </div>
                 </div>
 
-                <!-- Etapa 9: Áreas de Melhoria -->
+                <!-- Etapa 9: Áreas Prioritárias -->
                 <div class="form-step" data-step="8">
                   <div class="field">
-                    <label>Qual área você quer melhorar? (Marque quantas desejar)</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Relacionamento amoroso" data-required-group="areas_melhoria" /> Relacionamento amoroso</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Saúde emocional" data-required-group="areas_melhoria" /> Saúde emocional</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Saúde física" data-required-group="areas_melhoria" /> Saúde física</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Vida financeira" data-required-group="areas_melhoria" /> Vida financeira</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Todas as anteriores" data-required-group="areas_melhoria" /> Todas as anteriores</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Não sei" data-required-group="areas_melhoria" /> Não sei</label>
-                    <label><input type="checkbox" name="areas_melhoria" value="Não quero responder" data-required-group="areas_melhoria" /> Não quero responder</label>
+                    <label>Quais áreas deseja evoluir nos próximos 90 dias? (marque quantas desejar)</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Autogestão emocional" data-required-group="areas_melhoria" /> Autogestão emocional</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Gestão do estresse e da ansiedade" data-required-group="areas_melhoria" /> Gestão do estresse e da ansiedade</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Comunicação e feedback" data-required-group="areas_melhoria" /> Comunicação e feedback</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Liderança e desenvolvimento de equipe" data-required-group="areas_melhoria" /> Liderança e desenvolvimento de equipe</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Relacionamentos pessoais e familiares" data-required-group="areas_melhoria" /> Relacionamentos pessoais e familiares</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Produtividade e foco" data-required-group="areas_melhoria" /> Produtividade e foco</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Vida financeira e carreira" data-required-group="areas_melhoria" /> Vida financeira e carreira</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Não sei ainda" data-required-group="areas_melhoria" /> Não sei ainda</label>
+                    <label><input type="checkbox" name="areas_melhoria" value="Prefiro não responder" data-required-group="areas_melhoria" /> Prefiro não responder</label>
                     <div class="error" data-for="areas_melhoria"></div>
                   </div>
-                  <div class="note">Avance para compartilhar objetivos em liderança e inteligência emocional.</div>
+                  <div class="note">Avance para detalhar seu contexto profissional e de liderança.</div>
                   <div class="actions">
                     <button type="button" class="btn" data-back>VOLTAR</button>
                     <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
                   </div>
                 </div>
 
-                <!-- Etapa 10: Perfil Profissional e Liderança -->
+                <!-- Etapa 10: Contexto Profissional -->
                 <div class="form-step" data-step="9">
                   <div class="field">
-                    <label for="profissao_area">Profissão ou área de atuação (confirme ou detalhe)</label>
-                    <input id="profissao_area" name="profissao_area" type="text" placeholder="Ex.: Gestão de Pessoas, Marketing, Tecnologia" required />
-                    <div class="note">Se desejar atualizar a informação da etapa inicial, ajuste aqui.</div>
+                    <label for="profissao_area">Qual é sua função ou área de atuação atual?</label>
+                    <input id="profissao_area" name="profissao_area" type="text" placeholder="Ex.: Gerente de Customer Success, Psicóloga, CEO de startup" required />
+                    <div class="note">Isso nos ajuda a entender seu momento profissional.</div>
                     <div class="error" data-for="profissao_area"></div>
                   </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 11: Segmento de Atuação -->
+                <div class="form-step" data-step="10">
                   <div class="field">
-                    <label>Cargo atual e liderança</label>
-                    <label><input type="radio" name="cargo_lideranca" value="Lidero equipe direta" required /> Lidero equipe direta</label>
-                    <label><input type="radio" name="cargo_lideranca" value="Lidero projetos temporários" /> Lidero projetos temporários</label>
-                    <label><input type="radio" name="cargo_lideranca" value="Não, mas quero desenvolver liderança" /> Não, mas quero desenvolver liderança</label>
-                    <label><input type="radio" name="cargo_lideranca" value="Não" /> Não</label>
+                    <label for="segmento_atuacao">Em qual segmento atua hoje?</label>
+                    <select id="segmento_atuacao" name="segmento_atuacao" required>
+                      <option value="" disabled selected>Selecione</option>
+                      <option value="Recursos Humanos / Gente & Gestão">Recursos Humanos / Gente & Gestão</option>
+                      <option value="Tecnologia e Inovação">Tecnologia e Inovação</option>
+                      <option value="Saúde e Bem-estar">Saúde e Bem-estar</option>
+                      <option value="Educação">Educação</option>
+                      <option value="Serviços Financeiros">Serviços Financeiros</option>
+                      <option value="Marketing e Vendas">Marketing e Vendas</option>
+                      <option value="Outro segmento">Outro segmento</option>
+                    </select>
+                    <div class="error" data-for="segmento_atuacao"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 12: Nível de Carreira -->
+                <div class="form-step" data-step="11">
+                  <div class="field">
+                    <label>Qual faixa melhor descreve sua posição atual?</label>
+                    <label><input type="radio" name="cargo_lideranca" value="Diretoria / C-Level" required /> Diretoria / C-Level</label>
+                    <label><input type="radio" name="cargo_lideranca" value="Gerência ou coordenação" /> Gerência ou coordenação</label>
+                    <label><input type="radio" name="cargo_lideranca" value="Especialista sênior (sem equipe direta)" /> Especialista sênior (sem equipe direta)</label>
+                    <label><input type="radio" name="cargo_lideranca" value="Analista ou assistente" /> Analista ou assistente</label>
+                    <label><input type="radio" name="cargo_lideranca" value="Empreendedor(a) / Autônomo(a)" /> Empreendedor(a) / Autônomo(a)</label>
+                    <label><input type="radio" name="cargo_lideranca" value="Em transição de carreira / estudante" /> Em transição de carreira / estudante</label>
                     <div class="error" data-for="cargo_lideranca"></div>
                   </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 13: Escopo de Liderança -->
+                <div class="form-step" data-step="12">
                   <div class="field">
-                    <label for="tempo_atuacao">Tempo de atuação na área</label>
+                    <label>Qual é o escopo da sua liderança hoje?</label>
+                    <label><input type="radio" name="escopo_lideranca" value="Lidero equipe com mais de 10 pessoas" required /> Lidero equipe com mais de 10 pessoas</label>
+                    <label><input type="radio" name="escopo_lideranca" value="Lidero equipe de até 10 pessoas" /> Lidero equipe de até 10 pessoas</label>
+                    <label><input type="radio" name="escopo_lideranca" value="Coordeno projetos sem equipe direta" /> Coordeno projetos sem equipe direta</label>
+                    <label><input type="radio" name="escopo_lideranca" value="Atuo individualmente e estou me preparando para liderar" /> Atuo individualmente e estou me preparando para liderar</label>
+                    <label><input type="radio" name="escopo_lideranca" value="Ainda não lidero e estou avaliando possibilidades" /> Ainda não lidero e estou avaliando possibilidades</label>
+                    <div class="error" data-for="escopo_lideranca"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 14: Tempo de Atuação -->
+                <div class="form-step" data-step="13">
+                  <div class="field">
+                    <label for="tempo_atuacao">Há quanto tempo atua na área?</label>
                     <select id="tempo_atuacao" name="tempo_atuacao" required>
                       <option value="" disabled selected>Selecione</option>
                       <option value="Menos de 1 ano">Menos de 1 ano</option>
@@ -457,11 +520,20 @@
                     </select>
                     <div class="error" data-for="tempo_atuacao"></div>
                   </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 15: Histórico de Desenvolvimento -->
+                <div class="form-step" data-step="14">
                   <div class="field">
-                    <label>Já participou de treinamentos em liderança ou inteligência emocional?</label>
-                    <label><input type="radio" name="treinamentos_lideranca" value="Sim, presencial" required /> Sim, presencial</label>
-                    <label><input type="radio" name="treinamentos_lideranca" value="Sim, online" /> Sim, online</label>
-                    <label><input type="radio" name="treinamentos_lideranca" value="Não" /> Não</label>
+                    <label>Como tem sido seu investimento em liderança ou inteligência emocional?</label>
+                    <label><input type="radio" name="treinamentos_lideranca" value="Participo regularmente de programas avançados" required /> Participo regularmente de programas avançados</label>
+                    <label><input type="radio" name="treinamentos_lideranca" value="Realizei workshops ou cursos pontuais no último ano" /> Realizei workshops ou cursos pontuais no último ano</label>
+                    <label><input type="radio" name="treinamentos_lideranca" value="Ainda não participei, mas quero investir agora" /> Ainda não participei, mas quero investir agora</label>
+                    <label><input type="radio" name="treinamentos_lideranca" value="Estou avaliando e preciso entender melhor antes de investir" /> Estou avaliando e preciso entender melhor antes de investir</label>
                     <div class="error" data-for="treinamentos_lideranca"></div>
                   </div>
                   <div class="actions">
@@ -470,18 +542,26 @@
                   </div>
                 </div>
 
-                <!-- Etapa 11: Inteligência Emocional -->
-                <div class="form-step" data-step="10">
+                <!-- Etapa 16: Autoconhecimento Emocional -->
+                <div class="form-step" data-step="15">
                   <div class="field">
-                    <label>Como avalia seu nível de autoconhecimento emocional?</label>
+                    <label>Como avalia seu autoconhecimento emocional hoje?</label>
                     <label><input type="radio" name="autoconhecimento_emocional" value="Baixo" required /> Baixo</label>
                     <label><input type="radio" name="autoconhecimento_emocional" value="Médio" /> Médio</label>
                     <label><input type="radio" name="autoconhecimento_emocional" value="Alto" /> Alto</label>
                     <div class="error" data-for="autoconhecimento_emocional"></div>
                   </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 17: Desafios de Inteligência Emocional -->
+                <div class="form-step" data-step="16">
                   <div class="field">
-                    <label>Quais áreas de inteligência emocional representam maior desafio? (marque todas)</label>
-                    <label><input type="checkbox" name="desafios_inteligencia_emocional" value="Gestão de stress / ansiedade" data-required-group="desafios_inteligencia_emocional" /> Gestão de stress / ansiedade</label>
+                    <label>Quais desafios de inteligência emocional mais impactam seu dia a dia? (marque todas)</label>
+                    <label><input type="checkbox" name="desafios_inteligencia_emocional" value="Gestão do estresse e da ansiedade" data-required-group="desafios_inteligencia_emocional" /> Gestão do estresse e da ansiedade</label>
                     <label><input type="checkbox" name="desafios_inteligencia_emocional" value="Comunicação assertiva" data-required-group="desafios_inteligencia_emocional" /> Comunicação assertiva</label>
                     <label><input type="checkbox" name="desafios_inteligencia_emocional" value="Relacionamentos profissionais" data-required-group="desafios_inteligencia_emocional" /> Relacionamentos profissionais</label>
                     <label><input type="checkbox" name="desafios_inteligencia_emocional" value="Liderança de equipe" data-required-group="desafios_inteligencia_emocional" /> Liderança de equipe</label>
@@ -492,8 +572,16 @@
                     </div>
                     <div class="error" data-for="desafios_inteligencia_emocional"></div>
                   </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 18: Impacto das Emoções -->
+                <div class="form-step" data-step="17">
                   <div class="field">
-                    <label>Em uma escala de 1 a 5, quanto suas emoções impactam sua performance no trabalho?</label>
+                    <label>Quanto as emoções influenciam sua performance no trabalho?</label>
                     <label><input type="radio" name="impacto_emocoes_trabalho" value="1" required /> 1 - Impacto mínimo</label>
                     <label><input type="radio" name="impacto_emocoes_trabalho" value="2" /> 2</label>
                     <label><input type="radio" name="impacto_emocoes_trabalho" value="3" /> 3</label>
@@ -507,27 +595,15 @@
                   </div>
                 </div>
 
-                <!-- Etapa 12: Comunicação e Liderança -->
-                <div class="form-step" data-step="11">
+                <!-- Etapa 19: Objetivos de Liderança -->
+                <div class="form-step" data-step="18">
                   <div class="field">
-                    <label for="objetivo_lideranca">Qual seu principal objetivo em desenvolvimento de liderança?</label>
-                    <textarea id="objetivo_lideranca" name="objetivo_lideranca" rows="3" placeholder="Conte em poucas linhas o que busca desenvolver" required></textarea>
+                    <label for="objetivo_lideranca">Qual transformação em liderança deseja conquistar nos próximos 6 meses?</label>
+                    <textarea id="objetivo_lideranca" name="objetivo_lideranca" rows="3" placeholder="Ex.: Estruturar meu time, aumentar engajamento, liderar com mais segurança" required></textarea>
                     <div class="error" data-for="objetivo_lideranca"></div>
                   </div>
                   <div class="field">
-                    <label for="dificuldade_comunicacao">Maior dificuldade na comunicação no trabalho ou vida pessoal?</label>
-                    <textarea id="dificuldade_comunicacao" name="dificuldade_comunicacao" rows="3" placeholder="Ex.: Dar feedbacks difíceis, negociar, falar em público" required></textarea>
-                    <div class="error" data-for="dificuldade_comunicacao"></div>
-                  </div>
-                  <div class="field">
-                    <label>Quão confortável se sente ao dar feedback ou conduzir reuniões?</label>
-                    <label><input type="radio" name="conforto_feedback" value="Sempre" required /> Sempre</label>
-                    <label><input type="radio" name="conforto_feedback" value="Às vezes" /> Às vezes</label>
-                    <label><input type="radio" name="conforto_feedback" value="Não" /> Não</label>
-                    <div class="error" data-for="conforto_feedback"></div>
-                  </div>
-                  <div class="field">
-                    <label for="estilo_lideranca_desejado">Qual estilo de liderança deseja desenvolver?</label>
+                    <label for="estilo_lideranca_desejado">Qual estilo de liderança deseja fortalecer?</label>
                     <textarea id="estilo_lideranca_desejado" name="estilo_lideranca_desejado" rows="3" placeholder="Ex.: Inspiradora, orientada a resultados, colaborativa" required></textarea>
                     <div class="error" data-for="estilo_lideranca_desejado"></div>
                   </div>
@@ -537,33 +613,61 @@
                   </div>
                 </div>
 
-                <!-- Etapa 13: Interesse e Engajamento -->
-                <div class="form-step" data-step="12">
+                <!-- Etapa 20: Comunicação Atual -->
+                <div class="form-step" data-step="19">
                   <div class="field">
-                    <label>Nível de interesse em treinamentos de inteligência emocional e liderança</label>
-                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Muito interessado" required /> Muito interessado</label>
-                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Interessado" /> Interessado</label>
-                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Pouco interessado" /> Pouco interessado</label>
-                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Apenas curioso" /> Apenas curioso</label>
-                    <div class="error" data-for="nivel_interesse_treinamentos"></div>
+                    <label for="dificuldade_comunicacao">Qual desafio de comunicação mais limita seus resultados hoje?</label>
+                    <textarea id="dificuldade_comunicacao" name="dificuldade_comunicacao" rows="3" placeholder="Ex.: Feedbacks difíceis, conversas delicadas, alinhamento com a diretoria" required></textarea>
+                    <div class="error" data-for="dificuldade_comunicacao"></div>
                   </div>
                   <div class="field">
-                    <label>Quais formatos prefere para próximos treinamentos ou conteúdos?</label>
-                    <label><input type="checkbox" name="formatos_preferidos" value="Online ao vivo" data-required-group="formatos_preferidos" /> Online ao vivo</label>
-                    <label><input type="checkbox" name="formatos_preferidos" value="Gravado" data-required-group="formatos_preferidos" /> Gravado</label>
-                    <label><input type="checkbox" name="formatos_preferidos" value="Presencial" data-required-group="formatos_preferidos" /> Presencial</label>
+                    <label>Quão confortável se sente ao conduzir conversas estratégicas (feedbacks, 1:1, reuniões)?</label>
+                    <label><input type="radio" name="conforto_feedback" value="Me sinto muito seguro(a)" required /> Me sinto muito seguro(a)</label>
+                    <label><input type="radio" name="conforto_feedback" value="Consigo, mas ainda fico inseguro(a)" /> Consigo, mas ainda fico inseguro(a)</label>
+                    <label><input type="radio" name="conforto_feedback" value="Evito ou posterguei essas conversas" /> Evito ou posterguei essas conversas</label>
+                    <div class="error" data-for="conforto_feedback"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 21: Interesse em Programas -->
+                <div class="form-step" data-step="20">
+                  <div class="field">
+                    <label>Quando pretende investir em um programa de liderança ou inteligência emocional?</label>
+                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Quero começar nas próximas 2 semanas" required /> Quero começar nas próximas 2 semanas</label>
+                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Dentro de 30 dias" /> Dentro de 30 dias</label>
+                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Estou avaliando para os próximos 2-3 meses" /> Estou avaliando para os próximos 2-3 meses</label>
+                    <label><input type="radio" name="nivel_interesse_treinamentos" value="Ainda sem prazo definido" /> Ainda sem prazo definido</label>
+                    <div class="error" data-for="nivel_interesse_treinamentos"></div>
+                  </div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 22: Preferências de Formato e Temas -->
+                <div class="form-step" data-step="21">
+                  <div class="field">
+                    <label>Quais formatos prefere para aprofundar esse desenvolvimento?</label>
+                    <label><input type="checkbox" name="formatos_preferidos" value="Mentoria em grupo ao vivo" data-required-group="formatos_preferidos" /> Mentoria em grupo ao vivo</label>
+                    <label><input type="checkbox" name="formatos_preferidos" value="Imersão presencial" data-required-group="formatos_preferidos" /> Imersão presencial</label>
+                    <label><input type="checkbox" name="formatos_preferidos" value="Programa online com acompanhamento" data-required-group="formatos_preferidos" /> Programa online com acompanhamento</label>
+                    <label><input type="checkbox" name="formatos_preferidos" value="Conteúdos gravados para estudar no meu ritmo" data-required-group="formatos_preferidos" /> Conteúdos gravados para estudar no meu ritmo</label>
                     <div class="error" data-for="formatos_preferidos"></div>
                   </div>
                   <div class="field">
-                    <label>Top 3 temas que deseja desenvolver</label>
-                    <div class="note">Escolha até 3 para entendermos sua prioridade.</div>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Autoconhecimento" data-required-group="temas_prioritarios" /> Autoconhecimento</label>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Gestão de ansiedade" data-required-group="temas_prioritarios" /> Gestão de ansiedade</label>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Comunicação assertiva" data-required-group="temas_prioritarios" /> Comunicação assertiva</label>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Liderança de equipe" data-required-group="temas_prioritarios" /> Liderança de equipe</label>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Tomada de decisão" data-required-group="temas_prioritarios" /> Tomada de decisão</label>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Relacionamentos profissionais" data-required-group="temas_prioritarios" /> Relacionamentos profissionais</label>
-                    <label><input type="checkbox" name="temas_prioritarios" value="Outros" data-required-group="temas_prioritarios" data-other-input="temas_prioritarios_outros" /> Outros</label>
+                    <label>Quais temas precisam estar entre suas prioridades agora?</label>
+                    <div class="note">Escolha até 3 para direcionarmos o acompanhamento.</div>
+                    <label><input type="checkbox" name="temas_prioritarios" value="Regulação emocional e autocuidado" data-required-group="temas_prioritarios" /> Regulação emocional e autocuidado</label>
+                    <label><input type="checkbox" name="temas_prioritarios" value="Gestão de conflitos e feedbacks" data-required-group="temas_prioritarios" /> Gestão de conflitos e feedbacks</label>
+                    <label><input type="checkbox" name="temas_prioritarios" value="Engajamento e cultura de equipe" data-required-group="temas_prioritarios" /> Engajamento e cultura de equipe</label>
+                    <label><input type="checkbox" name="temas_prioritarios" value="Planejamento e produtividade" data-required-group="temas_prioritarios" /> Planejamento e produtividade</label>
+                    <label><input type="checkbox" name="temas_prioritarios" value="Tomada de decisão estratégica" data-required-group="temas_prioritarios" /> Tomada de decisão estratégica</label>
+                    <label><input type="checkbox" name="temas_prioritarios" value="Outro tema" data-required-group="temas_prioritarios" data-other-input="temas_prioritarios_outros" /> Outro tema</label>
                     <div class="field" id="temas_prioritarios_outros_wrapper" hidden>
                       <input id="temas_prioritarios_outros" name="temas_prioritarios_outros" type="text" placeholder="Quais outros temas?" />
                     </div>
@@ -575,8 +679,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 14: Observações e Origem -->
-                <div class="form-step" data-step="13">
+                <!-- Etapa 23: Observações e Origem -->
+                <div class="form-step" data-step="22">
                   <div class="field">
                     <label>Como conheceu o Instituto UP?</label>
                     <label><input type="radio" name="como_conheceu" value="Instagram" required /> Instagram</label>
@@ -652,9 +756,9 @@
 
       // Campos esperados para padronizar o payload (ordem e existência estável)
       const EXPECTED_FIELDS = [
-        'nome','cidade','telefone','idade','profissao',
+        'nome','cidade','telefone','idade',
         'ansiedade','sono','vida_financeira','saude_fisica','relacionamentos_familiares','relacionamento','areas_melhoria',
-        'profissao_area','cargo_lideranca','tempo_atuacao','treinamentos_lideranca',
+        'profissao_area','segmento_atuacao','cargo_lideranca','escopo_lideranca','tempo_atuacao','treinamentos_lideranca',
         'autoconhecimento_emocional','desafios_inteligencia_emocional','desafios_inteligencia_outros','impacto_emocoes_trabalho',
         'objetivo_lideranca','dificuldade_comunicacao','conforto_feedback','estilo_lideranca_desejado',
         'nivel_interesse_treinamentos','formatos_preferidos','temas_prioritarios','temas_prioritarios_outros',
@@ -724,9 +828,6 @@
   const dots = Array.from(document.querySelectorAll('#progressDots .dot'));
   const progressTextEl = document.getElementById('progressText');
   if(progressTextEl) progressTextEl.textContent = `Etapa 1 de ${steps.length}`;
-  const profileStepIndex = steps.findIndex(step => step.contains(document.getElementById('profissao_area')));
-  const primaryProfessionInput = document.getElementById('profissao');
-  const detailedProfessionInput = document.getElementById('profissao_area');
   const formCard = document.getElementById('formCard');
       // (Contagem regressiva removida a pedido)
       // Adiciona elemento de status
@@ -762,19 +863,6 @@
       telInput.value = out;
     });
   })();
-
-      function syncProfessionExtra(force = false){
-        if(!primaryProfessionInput || !detailedProfessionInput) return;
-        const baseValue = primaryProfessionInput.value.trim();
-        if(force || (!detailedProfessionInput.value.trim() && baseValue)){
-          detailedProfessionInput.value = baseValue;
-        }
-      }
-
-      if(primaryProfessionInput){
-        primaryProfessionInput.addEventListener('change', ()=> syncProfessionExtra(false));
-        primaryProfessionInput.addEventListener('blur', ()=> syncProfessionExtra(false));
-      }
 
       function handleOtherToggle(element){
         const targetId = element.dataset.otherInput;
@@ -821,9 +909,6 @@
         });
         const pt = document.getElementById('progressText');
         if(pt) pt.textContent = `Etapa ${current+1} de ${steps.length}`;
-        if(current === profileStepIndex){
-          syncProfessionExtra(false);
-        }
       }
 
       // Validação da etapa atual
@@ -1074,7 +1159,6 @@
 
       // Inicializa
   initOtherToggles();
-  syncProfessionExtra(false);
       showStep(0);
 
       function showFinalModal(){
