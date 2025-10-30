@@ -695,9 +695,26 @@
       }
 
   let current = 0;
-  // Novo clientId a cada carregamento (permite múltiplas inscrições no mesmo dispositivo)
-  let clientId = cryptoRandomId();
-  const allData = {}; // acumulador
+  // Recupera ou gera clientId (permite continuar preenchimento interrompido)
+  let clientId = (function(){
+    try{
+      const stored = sessionStorage.getItem('up:clientId');
+      if(stored) return stored;
+      const newId = cryptoRandomId();
+      sessionStorage.setItem('up:clientId', newId);
+      return newId;
+    }catch{
+      return cryptoRandomId();
+    }
+  })();
+  const allData = (function(){
+    try{
+      const stored = sessionStorage.getItem('up:formData');
+      return stored ? JSON.parse(stored) : {};
+    }catch{
+      return {};
+    }
+  })(); // acumulador com dados recuperados
 
   // Máscara de telefone dinâmica (formato brasileiro)
   (function(){
@@ -788,21 +805,6 @@
         let valid = true;
         // Limpa mensagens antigas
         section.querySelectorAll('.error').forEach(el=> el.textContent='');
-        
-        // Verificação especial para telefone já cadastrado (primeira etapa)
-        if(current === 0){
-          const telefoneInput = section.querySelector('#telefone');
-          if(telefoneInput && telefoneInput.value.trim()){
-            const digits = telefoneInput.value.replace(/\D+/g,'');
-            if(digits.length >= 10){
-              if(isPhoneAlreadyRegistered(digits)){
-                const errorEl = section.querySelector('.error[data-for="telefone"]');
-                if(errorEl) errorEl.textContent = 'Este telefone já foi cadastrado';
-                valid = false;
-              }
-            }
-          }
-        }
         
         // Agrupar radios por name para checar uma vez
         const radiosChecked = new Set();
@@ -912,6 +914,12 @@
         Object.entries(checkboxGroups).forEach(([k,v])=>{ stepData[k] = v; });
         // Mescla (limpeza com null também sobrescreve)
         Object.entries(stepData).forEach(([k,v])=>{ allData[k] = v; });
+        // Salva progresso em sessionStorage
+        try{
+          sessionStorage.setItem('up:formData', JSON.stringify(allData));
+        }catch{
+          console.warn('Erro ao salvar progresso');
+        }
         // Normaliza payload completo
         const payload = {};
         EXPECTED_FIELDS.forEach(f=>{
@@ -1016,9 +1024,12 @@
         payload._final = true;
         await sendPartial(payload);
         
-        // Registrar telefone como usado após envio bem-sucedido
-        if(payload.telefone){
-          addRegisteredPhone(payload.telefone);
+        // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
+        try{
+          sessionStorage.removeItem('up:formData');
+          sessionStorage.removeItem('up:clientId');
+        }catch{
+          console.warn('Erro ao limpar sessionStorage');
         }
         
         // Mostrar modal final de preparação em vez de recarregar direto
@@ -1030,6 +1041,24 @@
       // Inicializa
   initOtherToggles();
       showStep(0);
+      // Restaura campos salvos ao carregar
+      (function restoreFields(){
+        steps.forEach((section, idx)=>{
+          const inputs = section.querySelectorAll('input, textarea, select');
+          inputs.forEach(el=>{
+            const key = el.name || el.id;
+            if(!key || !(key in allData)) return;
+            const val = allData[key];
+            if(el.type === 'radio'){
+              if(el.value === val) el.checked = true;
+            } else if(el.type === 'checkbox'){
+              if(Array.isArray(val) && val.includes(el.value)) el.checked = true;
+            } else {
+              if(val != null) el.value = val;
+            }
+          });
+        });
+      })();
 
       function showFinalModal(){
         if(document.getElementById('finalOverlay')) return;
@@ -1117,35 +1146,6 @@
         }catch{
           return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
         }
-      }
-
-      // ================= Controle de telefones únicos =================
-      function getRegisteredPhones(){
-        try{
-          const phones = localStorage.getItem('up:registeredPhones');
-          return phones ? JSON.parse(phones) : [];
-        }catch{
-          return [];
-        }
-      }
-
-      function addRegisteredPhone(phone){
-        try{
-          const phones = getRegisteredPhones();
-          const digits = phone.replace(/\D+/g,'');
-          if(!phones.includes(digits)){
-            phones.push(digits);
-            localStorage.setItem('up:registeredPhones', JSON.stringify(phones));
-          }
-        }catch{
-          console.warn('Erro ao salvar telefone registrado');
-        }
-      }
-
-      function isPhoneAlreadyRegistered(phone){
-        const phones = getRegisteredPhones();
-        const digits = phone.replace(/\D+/g,'');
-        return phones.includes(digits);
       }
 
       // ================= Contagem pós-formulário =================
