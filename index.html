@@ -1067,78 +1067,23 @@
         ov.id = 'finalOverlay';
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-            <h2 id="modalTitle">Inscrição Confirmada</h2>
-            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">06/11</span> • <span style="color:#ffffff">19:00 às 21:29</span> (Brasília)</p>
-            <p>Para extrair o máximo do encontro, já deixe ao seu lado:</p>
-            <ul class="prep-list">
-              <li>Papel para anotar insights</li>
-              <li>Caneta (ou lápis) funcionando</li>
-              <li>Fone de ouvido para focar</li>
-              <li>Um lugar tranquilo e sem interrupções</li>
-            </ul>
-            <div class="cal-actions" aria-label="Adicionar ao calendário">
-              <button type="button" class="btn-cal" id="btnGCal" title="Adicionar ao Google Calendar">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-5 2v2h-4V5h4M5 19V8h14v11H5m7-9a4 4 0 0 0-4 4h2a2 2 0 1 1 2 2 1 1 0 0 1-1-1H9a3 3 0 1 0 3 3 1 1 0 0 1 2 0 3 3 0 1 0-3-3 1 1 0 0 1 1-1 2 2 0 1 1 2-2 4 4 0 0 0-4-4Z"/></svg>
-                Google Calendar
-              </button>
-              <button type="button" class="btn-cal" id="btnICS" title="Baixar arquivo .ics">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0m1 17h-2v-2h2Zm0-4h-2V7h2Z"/></svg>
-                Arquivo .ICS
-              </button>
-              <span class="ics-link" id="rawICS" hidden>Copiar ICS</span>
-            </div>
-            <div class="confirm-rep" style="margin:22px 0 18px;padding:18px 18px 20px;background:#132628;border:1px solid #21484d;border-radius:16px;">
-              <p style="margin:0 0 12px;font-size:.85rem;color:#c0dee1;line-height:1.5;">Para confirmar sua inscrição, envie uma mensagem para nossa representante pelo WhatsApp:</p>
-              <a class="btn btn-primary" id="btnRepWhats" href="https://wa.me/5513997832766?text=Olá! Acabei de me inscrever no Encontro UP e quero confirmar minha vaga." target="_blank" rel="noopener">Confirmar com a representante</a>
-            </div>
-            <p style="font-size:.78rem;color:#8fb8bc;letter-spacing:.4px;margin-top:-4px">(Dica: silenciar notificações e avisar quem mora com você ajuda muito.)</p>
-            <div class="final-actions">
-              <button type="button" class="btn btn-sec" id="finalClose">Fechar</button>
-              <button type="button" class="btn btn-primary" id="finalOk">Tudo pronto</button>
-            </div>
+            <h2 id="modalTitle">Primeira fase da inscrição finalizada</h2>
+            <p style="margin:6px 0 18px;font-size:.85rem;color:#c0dee1;line-height:1.55;">Sua inscrição foi registrada. Para garantir a vaga no encontro de <strong style="color:#ffffff;">06/11 • 19:00 às 21:29</strong>, finalize falando com nossa representante pelo WhatsApp.</p>
+            <button type="button" class="btn btn-primary" id="finalWhats" style="width:100%;justify-content:center;">Falar com a representante</button>
+            <p style="margin:18px 0 0;font-size:.75rem;color:#8fb8bc;line-height:1.5;">Ao clicar no botão, uma nova aba será aberta com a mensagem pronta. Envie para confirmar sua participação.</p>
           </div>`;
         document.body.appendChild(ov);
-        function close(){
+        const whatsappUrl = 'https://wa.me/5513997832766?text=Olá! Acabei de me inscrever no Encontro UP e quero confirmar minha vaga.';
+        function closeOverlay(){
           ov.classList.add('hide');
           setTimeout(()=>{ ov.remove(); location.reload(); }, 300);
         }
-        ov.addEventListener('click', e=>{ if(e.target === ov) close(); });
-        ov.querySelector('#finalClose').addEventListener('click', close);
-        ov.querySelector('#finalOk').addEventListener('click', close);
-
-        // ===== Calendar Helpers =====
-  const startLocal = new Date('2025-11-06T19:00:00-03:00');
-        const endLocal = new Date(startLocal.getTime() + (2*60 + 29)*60*1000);
-        function toICSDate(d){
-          // Convert to UTC and format YYYYMMDDTHHMMSSZ
-          const y = d.getUTCFullYear();
-          const m = String(d.getUTCMonth()+1).padStart(2,'0');
-          const day = String(d.getUTCDate()).padStart(2,'0');
-            const h = String(d.getUTCHours()).padStart(2,'0');
-          const min = String(d.getUTCMinutes()).padStart(2,'0');
-          const s = String(d.getUTCSeconds()).padStart(2,'0');
-          return `${y}${m}${day}T${h}${min}${s}Z`;
-        }
-  const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (06/11 19:00-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
-        const blob = new Blob([icsContent], {type:'text/calendar'});
-        const icsUrl = URL.createObjectURL(blob);
-        const btnICS = ov.querySelector('#btnICS');
-        btnICS.addEventListener('click', ()=>{
-          const a = document.createElement('a');
-          a.href = icsUrl; a.download = 'encontro-up.ics';
-          document.body.appendChild(a); a.click(); a.remove();
+        ov.addEventListener('click', e=>{ if(e.target === ov) closeOverlay(); });
+        const whatsBtn = ov.querySelector('#finalWhats');
+        whatsBtn.addEventListener('click', ()=>{
+          window.open(whatsappUrl, '_blank','noopener');
+          closeOverlay();
         });
-        const gStart = toICSDate(startLocal).replace(/Z$/,'');
-        const gEnd = toICSDate(endLocal).replace(/Z$/,'');
-        const text = encodeURIComponent('Encontro UP | Construindo Uma Vida Mais Leve');
-        const details = encodeURIComponent('Aula gratuita de Inteligência Emocional. Prepare papel, caneta, fone e um lugar tranquilo.');
-        const locationTxt = encodeURIComponent('Online');
-        const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${gStart}/${gEnd}&details=${details}&location=${locationTxt}&ctz=America/Sao_Paulo`;
-        ov.querySelector('#btnGCal').addEventListener('click', ()=>{ window.open(gcalUrl, '_blank','noopener'); });
-        // Copy raw ICS if needed
-        const raw = ov.querySelector('#rawICS');
-        raw.addEventListener('click', async ()=>{
-          try{ await navigator.clipboard.writeText(icsContent); raw.textContent='Copiado!'; setTimeout(()=>raw.textContent='Copiar ICS',2000);}catch{raw.textContent='Falha'; setTimeout(()=>raw.textContent='Copiar ICS',2000);} });
       }
 
 
