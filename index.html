@@ -1026,8 +1026,16 @@
         const backBtn = e.target.closest('[data-back]');
         if(nextBtn){
           if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-          collectStepData();
+          const payload = collectStepData();
           setStatus('');
+          if(current === 0){
+            const phone = payload.telefone || allData.telefone || '';
+            if(isPhoneAlreadyRegistered(phone)){
+              setStatus('Este número já possui inscrição ativa.', 'err');
+              showPhoneDuplicateModal();
+              return;
+            }
+          }
           showStep(current + 1);
         }
         if(backBtn){
@@ -1044,8 +1052,16 @@
           // Se não estiver na última etapa, simula clique no botão PRÓXIMO
           if(current < steps.length - 1){
             if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-            collectStepData();
+            const payload = collectStepData();
             setStatus('');
+            if(current === 0){
+              const phone = payload.telefone || allData.telefone || '';
+              if(isPhoneAlreadyRegistered(phone)){
+                setStatus('Este número já possui inscrição ativa.', 'err');
+                showPhoneDuplicateModal();
+                return;
+              }
+            }
             showStep(current + 1);
           } else {
             // Se estiver na última etapa, submete o formulário
