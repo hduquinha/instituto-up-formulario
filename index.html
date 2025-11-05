@@ -571,7 +571,7 @@
 
       <div class="after-form-countdown" aria-live="polite">
         <div class="countdown-banner" id="afterCountdown" data-date="2025-11-06T19:00:00-03:00">
-          <h3>Encontro 30/10 • 19:00 – 21:29</h3>
+          <h3>Encontro 06/11 • 19:00 – 21:29</h3>
           <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
@@ -954,9 +954,8 @@
         sendStatus.textContent = msg || '';
       }
 
-      async function sendPartial(data){
-        // Envia os dados desta etapa ao seu backend
-        // Troque a URL N8N_WEBHOOK_URL pela sua URL real (n8n). Ou use ?endpoint= na URL da página.
+      async function sendFinalSubmission(data){
+        // Envia todos os dados somente ao final para o seu backend
         try{
           const endpoint = getEndpoint();
           if(!endpoint || endpoint.startsWith('PASTE_')){
@@ -964,7 +963,7 @@
             setStatus('Webhook n8n não configurado', 'err');
             return;
           }
-          setStatus('Enviando etapa ' + data._step + '...', 'info');
+          setStatus('Enviando sua inscrição...', 'info');
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -973,41 +972,42 @@
           if(!res.ok){
             const txt = await res.text().catch(()=>res.statusText);
             console.warn('Resposta não OK do n8n', res.status, txt);
-            setStatus('Falha ('+res.status+') ao enviar etapa '+data._step, 'err');
+            setStatus('Falha ('+res.status+') ao enviar sua inscrição', 'err');
           } else {
-            setStatus('Etapa '+data._step+' salva ✔', 'ok');
+            setStatus('Inscrição enviada com sucesso!', 'ok');
           }
         }catch(err){
-          // Se falhar, apenas registramos no console e seguimos.
-          console.warn('Falha ao enviar etapa:', err);
-          setStatus('Erro ao enviar etapa '+data._step, 'err');
+          console.warn('Falha ao enviar inscrição:', err);
+          setStatus('Erro ao enviar sua inscrição', 'err');
         }
       }
 
       // Navegação Próximo/Voltar
-      form.addEventListener('click', async (e)=>{
+      form.addEventListener('click', (e)=>{
         const nextBtn = e.target.closest('[data-next]');
         const backBtn = e.target.closest('[data-back]');
         if(nextBtn){
           if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-          const payload = collectStepData();
-          await sendPartial(payload);
+          collectStepData();
+          setStatus('');
           showStep(current + 1);
         }
         if(backBtn){
+          collectStepData();
+          setStatus('');
           showStep(current - 1);
         }
       });
 
       // Prevenir Enter de submeter o formulário, exceto na última etapa
-      form.addEventListener('keydown', async (e)=>{
+      form.addEventListener('keydown', (e)=>{
         if(e.key === 'Enter' && e.target.type !== 'submit'){
           e.preventDefault();
           // Se não estiver na última etapa, simula clique no botão PRÓXIMO
           if(current < steps.length - 1){
             if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-            const payload = collectStepData();
-            await sendPartial(payload);
+            collectStepData();
+            setStatus('');
             showStep(current + 1);
           } else {
             // Se estiver na última etapa, submete o formulário
@@ -1020,9 +1020,9 @@
       form.addEventListener('submit', async (e)=>{
         e.preventDefault();
   if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-        const payload = collectStepData();
-        payload._final = true;
-        await sendPartial(payload);
+  const payload = collectStepData();
+  payload._final = true;
+  await sendFinalSubmission(payload);
         
         // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
         try{
@@ -1068,7 +1068,7 @@
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h2 id="modalTitle">Inscrição Confirmada</h2>
-            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">30/10</span> • <span style="color:#ffffff">19:00 às 21:29</span> (Brasília)</p>
+            <p style="margin:4px 0 18px;font-size:.82rem;color:#9bd5da;letter-spacing:.6px;font-weight:600;">Encontro: <span style="color:#ffffff">06/11</span> • <span style="color:#ffffff">19:00 às 21:29</span> (Brasília)</p>
             <p>Para extrair o máximo do encontro, já deixe ao seu lado:</p>
             <ul class="prep-list">
               <li>Papel para anotar insights</li>
@@ -1087,6 +1087,10 @@
               </button>
               <span class="ics-link" id="rawICS" hidden>Copiar ICS</span>
             </div>
+            <div class="confirm-rep" style="margin:22px 0 18px;padding:18px 18px 20px;background:#132628;border:1px solid #21484d;border-radius:16px;">
+              <p style="margin:0 0 12px;font-size:.85rem;color:#c0dee1;line-height:1.5;">Para confirmar sua inscrição, envie uma mensagem para nossa representante pelo WhatsApp:</p>
+              <a class="btn btn-primary" id="btnRepWhats" href="https://wa.me/5513997832766?text=Olá! Acabei de me inscrever no Encontro UP e quero confirmar minha vaga." target="_blank" rel="noopener">Confirmar com a representante</a>
+            </div>
             <p style="font-size:.78rem;color:#8fb8bc;letter-spacing:.4px;margin-top:-4px">(Dica: silenciar notificações e avisar quem mora com você ajuda muito.)</p>
             <div class="final-actions">
               <button type="button" class="btn btn-sec" id="finalClose">Fechar</button>
@@ -1103,7 +1107,7 @@
         ov.querySelector('#finalOk').addEventListener('click', close);
 
         // ===== Calendar Helpers =====
-        const startLocal = new Date('2025-10-30T19:00:00-03:00');
+  const startLocal = new Date('2025-11-06T19:00:00-03:00');
         const endLocal = new Date(startLocal.getTime() + (2*60 + 29)*60*1000);
         function toICSDate(d){
           // Convert to UTC and format YYYYMMDDTHHMMSSZ
@@ -1115,7 +1119,7 @@
           const s = String(d.getUTCSeconds()).padStart(2,'0');
           return `${y}${m}${day}T${h}${min}${s}Z`;
         }
-        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (30/10 19:00-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
+  const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Encontro UP//PT-BR\nBEGIN:VEVENT\nUID:${cryptoRandomId()}@encontro-up\nDTSTAMP:${toICSDate(new Date())}\nDTSTART:${toICSDate(startLocal)}\nDTEND:${toICSDate(endLocal)}\nSUMMARY:Encontro UP | Construindo Uma Vida Mais Leve\nDESCRIPTION:Aula gratuita de Inteligência Emocional (06/11 19:00-21:29 Brasília). Prepare papel, caneta, fone e um lugar tranquilo.\nLOCATION:Online\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
         const blob = new Blob([icsContent], {type:'text/calendar'});
         const icsUrl = URL.createObjectURL(blob);
         const btnICS = ov.querySelector('#btnICS');
