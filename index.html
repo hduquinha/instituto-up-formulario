@@ -716,6 +716,42 @@
     }
   })(); // acumulador com dados recuperados
 
+  const PHONE_STORAGE_KEY = 'up:registeredPhones';
+
+  function normalizePhone(phone){
+    return (phone || '').replace(/\D+/g,'');
+  }
+
+  function getRegisteredPhones(){
+    try{
+      const raw = localStorage.getItem(PHONE_STORAGE_KEY);
+      if(!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    }catch{
+      return [];
+    }
+  }
+
+  function isPhoneAlreadyRegistered(phone){
+    const normalized = normalizePhone(phone);
+    if(!normalized) return false;
+    return getRegisteredPhones().includes(normalized);
+  }
+
+  function addRegisteredPhone(phone){
+    const normalized = normalizePhone(phone);
+    if(!normalized) return;
+    const list = getRegisteredPhones();
+    if(list.includes(normalized)) return;
+    list.push(normalized);
+    try{
+      localStorage.setItem(PHONE_STORAGE_KEY, JSON.stringify(list));
+    }catch{
+      console.warn('Falha ao salvar número no storage');
+    }
+  }
+
   // Máscara de telefone dinâmica (formato brasileiro)
   (function(){
     const telInput = document.getElementById('telefone');
@@ -961,7 +997,7 @@
           if(!endpoint || endpoint.startsWith('PASTE_')){
             console.warn('Defina a URL do Webhook do n8n em N8N_WEBHOOK_URL ou via ?endpoint=');
             setStatus('Webhook n8n não configurado', 'err');
-            return;
+            return false;
           }
           setStatus('Enviando sua inscrição...', 'info');
           const res = await fetch(endpoint, {
@@ -973,12 +1009,14 @@
             const txt = await res.text().catch(()=>res.statusText);
             console.warn('Resposta não OK do n8n', res.status, txt);
             setStatus('Falha ('+res.status+') ao enviar sua inscrição', 'err');
-          } else {
-            setStatus('Inscrição enviada com sucesso!', 'ok');
+            return false;
           }
+          setStatus('Inscrição enviada com sucesso!', 'ok');
+          return true;
         }catch(err){
           console.warn('Falha ao enviar inscrição:', err);
           setStatus('Erro ao enviar sua inscrição', 'err');
+          return false;
         }
       }
 
@@ -1019,11 +1057,22 @@
       // Envio final (poderia também disparar uma última captura)
       form.addEventListener('submit', async (e)=>{
         e.preventDefault();
-  if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-  const payload = collectStepData();
-  payload._final = true;
-  await sendFinalSubmission(payload);
-        
+        if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
+        const payload = collectStepData();
+        const phone = payload.telefone || allData.telefone || '';
+        if(isPhoneAlreadyRegistered(phone)){
+          setStatus('Este número já possui inscrição ativa.', 'err');
+          showPhoneDuplicateModal();
+          return;
+        }
+        payload._final = true;
+        const ok = await sendFinalSubmission(payload);
+        if(!ok){
+          setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
+          return;
+        }
+        addRegisteredPhone(phone);
+
         // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
         try{
           sessionStorage.removeItem('up:formData');
@@ -1059,6 +1108,34 @@
           });
         });
       })();
+
+      function showPhoneDuplicateModal(){
+        if(document.getElementById('duplicateOverlay')) return;
+        const ov = document.createElement('div');
+        ov.className = 'final-overlay';
+        ov.id = 'duplicateOverlay';
+        ov.innerHTML = `
+          <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="duplicateTitle">
+            <h2 id="duplicateTitle">Número já inscrito</h2>
+            <p style="margin:10px 0 18px;font-size:.9rem;color:#c0dee1;line-height:1.55;">Este telefone já está cadastrado para esta live. Se precisar de ajuda, fale com nossa equipe pelo WhatsApp.</p>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <button type="button" class="btn btn-primary" id="dupWhats" style="justify-content:center;">Chamar suporte no WhatsApp</button>
+              <button type="button" class="btn btn-sec" id="dupClose" style="justify-content:center;">Fechar</button>
+            </div>
+          </div>`;
+        document.body.appendChild(ov);
+        const whatsappUrl = 'https://wa.me/5513997832766?text=Olá! Estou com dúvidas sobre minha inscrição no Encontro UP.';
+        const close = ()=>{
+          ov.classList.add('hide');
+          setTimeout(()=>{ if(ov.parentNode) ov.remove(); }, 250);
+        };
+        ov.addEventListener('click', e=>{ if(e.target === ov) close(); });
+        ov.querySelector('#dupClose').addEventListener('click', close);
+        ov.querySelector('#dupWhats').addEventListener('click', ()=>{
+          window.open(whatsappUrl, '_blank','noopener');
+          close();
+        });
+      }
 
       function showFinalModal(){
         if(document.getElementById('finalOverlay')) return;
