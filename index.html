@@ -550,7 +550,12 @@
                   </div>
                   <div class="field">
                     <label for="comentarios_adicionais">Expectativas ou comentários adicionais</label>
-                    <textarea id="comentarios_adicionais" name="comentarios_adicionais" rows="3" placeholder="Se quiser, compartilhe expectativas, dúvidas ou contexto."></textarea>
+                    <textarea id="comentarios_adicionais" name="comentarios_adicionais" rows="3" placeholder="Compartilhe expectativas, dúvidas ou contexto." required></textarea>
+                    <div class="note">Se não quiser detalhar, clique em uma das opções rápidas abaixo.</div>
+                    <div class="option-shortcuts" data-target="comentarios_adicionais">
+                      <button type="button" class="fill-option" data-target="comentarios_adicionais" data-value="Nenhuma observação no momento">Nenhuma observação</button>
+                      <button type="button" class="fill-option" data-target="comentarios_adicionais" data-value="Não quero responder">Não quero responder</button>
+                    </div>
                     <div class="error" data-for="comentarios_adicionais"></div>
                   </div>
                   <div class="note">Obrigado! Suas respostas nos ajudam a personalizar o acompanhamento após a aula.</div>
