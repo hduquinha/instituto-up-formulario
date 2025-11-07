@@ -722,6 +722,20 @@
   })(); // acumulador com dados recuperados
 
   const PHONE_STORAGE_KEY = 'up:registeredPhones';
+  const PHONE_VERSION_KEY = 'up:phoneVersion';
+  const PHONE_VERSION_VALUE = 'event-2025-11-13';
+
+  (function ensurePhoneStorageVersion(){
+    try{
+      const current = localStorage.getItem(PHONE_VERSION_KEY);
+      if(current !== PHONE_VERSION_VALUE){
+        localStorage.removeItem(PHONE_STORAGE_KEY);
+        localStorage.setItem(PHONE_VERSION_KEY, PHONE_VERSION_VALUE);
+      }
+    }catch{
+      console.warn('Não foi possível sincronizar a versão dos telefones cadastrados');
+    }
+  })();
 
   function normalizePhone(phone){
     return (phone || '').replace(/\D+/g,'');
