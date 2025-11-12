@@ -153,8 +153,14 @@
       /* Aumentar espaçamento entre opções de grupos */
       .form-step label input[type=radio]+span,.form-step label input[type=checkbox]+span{font-size:1rem;}
       .form-step label{font-size:.95rem; font-weight:500;}
-      /* Barra de status mais legível */
-      #sendStatus{font-size:.8rem !important; letter-spacing:.4px}
+  /* Barra de status mais legível */
+  #sendStatus{font-size:.8rem !important; letter-spacing:.4px}
+  .success-state{padding:20px 22px;margin:12px 0 0;background:rgba(var(--primary-rgb),.08);border:1px solid #21494e;border-radius:18px;text-align:center;box-shadow:0 0 0 1px rgba(var(--primary-rgb),.2) inset}
+  .success-state h3{margin:0 0 10px;font-size:1.2rem;color:var(--primary);letter-spacing:.5px}
+  .success-state p{margin:0 0 16px;font-size:.9rem;color:#b7dfe4;line-height:1.4}
+  .success-state .success-icon{font-size:2.2rem;line-height:1;margin-bottom:12px}
+  .success-state .success-tip{margin-top:-4px;color:#7fa6aa;font-size:.78rem;letter-spacing:.4px}
+  .form-completed .form-title{background:rgba(var(--primary-rgb),.12);color:var(--primary)}
 
       /* Botão flutuante WhatsApp */
       .whatsapp-float{
@@ -254,6 +260,14 @@
                 <div class="dot" data-step="14">15</div>
               </div>
               <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 15</div>
+
+              <div id="formSuccess" class="success-state" hidden role="status" aria-live="polite">
+                <div class="success-icon" aria-hidden="true">✅</div>
+                <h3>Cadastro confirmado!</h3>
+                <p>Recebemos suas informações. Você receberá as orientações oficiais no WhatsApp e no e-mail informado.</p>
+                <p class="success-tip">Não é necessário enviar novamente. Caso precise ajustar os dados, clique no botão abaixo.</p>
+                <button type="button" class="btn btn-primary" id="successReset" style="justify-content:center;">Preciso editar os dados</button>
+              </div>
 
               <form id="msForm" novalidate>
                 <!-- Etapa 1: Dados Pessoais -->
@@ -689,6 +703,9 @@
   const progressTextEl = document.getElementById('progressText');
   if(progressTextEl) progressTextEl.textContent = `Etapa 1 de ${steps.length}`;
   const formCard = document.getElementById('formCard');
+  const successBlock = document.getElementById('formSuccess');
+  const successResetBtn = document.getElementById('successReset');
+  const formTitleEl = document.getElementById('formTitle');
       // (Contagem regressiva removida a pedido)
       // Adiciona elemento de status
       let sendStatus = document.getElementById('sendStatus');
@@ -1009,8 +1026,46 @@
         sendStatus.textContent = msg || '';
       }
 
+<<<<<<< HEAD
       async function sendFinalSubmission(data){
         // Envia todos os dados somente ao final para o seu backend
+=======
+      function enterSuccessState({ skipStatus=false } = {}){
+        if(formCard) formCard.classList.add('form-completed');
+        if(formTitleEl) formTitleEl.textContent = 'Cadastro confirmado';
+        const dotsWrapper = document.getElementById('progressDots');
+        if(dotsWrapper){
+          dotsWrapper.hidden = true;
+          dotsWrapper.setAttribute('aria-hidden','true');
+        }
+        if(progressTextEl) progressTextEl.hidden = true;
+        if(form){
+          form.hidden = true;
+          form.setAttribute('aria-hidden','true');
+          form.querySelectorAll('input, textarea, select, button').forEach(el => { el.disabled = true; });
+        }
+        if(successBlock){
+          successBlock.hidden = false;
+          const focusable = successBlock.querySelector('button, a');
+          if(focusable) focusable.focus();
+        }
+        if(!skipStatus) setStatus('Cadastro enviado com sucesso! 🎉', 'ok');
+      }
+
+      if(successResetBtn){
+        successResetBtn.addEventListener('click', ()=>{
+          try{
+            sessionStorage.removeItem('up:formCompleted');
+            sessionStorage.removeItem('up:formData');
+          }catch{}
+          location.reload();
+        });
+      }
+
+      async function sendPartial(data){
+        // Envia os dados desta etapa ao seu backend
+        // Troque a URL N8N_WEBHOOK_URL pela sua URL real (n8n). Ou use ?endpoint= na URL da página.
+>>>>>>> 5fb9f1ce04f6d01ab887ffdf148731f2e2594925
         try{
           const endpoint = getEndpoint();
           if(!endpoint || endpoint.startsWith('PASTE_')){
@@ -1027,14 +1082,28 @@
           if(!res.ok){
             const txt = await res.text().catch(()=>res.statusText);
             console.warn('Resposta não OK do n8n', res.status, txt);
+<<<<<<< HEAD
             setStatus('Falha ('+res.status+') ao enviar sua inscrição', 'err');
             return false;
+=======
+            setStatus('Falha ('+res.status+') ao enviar etapa '+data._step, 'err');
+            return false;
+          } else {
+            setStatus('Etapa '+data._step+' salva ✔', 'ok');
+            return true;
+>>>>>>> 5fb9f1ce04f6d01ab887ffdf148731f2e2594925
           }
           setStatus('Inscrição enviada com sucesso!', 'ok');
           return true;
         }catch(err){
+<<<<<<< HEAD
           console.warn('Falha ao enviar inscrição:', err);
           setStatus('Erro ao enviar sua inscrição', 'err');
+=======
+          // Se falhar, apenas registramos no console e seguimos.
+          console.warn('Falha ao enviar etapa:', err);
+          setStatus('Erro ao enviar etapa '+data._step, 'err');
+>>>>>>> 5fb9f1ce04f6d01ab887ffdf148731f2e2594925
           return false;
         }
       }
@@ -1101,20 +1170,31 @@
           return;
         }
         payload._final = true;
+<<<<<<< HEAD
         const ok = await sendFinalSubmission(payload);
+=======
+        const ok = await sendPartial(payload);
+>>>>>>> 5fb9f1ce04f6d01ab887ffdf148731f2e2594925
         if(!ok){
           setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
           return;
         }
+<<<<<<< HEAD
         addRegisteredPhone(phone);
 
+=======
+        
+>>>>>>> 5fb9f1ce04f6d01ab887ffdf148731f2e2594925
         // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
         try{
           sessionStorage.removeItem('up:formData');
           sessionStorage.removeItem('up:clientId');
+          sessionStorage.setItem('up:formCompleted','true');
         }catch{
           console.warn('Erro ao limpar sessionStorage');
         }
+
+        enterSuccessState();
         
         // Mostrar modal final de preparação em vez de recarregar direto
         showFinalModal();
@@ -1144,6 +1224,7 @@
         });
       })();
 
+<<<<<<< HEAD
       function showPhoneDuplicateModal(){
         if(document.getElementById('duplicateOverlay')) return;
         const ov = document.createElement('div');
@@ -1171,6 +1252,14 @@
           close();
         });
       }
+=======
+      try{
+        if(sessionStorage.getItem('up:formCompleted') === 'true'){
+          enterSuccessState({ skipStatus:true });
+          setStatus('Você já concluiu seu cadastro. ✅', 'ok');
+        }
+      }catch{}
+>>>>>>> 5fb9f1ce04f6d01ab887ffdf148731f2e2594925
 
       function showFinalModal(){
         if(document.getElementById('finalOverlay')) return;
