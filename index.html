@@ -218,7 +218,7 @@
             <div class="prep-callout" aria-label="Preparação recomendada">
               <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
             </div>
-            <div class="event-datetime" id="eventDatetime" data-template="Aula ao vivo: {date} • {time} (horário de Brasília)">Aula ao vivo: 13/11 • 19:00 às 21:29 (horário de Brasília)</div>
+            <div class="event-datetime" id="eventDatetime" data-template="Aula ao vivo: {date} • {time} (horário de Brasília)">Aula ao vivo: 27/11 • 19:00 às 21:29 (horário de Brasília)</div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... <strong>mais foco</strong></li>
               <li><strong>menos estresse</strong> ... <strong>mais qualidade de sono</strong></li>
@@ -228,10 +228,10 @@
             </ul>
             <div class="scarcity" aria-label="Indicador de vagas restantes">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-                <div style="font-size:13px;font-weight:600;color:#cfd2ff;">71% das vagas preenchidas</div>
+                <div id="scarcityPercent" data-template="{percent}% das vagas preenchidas" style="font-size:13px;font-weight:600;color:#cfd2ff;">71% das vagas preenchidas</div>
                 <div class="cta-ribbon">Vagas Limitadas</div>
               </div>
-            <div class="scarcity-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="71"><span></span></div>
+              <div class="scarcity-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="71"><span></span></div>
               <div class="mini-deadline">Movimento alto hoje — confirme enquanto ainda há acesso.</div>
             </div>
           </div>
@@ -590,7 +590,7 @@
 
       <div class="after-form-countdown" aria-live="polite">
         <div class="countdown-banner" id="afterCountdown" data-date="">
-          <h3 id="countdownTitle" data-template="Encontro {date} • {timeRangeShort}">Encontro 13/11 • 19:00 – 21:29</h3>
+          <h3 id="countdownTitle" data-template="Encontro {date} • {timeRangeShort}">Encontro 27/11 • 19:00 – 21:29</h3>
           <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
@@ -622,11 +622,14 @@
       // =============================================
     // Ajuste a data do treinamento aqui para atualizar a página inteira e o payload automaticamente
     const TRAINING_CONFIG = {
-      startISO: '2025-11-13T19:00:00-03:00',
-      endISO: '2025-11-13T21:29:00-03:00',
-      dateDisplay: '13/11',
+      startISO: '2025-11-27T19:00:00-03:00',
+      endISO: '2025-11-27T21:29:00-03:00',
+      dateDisplay: '27/11',
       timeRange: '19:00 às 21:29',
-      timeRangeShort: '19:00 – 21:29'
+      timeRangeShort: '19:00 – 21:29',
+      occupancyStartISO: '2025-11-14T00:00:00-03:00',
+      occupancyMinPercent: 71,
+      occupancyMaxPercent: 98
     };
 
     // Endpoint padrão da API (pode ser sobrescrito com ?endpoint=https://...)
@@ -710,6 +713,39 @@
           countdownRoot.setAttribute('data-date', startISO);
         }
       })();
+
+      function updateScarcityProgress(){
+        const percentLabel = document.getElementById('scarcityPercent');
+        const progressBar = document.querySelector('.scarcity-progress');
+        const progressFill = progressBar ? progressBar.querySelector('span') : null;
+        const { startISO, occupancyStartISO, occupancyMinPercent, occupancyMaxPercent } = TRAINING_CONFIG;
+        if(!percentLabel || !progressBar || !progressFill || !startISO) return;
+
+        const eventStart = new Date(startISO);
+        const windowStart = occupancyStartISO ? new Date(occupancyStartISO) : new Date(eventStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const now = new Date();
+
+        const min = Number(occupancyMinPercent ?? 0);
+        const max = Number(occupancyMaxPercent ?? 100);
+        let precise = min;
+
+        if(now >= eventStart){
+          precise = max;
+        } else if(now <= windowStart){
+          precise = min;
+        } else {
+          const totalWindow = eventStart - windowStart;
+          const elapsed = now - windowStart;
+          const ratio = totalWindow > 0 ? elapsed / totalWindow : 1;
+          precise = min + (max - min) * Math.min(Math.max(ratio, 0), 1);
+        }
+
+        const display = Math.round(Math.min(Math.max(precise, min), max));
+        progressFill.style.width = `${precise.toFixed(2)}%`;
+        progressBar.setAttribute('aria-valuenow', String(display));
+        const template = percentLabel.dataset.template || percentLabel.textContent;
+        percentLabel.textContent = template.replace('{percent}', display);
+      }
       function getEndpoint(){
         const u = new URL(location.href);
         const p = u.searchParams.get('endpoint');
@@ -1201,6 +1237,8 @@
       // Inicializa
   initOtherToggles();
       showStep(0);
+      updateScarcityProgress();
+      setInterval(updateScarcityProgress, 15 * 60 * 1000);
       // Restaura campos salvos ao carregar
       (function restoreFields(){
         steps.forEach((section, idx)=>{
