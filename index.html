@@ -218,7 +218,7 @@
             <div class="prep-callout" aria-label="Preparação recomendada">
               <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
             </div>
-            <div class="event-datetime">Aula ao vivo: 13/11 • 19:00 às 21:29 (horário de Brasília)</div>
+            <div class="event-datetime" id="eventDatetime" data-template="Aula ao vivo: {date} • {time} (horário de Brasília)">Aula ao vivo: 13/11 • 19:00 às 21:29 (horário de Brasília)</div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... <strong>mais foco</strong></li>
               <li><strong>menos estresse</strong> ... <strong>mais qualidade de sono</strong></li>
@@ -589,8 +589,8 @@
       <!-- seção de transformações removida conforme solicitação -->
 
       <div class="after-form-countdown" aria-live="polite">
-        <div class="countdown-banner" id="afterCountdown" data-date="2025-11-13T19:00:00-03:00">
-          <h3>Encontro 13/11 • 19:00 – 21:29</h3>
+        <div class="countdown-banner" id="afterCountdown" data-date="">
+          <h3 id="countdownTitle" data-template="Encontro {date} • {timeRangeShort}">Encontro 13/11 • 19:00 – 21:29</h3>
           <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
@@ -620,6 +620,15 @@
       // =============================================
       // Configurações & Opções Avançadas
       // =============================================
+    // Ajuste a data do treinamento aqui para atualizar a página inteira e o payload automaticamente
+    const TRAINING_CONFIG = {
+      startISO: '2025-11-13T19:00:00-03:00',
+      endISO: '2025-11-13T21:29:00-03:00',
+      dateDisplay: '13/11',
+      timeRange: '19:00 às 21:29',
+      timeRangeShort: '19:00 – 21:29'
+    };
+
     // Endpoint padrão da API (pode ser sobrescrito com ?endpoint=https://...)
     const API_ENDPOINT = '/api/inscricao';
     // URL de redirecionamento opcional após sucesso (deixe vazio se não quiser redirecionar)
@@ -636,7 +645,8 @@
         'tentativas_anteriores',
         'como_conheceu','comentarios_adicionais',
         // Campos de tracking e segmentação
-        'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment'
+        'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment',
+        'data_treinamento'
       ];
       const ARRAY_FIELDS = new Set(['areas_melhoria','gatilhos_ansiedade','sintomas_fisicos','sintomas_emocionais','tentativas_anteriores']);
       // Se true: quando usuário apaga conteúdo de um campo texto/number, enviamos null (limpa no acumulado)
@@ -681,6 +691,24 @@
           }catch{return new Date().toISOString();}
         })();
         return obj;
+      })();
+
+      (function applyTrainingConfig(){
+        const { dateDisplay, timeRange, timeRangeShort, startISO } = TRAINING_CONFIG;
+        const eventDt = document.getElementById('eventDatetime');
+        if(eventDt){
+          const template = eventDt.dataset.template || eventDt.textContent;
+          eventDt.textContent = template.replace('{date}', dateDisplay).replace('{time}', timeRange);
+        }
+        const countdownTitle = document.getElementById('countdownTitle');
+        if(countdownTitle){
+          const template = countdownTitle.dataset.template || countdownTitle.textContent;
+          countdownTitle.textContent = template.replace('{date}', dateDisplay).replace('{timeRangeShort}', timeRangeShort);
+        }
+        const countdownRoot = document.getElementById('afterCountdown');
+        if(countdownRoot){
+          countdownRoot.setAttribute('data-date', startISO);
+        }
       })();
       function getEndpoint(){
         const u = new URL(location.href);
@@ -732,7 +760,7 @@
 
   const PHONE_STORAGE_KEY = 'up:registeredPhones';
   const PHONE_VERSION_KEY = 'up:phoneVersion';
-  const PHONE_VERSION_VALUE = 'event-2025-11-13';
+  const PHONE_VERSION_VALUE = `event-${TRAINING_CONFIG.startISO.slice(0,10)}`;
 
   (function ensurePhoneStorageVersion(){
     try{
@@ -986,6 +1014,7 @@
         }
         // Normaliza payload completo
         const payload = {};
+        allData.data_treinamento = TRAINING_CONFIG.startISO;
         EXPECTED_FIELDS.forEach(f=>{
           if(ARRAY_FIELDS.has(f)){
             const val = allData[f];
@@ -1008,6 +1037,7 @@
           second: '2-digit'
         });
         payload.page = location.href;
+        payload.data_treinamento = TRAINING_CONFIG.startISO;
         Object.entries(utmData).forEach(([k,v])=>{ payload[k]=v; });
         if(!payload.traffic_source){
           const sourceFallback = allData.como_conheceu || utmData.utm_source || utmData.utm_medium;
@@ -1232,7 +1262,7 @@
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h2 id="modalTitle">Primeira fase da inscrição finalizada</h2>
-            <p style="margin:6px 0 18px;font-size:.85rem;color:#c0dee1;line-height:1.55;">Sua inscrição foi registrada. Para garantir a vaga no encontro de <strong style="color:#ffffff;">13/11 • 19:00 às 21:29</strong>, finalize falando com nossa representante pelo WhatsApp.</p>
+            <p style="margin:6px 0 18px;font-size:.85rem;color:#c0dee1;line-height:1.55;">Sua inscrição foi registrada. Para garantir a vaga no encontro de <strong style="color:#ffffff;">${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}</strong>, finalize falando com nossa representante pelo WhatsApp.</p>
             <button type="button" class="btn btn-primary" id="finalWhats" style="width:100%;justify-content:center;">Falar com a representante</button>
             <p style="margin:18px 0 0;font-size:.75rem;color:#8fb8bc;line-height:1.5;">Ao clicar no botão, uma nova aba será aberta com a mensagem pronta. Envie para confirmar sua participação.</p>
           </div>`;
@@ -1265,9 +1295,9 @@
       (function initAfterCountdown(){
         const root = document.getElementById('afterCountdown');
         if(!root) return;
-        const startStr = root.getAttribute('data-date');
-        const start = new Date(startStr); // 29/09 19:29 -03
-        const end = new Date(start.getTime() + (2*60 + 0)*60*1000); // +2h (19:29 -> 21:29)
+        const startStr = root.getAttribute('data-date') || TRAINING_CONFIG.startISO;
+        const start = new Date(startStr);
+        const end = TRAINING_CONFIG.endISO ? new Date(TRAINING_CONFIG.endISO) : new Date(start.getTime() + (2*60)*60*1000);
         const dEl = document.getElementById('afDays');
         const hEl = document.getElementById('afHours');
         const mEl = document.getElementById('afMinutes');
