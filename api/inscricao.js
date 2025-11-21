@@ -62,6 +62,15 @@ function normalizePayload(body) {
   return body;
 }
 
+function extractClientId(payload) {
+  if (!payload || typeof payload !== 'object') return '';
+  if (payload.clientId) return String(payload.clientId).trim();
+  if (payload._meta && payload._meta.clientId) {
+    return String(payload._meta.clientId).trim();
+  }
+  return '';
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -82,7 +91,19 @@ export default async function handler(req, res) {
     await ensureSchema();
 
     const payload = normalizePayload(req.body);
+    const clientId = extractClientId(payload);
     const pg = getPool();
+    if (clientId) {
+      const existing = await pg.query(
+        `SELECT 1 FROM inscricoes.inscricoes WHERE payload->>'clientId' = $1 LIMIT 1`,
+        [clientId]
+      );
+      if (existing.rowCount) {
+        res.status(200).json({ ok: true, deduped: true, clientId });
+        return;
+      }
+    }
+
     await pg.query('INSERT INTO inscricoes.inscricoes (payload) VALUES ($1)', [payload]);
 
     if (N8N_WEBHOOK_URL) {

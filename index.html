@@ -773,6 +773,8 @@
       }
 
   let current = 0;
+  let isSubmitting = false;
+  let submitBtnOriginalText = '';
   // Recupera ou gera clientId (permite continuar preenchimento interrompido)
   let clientId = (function(){
     try{
@@ -841,6 +843,23 @@
       localStorage.setItem(PHONE_STORAGE_KEY, JSON.stringify(list));
     }catch{
       console.warn('Falha ao salvar número no storage');
+    }
+  }
+
+  function setSubmitButtonDisabled(disabled){
+    const btn = form ? form.querySelector('button[type="submit"]') : null;
+    if(!btn) return;
+    if(disabled){
+      if(!submitBtnOriginalText) submitBtnOriginalText = btn.textContent || '';
+      btn.disabled = true;
+      btn.setAttribute('aria-busy','true');
+      btn.classList.add('is-submitting');
+      btn.textContent = 'Enviando...';
+    } else {
+      btn.disabled = false;
+      btn.removeAttribute('aria-busy');
+      btn.classList.remove('is-submitting');
+      if(submitBtnOriginalText) btn.textContent = submitBtnOriginalText;
     }
   }
 
@@ -1201,35 +1220,53 @@
       // Envio final (poderia também disparar uma última captura)
       form.addEventListener('submit', async (e)=>{
         e.preventDefault();
-        if(!validateCurrent()) { setStatus('Preencha os campos obrigatórios', 'err'); return; }
-        const payload = collectStepData();
-        const phone = payload.telefone || allData.telefone || '';
-        if(isPhoneAlreadyRegistered(phone)){
-          setStatus('Este número já possui inscrição ativa.', 'err');
-          showPhoneDuplicateModal();
+        if(isSubmitting){
+          setStatus('Estamos finalizando seu envio...', 'info');
           return;
         }
-  payload._final = true;
-  const ok = await sendFinalSubmission(payload);
-        if(!ok){
-          setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
-          return;
-        }
-        addRegisteredPhone(phone);
-        
-        // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
+        isSubmitting = true;
+        let keepLocked = false;
+        setSubmitButtonDisabled(true);
         try{
-          sessionStorage.removeItem('up:formData');
-          sessionStorage.removeItem('up:clientId');
-          sessionStorage.setItem('up:formCompleted','true');
-        }catch{
-          console.warn('Erro ao limpar sessionStorage');
-        }
+          if(!validateCurrent()){
+            setStatus('Preencha os campos obrigatórios', 'err');
+            return;
+          }
+          const payload = collectStepData();
+          const phone = payload.telefone || allData.telefone || '';
+          if(isPhoneAlreadyRegistered(phone)){
+            setStatus('Este número já possui inscrição ativa.', 'err');
+            showPhoneDuplicateModal();
+            return;
+          }
+          payload._final = true;
+          const ok = await sendFinalSubmission(payload);
+          if(!ok){
+            setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
+            return;
+          }
+          keepLocked = true;
+          addRegisteredPhone(phone);
 
-        enterSuccessState();
-        
-        // Mostrar modal final de preparação em vez de recarregar direto
-        showFinalModal();
+          // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
+          try{
+            sessionStorage.removeItem('up:formData');
+            sessionStorage.removeItem('up:clientId');
+            sessionStorage.setItem('up:formCompleted','true');
+          }catch{
+            console.warn('Erro ao limpar sessionStorage');
+          }
+
+          enterSuccessState();
+
+          // Mostrar modal final de preparação em vez de recarregar direto
+          showFinalModal();
+        } finally {
+          if(!keepLocked){
+            setSubmitButtonDisabled(false);
+            isSubmitting = false;
+          }
+        }
       });
 
       // (CTA removido conforme solicitação)
