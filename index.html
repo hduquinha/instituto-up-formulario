@@ -958,6 +958,15 @@
         });
         const pt = document.getElementById('progressText');
         if(pt) pt.textContent = `Etapa ${current+1} de ${steps.length}`;
+
+        // Scroll automático para o topo do formulário (melhora UX no mobile)
+        const card = document.getElementById('formCard');
+        if(card){
+          setTimeout(()=>{
+            const y = card.getBoundingClientRect().top + window.pageYOffset - 60; // 60px de margem superior
+            window.scrollTo({top: y, behavior: 'smooth'});
+          }, 50);
+        }
       }
 
       // Validação da etapa atual
