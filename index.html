@@ -959,13 +959,21 @@
         const pt = document.getElementById('progressText');
         if(pt) pt.textContent = `Etapa ${current+1} de ${steps.length}`;
 
-        // Scroll automático para o topo do formulário (melhora UX no mobile)
+        // Scroll inteligente: tenta mostrar todo o card se couber, senão vai pro topo
         const card = document.getElementById('formCard');
         if(card){
           setTimeout(()=>{
-            const y = card.getBoundingClientRect().top + window.pageYOffset - 60; // 60px de margem superior
-            window.scrollTo({top: y, behavior: 'smooth'});
-          }, 50);
+            const rect = card.getBoundingClientRect();
+            const winH = window.innerHeight;
+            // Se o card for menor que a janela (cabe tudo), centraliza
+            if(rect.height < winH - 40){ 
+              card.scrollIntoView({block: 'center', behavior: 'smooth'});
+            } else {
+              // Se for maior, alinha ao topo com margem suave
+              const y = rect.top + window.pageYOffset - 20;
+              window.scrollTo({top: y, behavior: 'smooth'});
+            }
+          }, 100);
         }
       }
 
