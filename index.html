@@ -233,7 +233,7 @@
             <div class="prep-callout" aria-label="Preparação recomendada">
               <strong>Prepare-se para aproveitar melhor:</strong> pegue <strong>papel</strong>, <strong>caneta</strong>, use <strong>fone de ouvido</strong> e esteja em um <strong>lugar tranquilo</strong>.
             </div>
-            <div class="event-datetime" id="eventDatetime" data-template="Encontro ao vivo: {date} • {time} (horário de Brasília)">Encontro ao vivo: 10 e 11/12 • 19:00 às 21:29 (horário de Brasília)</div>
+            <div class="event-datetime" id="eventDatetime" data-template="Encontro ao vivo: {date} • {time} (horário de Brasília)">Encontro ao vivo: 07 e 08/01 • 19:00 às 21:29 (horário de Brasília)</div>
             <ul class="hero-points" aria-label="Benefícios principais">
               <li><strong>menos ansiedade</strong> ... <strong>mais foco</strong></li>
               <li><strong>menos estresse</strong> ... <strong>mais qualidade de sono</strong></li>
@@ -605,7 +605,7 @@
 
       <div class="after-form-countdown" aria-live="polite">
         <div class="countdown-banner" id="afterCountdown" data-date="">
-          <h3 id="countdownTitle" data-template="Encontro {date} • {timeRangeShort}">Encontro 10 e 11/12 • 19:00 – 21:29</h3>
+          <h3 id="countdownTitle" data-template="Encontro {date} • {timeRangeShort}">Encontro 07 e 08/01 • 19:00 – 21:29</h3>
           <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
@@ -637,18 +637,18 @@
       // =============================================
     // Ajuste a data do treinamento aqui para atualizar a página inteira e o payload automaticamente
     const TRAINING_CONFIG = {
-      startISO: '2025-12-10T19:00:00-03:00',
-      endISO: '2025-12-11T21:29:00-03:00',
-      dateDisplay: '10 e 11/12',
+      startISO: '2026-01-07T19:00:00-03:00',
+      endISO: '2026-01-08T21:29:00-03:00',
+      dateDisplay: '07 e 08/01',
       timeRange: '19:00 às 21:29',
       timeRangeShort: '19:00 – 21:29',
-      occupancyStartISO: '2025-11-27T00:00:00-03:00',
+      occupancyStartISO: '2025-12-27T00:00:00-03:00',
       occupancyMinPercent: 71,
       occupancyMaxPercent: 98
     };
 
     // Endpoint padrão da API (pode ser sobrescrito com ?endpoint=https://...)
-    const API_ENDPOINT = '/api/inscricao';
+    const API_ENDPOINT = '/api/n8n-form';
     // URL de redirecionamento opcional após sucesso (deixe vazio se não quiser redirecionar)
     const REDIRECT_URL = '';// ex: 'https://seusite.com/obrigado'
       // Tempo (ms) antes de redirecionar automaticamente (se REDIRECT_URL não for vazio)
