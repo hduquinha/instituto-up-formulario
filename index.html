@@ -1012,6 +1012,14 @@
                 valid = false;
               }
             }
+            // Validação de nome completo (pelo menos duas palavras)
+            if((input.name === 'nome' || input.id === 'nome') && input.value.trim()){
+              const words = input.value.trim().split(/\s+/).filter(w => w.length > 0);
+              if(words.length < 2){
+                if(errorEl) errorEl.textContent = 'Por favor, coloque seu nome completo';
+                valid = false;
+              }
+            }
           }
 
           // Radios: validar apenas uma vez por grupo (name)
