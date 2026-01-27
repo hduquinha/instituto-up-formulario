@@ -157,6 +157,15 @@
         }
         valid = false;
       }
+      // Validação de nome completo (pelo menos duas palavras)
+      if((el.name === 'nome' || el.id === 'nome') && el.value){
+        const words = el.value.trim().split(/\s+/).filter(w => w.length > 0);
+        if(words.length < 2){
+          const err = section.querySelector(`.error[data-for="nome"]`);
+          if(err) err.textContent = 'Por favor, coloque seu nome completo.';
+          valid = false;
+        }
+      }
     });
     return valid;
   }
