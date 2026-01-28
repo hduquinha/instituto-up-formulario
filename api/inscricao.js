@@ -1,7 +1,10 @@
 import { Pool } from 'pg';
+import tls from 'tls';
+
+// Necessário para conexão SSL com Aiven (ignora validação de certificado)
+tls.DEFAULT_MIN_VERSION = 'TLSv1.2';
 
 const DATABASE_URL = process.env.DATABASE_URL;
-const PG_SSL = process.env.PG_SSL === 'true';
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 
 let pool;
@@ -15,7 +18,10 @@ function getPool() {
   if (!pool) {
     pool = new Pool({
       connectionString: DATABASE_URL,
-      ssl: PG_SSL ? { rejectUnauthorized: false } : undefined,
+      ssl: {
+        rejectUnauthorized: false,
+        checkServerIdentity: () => undefined, // Ignora verificação de identidade do servidor
+      },
       max: 4,
       connectionTimeoutMillis: 8000,
     });
