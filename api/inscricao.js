@@ -1,8 +1,7 @@
-import { Pool } from 'pg';
-import tls from 'tls';
+// IMPORTANTE: Esta linha DEVE vir antes de qualquer import para funcionar na Vercel
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-// Necessário para conexão SSL com Aiven (ignora validação de certificado)
-tls.DEFAULT_MIN_VERSION = 'TLSv1.2';
+import { Pool } from 'pg';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
