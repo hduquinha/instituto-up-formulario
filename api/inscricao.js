@@ -4,7 +4,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import { Pool } from 'pg';
 
 const DATABASE_URL = process.env.DATABASE_URL;
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 
 let pool;
 let schemaReadyPromise;
@@ -110,18 +109,6 @@ export default async function handler(req, res) {
     }
 
     await pg.query('INSERT INTO inscricoes.inscricoes (payload) VALUES ($1)', [payload]);
-
-    if (N8N_WEBHOOK_URL) {
-      try {
-        await fetch(N8N_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      } catch (webhookErr) {
-        console.error('Falha ao acionar o webhook do n8n:', webhookErr);
-      }
-    }
 
     res.status(200).json({ ok: true });
   } catch (err) {
