@@ -606,7 +606,6 @@
       <div class="after-form-countdown" aria-live="polite">
         <div class="countdown-banner" id="afterCountdown" data-date="">
           <h3 id="countdownTitle" data-template="Encontro {date} • {timeRangeShort}">Encontro 25/03 • 19:00 – 21:29</h3>
-          <div id="afLive" class="countdown-live" hidden>🔴 AO VIVO EM</div>
           <div class="countdown-numbers" aria-label="Tempo restante">
             <div class="cd-box"><span id="afDays">00</span><small>Dias</small></div>
             <div class="cd-box"><span id="afHours">00</span><small>Horas</small></div>
@@ -1417,23 +1416,22 @@
         const hEl = document.getElementById('afHours');
         const mEl = document.getElementById('afMinutes');
         const sEl = document.getElementById('afSeconds');
-        const liveEl = document.getElementById('afLive');
         const endedEl = document.getElementById('afEnded');
         function pad(n){return String(n).padStart(2,'0');}
         function tick(){
           const now = new Date();
             if(now >= start && now <= end){
-              // Durante a live (11/03 19:00 - 12/03 21:29) - esconder tudo
-              liveEl.hidden = true; endedEl.hidden = true;
+              // Durante a live - esconder tudo
+              endedEl.hidden = true;
               return;
             }
             if(now > end){
               // Após o fim da live
-              liveEl.hidden = true; endedEl.hidden = false;
+              endedEl.hidden = false;
               return;
             }
-          // Antes da live - mostrar "AO VIVO EM" + countdown
-          liveEl.hidden = false; endedEl.hidden = true;
+          // Antes da live - mostrar countdown
+          endedEl.hidden = true;
           const diff = start - now;
           const total = Math.max(0, Math.floor(diff/1000));
           const days = Math.floor(total / 86400);
