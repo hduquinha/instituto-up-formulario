@@ -1,6 +1,3 @@
-// IMPORTANTE: Esta linha DEVE vir antes de qualquer import para funcionar na Vercel
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 import { Pool } from 'pg';
 
 const DATABASE_URL = process.env.DATABASE_URL;
