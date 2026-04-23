@@ -9,8 +9,16 @@ const SSL_QUERY_KEYS = [
 ];
 
 const MAX_BODY_BYTES = 64 * 1024;
+const FALLBACK_TIMEOUT_MS = 8000;
 const SSL_DISABLE_VALUES = new Set(['0', 'false', 'disable', 'disabled', 'off', 'no']);
 const SSL_STRICT_VALUES = new Set(['verify-ca', 'verify-full', 'strict']);
+const DATABASE_CONNECTIVITY_ERROR_CODES = new Set([
+  'ENOTFOUND',
+  'EAI_AGAIN',
+  'ECONNREFUSED',
+  'ECONNRESET',
+  'ETIMEDOUT',
+]);
 const DEFAULT_ALLOWED_DEV_ORIGINS = new Set([
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -29,6 +37,26 @@ function getDatabaseUrl() {
     throw new Error('DATABASE_URL nao configurada nas variaveis de ambiente.');
   }
   return databaseUrl;
+}
+
+function getFallbackUrl() {
+  const fallbackUrl = String(
+    process.env.INSCRICAO_FALLBACK_URL ||
+    process.env.FALLBACK_WEBHOOK_URL ||
+    ''
+  ).trim();
+
+  if (!fallbackUrl) return '';
+
+  try {
+    const url = new URL(fallbackUrl);
+    if (url.protocol === 'https:' || url.protocol === 'http:') {
+      return url.toString();
+    }
+  } catch {}
+
+  console.error('INSCRICAO_FALLBACK_URL invalida.');
+  return '';
 }
 
 function sanitizeConnectionString(connectionString) {
@@ -220,6 +248,81 @@ function extractClientId(payload) {
   return '';
 }
 
+function isDatabaseConfigurationError(err) {
+  if (!err) return false;
+  if (DATABASE_CONNECTIVITY_ERROR_CODES.has(err.code)) return true;
+  return String(err.message || '').includes('DATABASE_URL');
+}
+
+function getPublicErrorMessage(err) {
+  if (isDatabaseConfigurationError(err)) {
+    return 'Banco de dados indisponivel. Verifique a DATABASE_URL na Vercel.';
+  }
+
+  return 'Nao foi possivel salvar a inscricao.';
+}
+
+function getPublicStatusCode(err) {
+  return isDatabaseConfigurationError(err) ? 503 : 500;
+}
+
+function buildFallbackPayload(payload, clientId) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const meta = payload._meta && typeof payload._meta === 'object'
+    ? { ...payload._meta }
+    : {};
+
+  if (clientId && !meta.clientId) meta.clientId = clientId;
+  if (payload.page && !meta.page) meta.page = payload.page;
+  if (payload._step && !meta.step) meta.step = payload._step;
+  if (meta.final === undefined) meta.final = true;
+
+  return { ...payload, _meta: meta };
+}
+
+async function tryFallbackSave(payload, clientId) {
+  const fallbackUrl = getFallbackUrl();
+  if (!fallbackUrl || typeof fetch !== 'function') return false;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FALLBACK_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(fallbackUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildFallbackPayload(payload, clientId)),
+      signal: controller.signal,
+    });
+    const text = await response.text().catch(() => '');
+
+    if (!response.ok) {
+      console.error('Fallback de inscricao retornou status nao OK:', response.status, text.slice(0, 300));
+      return false;
+    }
+
+    if (text) {
+      try {
+        const json = JSON.parse(text);
+        if (json && json.ok === false) {
+          console.error('Fallback de inscricao recusou o payload:', text.slice(0, 300));
+          return false;
+        }
+      } catch {}
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Falha ao acionar fallback de inscricao:', err);
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function handler(req, res) {
   setCommonHeaders(res);
 
@@ -271,7 +374,16 @@ async function handler(req, res) {
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Erro ao processar inscricao:', err);
-    res.status(500).json({ ok: false, error: 'Nao foi possivel salvar a inscricao.' });
+
+    const payload = normalizePayload(req.body);
+    const clientId = extractClientId(payload);
+
+    if (await tryFallbackSave(payload, clientId)) {
+      res.status(200).json({ ok: true, fallback: true });
+      return;
+    }
+
+    res.status(getPublicStatusCode(err)).json({ ok: false, error: getPublicErrorMessage(err) });
   }
 }
 
