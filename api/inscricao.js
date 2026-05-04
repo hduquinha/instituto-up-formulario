@@ -27,6 +27,11 @@ const DEFAULT_ALLOWED_DEV_ORIGINS = new Set([
   'http://localhost:5174',
   'http://127.0.0.1:5174',
 ]);
+const PHONE_CONFLICT_DECISIONS = new Set([
+  'reuse_existing',
+  'edit_existing',
+  'different_person',
+]);
 
 let pool;
 let schemaReadyPromise;
@@ -73,8 +78,16 @@ function sanitizeConnectionString(connectionString) {
   }
 }
 
+function getSslModeFromDatabaseUrl() {
+  try {
+    return new URL(getDatabaseUrl()).searchParams.get('sslmode') || '';
+  } catch {
+    return '';
+  }
+}
+
 function getSslConfig() {
-  const sslMode = String(process.env.PG_SSL || process.env.PGSSLMODE || '')
+  const sslMode = String(process.env.PG_SSL || process.env.PGSSLMODE || getSslModeFromDatabaseUrl())
     .trim()
     .toLowerCase();
 
@@ -248,6 +261,247 @@ function extractClientId(payload) {
   return '';
 }
 
+function getPayloadAction(payload) {
+  if (!payload || typeof payload !== 'object') return '';
+  return String(payload._action || '').trim().slice(0, 64);
+}
+
+function safeString(value, maxLength = 160) {
+  return String(value || '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
+function normalizePhoneDigits(phone) {
+  const digits = String(phone || '').replace(/\D+/g, '');
+  if (!digits) return '';
+  if (digits.length > 11 && digits.startsWith('55')) return digits.slice(-11);
+  if (digits.length > 11) return digits.slice(-11);
+  return digits;
+}
+
+function normalizeDateKey(value) {
+  const raw = safeString(value, 80);
+  if (!raw) return '';
+
+  const date = new Date(raw);
+  if (!Number.isNaN(date.getTime())) {
+    return date.toISOString().slice(0, 10);
+  }
+
+  return raw.slice(0, 10);
+}
+
+function getEventNameFromPayload(payload) {
+  return safeString(
+    payload?.nome_evento ||
+    payload?.evento ||
+    payload?.treinamento ||
+    payload?.training_name ||
+    'Encontro UP',
+    120
+  ) || 'Encontro UP';
+}
+
+function getTrainingDateFromPayload(payload) {
+  return safeString(
+    payload?.data_treinamento ||
+    payload?.data_evento ||
+    payload?.training_date ||
+    payload?.event_date,
+    80
+  );
+}
+
+function buildPhoneMatch(row, currentTrainingDate) {
+  const payload = row?.payload && typeof row.payload === 'object' ? row.payload : {};
+  const trainingDate = getTrainingDateFromPayload(payload);
+
+  return {
+    id: row.id,
+    registrationLabel: `cadastro #${row.id}`,
+    nome: safeString(payload.nome || payload.name || 'Nome nao informado', 140),
+    eventName: getEventNameFromPayload(payload),
+    trainingDate,
+    createdAt: row.criado_em instanceof Date ? row.criado_em.toISOString() : safeString(row.criado_em, 80),
+    sameTraining: Boolean(
+      normalizeDateKey(trainingDate) &&
+      normalizeDateKey(trainingDate) === normalizeDateKey(currentTrainingDate)
+    ),
+  };
+}
+
+function getPhoneLookupQuery(extraWhere = '') {
+  return `
+    WITH base AS (
+      SELECT
+        id,
+        payload,
+        criado_em,
+        regexp_replace(coalesce(payload->>'telefone', ''), '[^0-9]', '', 'g') AS digits
+      FROM inscricoes.inscricoes
+      WHERE coalesce(payload->>'telefone', '') <> ''
+      ${extraWhere}
+    ),
+    normalized AS (
+      SELECT
+        id,
+        payload,
+        criado_em,
+        CASE
+          WHEN length(digits) > 11 AND left(digits, 2) = '55' THEN right(digits, 11)
+          WHEN length(digits) > 11 THEN right(digits, 11)
+          ELSE digits
+        END AS phone_digits
+      FROM base
+    )
+    SELECT id, payload, criado_em
+    FROM normalized
+    WHERE phone_digits = $1
+    ORDER BY criado_em DESC
+    LIMIT 1
+  `;
+}
+
+async function findRegistrationByPhone(pg, phone) {
+  const phoneDigits = normalizePhoneDigits(phone);
+  if (phoneDigits.length < 10) return null;
+
+  const result = await pg.query(getPhoneLookupQuery(), [phoneDigits]);
+  return result.rows[0] || null;
+}
+
+async function findRegistrationByIdAndPhone(pg, id, phone) {
+  const registrationId = Number.parseInt(id, 10);
+  const phoneDigits = normalizePhoneDigits(phone);
+  if (!registrationId || phoneDigits.length < 10) return null;
+
+  const result = await pg.query(getPhoneLookupQuery('AND id = $2'), [phoneDigits, registrationId]);
+  return result.rows[0] || null;
+}
+
+function shouldCopyIncomingValue(key, value) {
+  if (key.startsWith('_')) return true;
+  if ([
+    'clientId',
+    'timestamp',
+    'data_preenchimento',
+    'page',
+    'data_treinamento',
+    'traffic_source',
+    'from_bio',
+    'is_whatsapp_traffic',
+    'is_bio_traffic',
+    'audience_segment',
+  ].includes(key)) {
+    return true;
+  }
+  if (key.startsWith('utm_')) return true;
+  if (value === null || value === undefined) return false;
+  if (typeof value === 'string' && !value.trim()) return false;
+  if (Array.isArray(value) && value.length === 0) return false;
+  return true;
+}
+
+function mergeExistingRegistrationPayload(existingPayload, incomingPayload) {
+  const existing = existingPayload && typeof existingPayload === 'object' && !Array.isArray(existingPayload)
+    ? existingPayload
+    : {};
+  const incoming = incomingPayload && typeof incomingPayload === 'object' && !Array.isArray(incomingPayload)
+    ? incomingPayload
+    : {};
+  const merged = { ...existing };
+
+  for (const [key, value] of Object.entries(incoming)) {
+    if (shouldCopyIncomingValue(key, value)) {
+      merged[key] = value;
+    }
+  }
+
+  return merged;
+}
+
+function buildPhoneConflictMetadata(decision, matchRow) {
+  const metadata = {
+    decision,
+    checkedAt: new Date().toISOString(),
+    dashboardAlert: decision === 'different_person',
+    verified: Boolean(matchRow),
+  };
+
+  if (matchRow) {
+    const match = buildPhoneMatch(matchRow);
+    metadata.existingRegistrationId = match.id;
+    metadata.existingRegistrationLabel = match.registrationLabel;
+    metadata.existingName = match.nome;
+    metadata.existingEventName = match.eventName;
+    metadata.existingTrainingDate = match.trainingDate;
+    metadata.existingCreatedAt = match.createdAt;
+  }
+
+  return metadata;
+}
+
+async function preparePayloadForInsert(pg, payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const decision = safeString(payload._phoneConflictDecision, 40);
+  if (!PHONE_CONFLICT_DECISIONS.has(decision)) {
+    return payload;
+  }
+
+  const matchId = payload._existingRegistrationId || payload._phoneConflict?.existingRegistrationId;
+  const matchRow = await findRegistrationByIdAndPhone(pg, matchId, payload.telefone);
+  const prepared = decision === 'reuse_existing' && matchRow
+    ? mergeExistingRegistrationPayload(matchRow.payload, payload)
+    : { ...payload };
+
+  prepared._phoneConflict = buildPhoneConflictMetadata(decision, matchRow);
+  prepared._existingRegistrationId = matchRow ? matchRow.id : matchId || null;
+
+  if (decision === 'reuse_existing') {
+    prepared.reaproveitou_cadastro_existente = true;
+    prepared.cadastro_reaproveitado_id = matchRow ? matchRow.id : matchId || null;
+  }
+
+  if (decision === 'edit_existing') {
+    prepared.atualizacao_de_cadastro_existente = true;
+    prepared.cadastro_atualizado_id = matchRow ? matchRow.id : matchId || null;
+  }
+
+  if (decision === 'different_person') {
+    prepared.telefone_duplicado_confirmado = true;
+    prepared.telefone_duplicado_alerta_dashboard = true;
+    prepared.alerta_dashboard = 'telefone_duplicado';
+    prepared.telefone_duplicado_com_cadastro_id = matchRow ? matchRow.id : matchId || null;
+  }
+
+  return prepared;
+}
+
+async function handlePhoneLookup(pg, payload, res) {
+  const phoneDigits = normalizePhoneDigits(payload.telefone || payload.phone);
+  if (phoneDigits.length < 10) {
+    res.status(422).json({ ok: false, error: 'Telefone invalido.' });
+    return;
+  }
+
+  const matchRow = await findRegistrationByPhone(pg, phoneDigits);
+  if (!matchRow) {
+    res.status(200).json({ ok: true, found: false });
+    return;
+  }
+
+  res.status(200).json({
+    ok: true,
+    found: true,
+    match: buildPhoneMatch(matchRow, payload.data_treinamento),
+  });
+}
+
 function isDatabaseConfigurationError(err) {
   if (!err) return false;
   if (DATABASE_CONNECTIVITY_ERROR_CODES.has(err.code)) return true;
@@ -354,8 +608,19 @@ async function handler(req, res) {
     await ensureSchema();
 
     const payload = normalizePayload(req.body);
+    const action = getPayloadAction(payload);
     const clientId = extractClientId(payload);
     const pg = getPool();
+
+    if (action === 'lookupPhone') {
+      await handlePhoneLookup(pg, payload, res);
+      return;
+    }
+
+    if (action) {
+      res.status(400).json({ ok: false, error: 'Acao invalida.' });
+      return;
+    }
 
     if (clientId) {
       const existing = await pg.query(
@@ -369,7 +634,9 @@ async function handler(req, res) {
       }
     }
 
-    await pg.query('INSERT INTO inscricoes.inscricoes (payload) VALUES ($1)', [payload]);
+    const payloadToInsert = await preparePayloadForInsert(pg, payload);
+
+    await pg.query('INSERT INTO inscricoes.inscricoes (payload) VALUES ($1)', [payloadToInsert]);
 
     res.status(200).json({ ok: true });
   } catch (err) {
@@ -377,6 +644,12 @@ async function handler(req, res) {
 
     const payload = normalizePayload(req.body);
     const clientId = extractClientId(payload);
+    const action = getPayloadAction(payload);
+
+    if (action) {
+      res.status(getPublicStatusCode(err)).json({ ok: false, error: getPublicErrorMessage(err) });
+      return;
+    }
 
     if (await tryFallbackSave(payload, clientId)) {
       res.status(200).json({ ok: true, fallback: true });

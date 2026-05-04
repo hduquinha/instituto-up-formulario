@@ -92,6 +92,14 @@
   .final-modal{background:#0f1718; border:1px solid #204044; width:100%; max-width:520px; border-radius:26px; padding:34px 32px 40px; position:relative; box-shadow:0 12px 56px -10px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04)}
   .final-modal h2{margin:0 0 14px; font-size:1.55rem; line-height:1.1; letter-spacing:.5px; color:var(--primary);}
   .final-modal p{margin:0 0 16px; font-size:.95rem; color:#d0e5e8; line-height:1.5}
+  .duplicate-card{background:#122325;border:1px solid #21484d;border-radius:16px;padding:14px 16px;margin:14px 0 18px;color:#c0dee1;font-size:.82rem;line-height:1.45}
+  .duplicate-card strong{display:block;color:#ffffff;font-size:.95rem;margin-top:4px}
+  .duplicate-actions{display:grid;gap:12px;margin-top:8px}
+  .duplicate-actions .btn{width:100%;justify-content:flex-start;text-align:left;white-space:normal;line-height:1.25}
+  .duplicate-actions .btn span{display:block;font-weight:800}
+  .duplicate-actions .btn small{display:block;font-size:.68rem;color:#8fb8bc;font-weight:600;letter-spacing:.2px;margin-top:4px;line-height:1.35;text-shadow:none}
+  .duplicate-actions .btn-primary small{color:#06464d}
+  .duplicate-note{margin:14px 0 0!important;font-size:.72rem!important;color:#8fb8bc!important}
   .prep-list{list-style:none; margin:14px 0 24px; padding:0; display:grid; gap:10px}
   .prep-list li{background:#132628; border:1px solid #21484d; padding:12px 14px 12px 48px; border-radius:14px; font-size:.8rem; position:relative; font-weight:500; letter-spacing:.3px; color:#c0dee1}
   .prep-list li:before{content:'✔'; position:absolute; left:16px; top:50%; transform:translateY(-50%); background:#1d4348; width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:.9rem; color:var(--primary); font-weight:700; box-shadow:0 0 0 1px #29666d inset}
@@ -813,6 +821,8 @@
   const PHONE_STORAGE_KEY = 'up:registeredPhones';
   const PHONE_VERSION_KEY = 'up:phoneVersion';
   const PHONE_VERSION_VALUE = `event-${TRAINING_CONFIG.startISO.slice(0,10)}`;
+  let phoneConflictState = null;
+  let isCheckingPhone = false;
 
   (function ensurePhoneStorageVersion(){
     try{
@@ -860,6 +870,139 @@
     }
   }
 
+  function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[char]));
+  }
+
+  function formatTrainingDateForDisplay(value){
+    if(!value) return '';
+    const date = new Date(value);
+    if(!Number.isNaN(date.getTime())){
+      const day = date.toLocaleDateString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      const time = date.toLocaleTimeString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return `${day} às ${time}`;
+    }
+    return String(value);
+  }
+
+  function getActivePhoneConflict(phone){
+    const normalized = normalizePhone(phone);
+    if(!phoneConflictState || phoneConflictState.phone !== normalized) return null;
+    return phoneConflictState;
+  }
+
+  function setPhoneConflictDecision(decision, match, phone){
+    phoneConflictState = {
+      phone: normalizePhone(phone || allData.telefone || ''),
+      found: true,
+      decision,
+      match: match || null
+    };
+  }
+
+  function applyPhoneConflictToPayload(payload){
+    const conflict = getActivePhoneConflict(payload.telefone || allData.telefone || '');
+    if(!conflict || !conflict.decision) return payload;
+
+    payload._phoneConflictDecision = conflict.decision;
+    payload._existingRegistrationId = conflict.match?.id || null;
+    payload._phoneConflict = {
+      decision: conflict.decision,
+      existingRegistrationId: conflict.match?.id || null,
+      existingRegistrationLabel: conflict.match?.registrationLabel || '',
+      existingName: conflict.match?.nome || '',
+      existingEventName: conflict.match?.eventName || '',
+      existingTrainingDate: conflict.match?.trainingDate || '',
+      selectedAt: new Date().toISOString(),
+      dashboardAlert: conflict.decision === 'different_person'
+    };
+
+    if(conflict.decision === 'different_person'){
+      payload.telefone_duplicado_confirmado = true;
+      payload.telefone_duplicado_alerta_dashboard = true;
+      payload.alerta_dashboard = 'telefone_duplicado';
+    }
+    if(conflict.decision === 'edit_existing'){
+      payload.atualizacao_de_cadastro_existente = true;
+    }
+    if(conflict.decision === 'reuse_existing'){
+      payload.reaproveitou_cadastro_existente = true;
+    }
+    return payload;
+  }
+
+  async function lookupPhoneRegistration(phone){
+    const endpoint = getEndpoint();
+    if(!endpoint || endpoint.startsWith('PASTE_')){
+      throw new Error('Endpoint de inscrição não configurado');
+    }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        _action: 'lookupPhone',
+        telefone: phone,
+        data_treinamento: TRAINING_CONFIG.startISO,
+        clientId
+      })
+    });
+    const json = await response.json().catch(()=>({ ok:false }));
+    if(!response.ok || json.ok === false){
+      throw new Error(json?.error || 'Falha ao consultar telefone');
+    }
+    return json;
+  }
+
+  async function ensurePhoneDecision(payload){
+    const phone = payload.telefone || allData.telefone || '';
+    const normalized = normalizePhone(phone);
+    if(!normalized) return true;
+
+    const activeConflict = getActivePhoneConflict(phone);
+    if(activeConflict?.decision || activeConflict?.found === false) return true;
+    if(isCheckingPhone) return false;
+
+    isCheckingPhone = true;
+    setStatus('Verificando se este telefone já tem cadastro...', 'info');
+
+    try{
+      const result = await lookupPhoneRegistration(phone);
+      if(!result.found){
+        phoneConflictState = { phone: normalized, found: false, decision: '', match: null };
+        setStatus('');
+        return true;
+      }
+
+      phoneConflictState = { phone: normalized, found: true, decision: '', match: result.match };
+      setStatus('Encontramos um cadastro com este telefone.', 'info');
+      showPhoneDuplicateModal(result.match, { phone, payload });
+      return false;
+    }catch(err){
+      console.warn('Falha ao consultar telefone:', err);
+      phoneConflictState = { phone: normalized, found: false, decision: '', match: null, lookupError: true };
+      setStatus('Não consegui verificar esse telefone agora. Vamos seguir e a equipe confere no painel.', 'info');
+      return true;
+    }finally{
+      isCheckingPhone = false;
+    }
+  }
+
   function setSubmitButtonDisabled(disabled){
     const btn = form ? form.querySelector('button[type="submit"]') : null;
     if(!btn) return;
@@ -894,6 +1037,9 @@
         out = '('+digits;
       }
       telInput.value = out;
+      if(phoneConflictState && phoneConflictState.phone !== normalizePhone(out)){
+        phoneConflictState = null;
+      }
     });
   })();
 
@@ -1206,8 +1352,32 @@
         }
       }
 
+      async function finalizeSubmission(payload, phone){
+        applyPhoneConflictToPayload(payload);
+        payload._final = true;
+        const ok = await sendFinalSubmission(payload);
+        if(!ok){
+          setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
+          return false;
+        }
+
+        addRegisteredPhone(phone);
+
+        try{
+          sessionStorage.removeItem('up:formData');
+          sessionStorage.removeItem('up:clientId');
+          sessionStorage.setItem('up:formCompleted','true');
+        }catch{
+          console.warn('Erro ao limpar sessionStorage');
+        }
+
+        enterSuccessState();
+        showFinalModal();
+        return true;
+      }
+
       // Navegação Próximo/Voltar
-      form.addEventListener('click', (e)=>{
+      form.addEventListener('click', async (e)=>{
         const nextBtn = e.target.closest('[data-next]');
         const backBtn = e.target.closest('[data-back]');
         if(nextBtn){
@@ -1215,12 +1385,8 @@
           const payload = collectStepData();
           setStatus('');
           if(current === 0){
-            const phone = payload.telefone || allData.telefone || '';
-            if(isPhoneAlreadyRegistered(phone)){
-              setStatus('Este número já possui inscrição ativa.', 'err');
-              showPhoneDuplicateModal();
-              return;
-            }
+            const canContinue = await ensurePhoneDecision(payload);
+            if(!canContinue) return;
           }
           showStep(current + 1);
         }
@@ -1232,7 +1398,7 @@
       });
 
       // Prevenir Enter de submeter o formulário, exceto na última etapa
-      form.addEventListener('keydown', (e)=>{
+      form.addEventListener('keydown', async (e)=>{
         if(e.key === 'Enter' && e.target.type !== 'submit'){
           e.preventDefault();
           // Se não estiver na última etapa, simula clique no botão PRÓXIMO
@@ -1241,12 +1407,8 @@
             const payload = collectStepData();
             setStatus('');
             if(current === 0){
-              const phone = payload.telefone || allData.telefone || '';
-              if(isPhoneAlreadyRegistered(phone)){
-                setStatus('Este número já possui inscrição ativa.', 'err');
-                showPhoneDuplicateModal();
-                return;
-              }
+              const canContinue = await ensurePhoneDecision(payload);
+              if(!canContinue) return;
             }
             showStep(current + 1);
           } else {
@@ -1273,33 +1435,15 @@
           }
           const payload = collectStepData();
           const phone = payload.telefone || allData.telefone || '';
-          if(isPhoneAlreadyRegistered(phone)){
-            setStatus('Este número já possui inscrição ativa.', 'err');
-            showPhoneDuplicateModal();
+          const canSubmit = await ensurePhoneDecision(payload);
+          if(!canSubmit){
             return;
           }
-          payload._final = true;
-          const ok = await sendFinalSubmission(payload);
-          if(!ok){
-            setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
+          const completed = await finalizeSubmission(payload, phone);
+          if(!completed){
             return;
           }
           keepLocked = true;
-          addRegisteredPhone(phone);
-
-          // Limpar progresso e clientId do sessionStorage após envio bem-sucedido
-          try{
-            sessionStorage.removeItem('up:formData');
-            sessionStorage.removeItem('up:clientId');
-            sessionStorage.setItem('up:formCompleted','true');
-          }catch{
-            console.warn('Erro ao limpar sessionStorage');
-          }
-
-          enterSuccessState();
-
-          // Mostrar modal final de preparação em vez de recarregar direto
-          showFinalModal();
         } finally {
           if(!keepLocked){
             setSubmitButtonDisabled(false);
@@ -1333,31 +1477,83 @@
           });
         });
       })();
-      function showPhoneDuplicateModal(){
-        if(document.getElementById('duplicateOverlay')) return;
+      function showPhoneDuplicateModal(match = {}, context = {}){
+        const existingOverlay = document.getElementById('duplicateOverlay');
+        if(existingOverlay) existingOverlay.remove();
+        const phone = context.phone || allData.telefone || '';
+        const currentEvent = `Encontro UP de ${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}`;
+        const previousEvent = [
+          match.eventName || 'Encontro UP',
+          formatTrainingDateForDisplay(match.trainingDate)
+        ].filter(Boolean).join(' de ');
+        const registrationLabel = match.registrationLabel || (match.id ? `cadastro #${match.id}` : 'cadastro encontrado');
+        const participantName = match.nome || 'nome não informado';
         const ov = document.createElement('div');
         ov.className = 'final-overlay';
         ov.id = 'duplicateOverlay';
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="duplicateTitle">
-            <h2 id="duplicateTitle">Número já inscrito</h2>
-            <p style="margin:10px 0 18px;font-size:.9rem;color:#c0dee1;line-height:1.55;">Este telefone já está cadastrado para esta live. Se precisar de ajuda, fale com nossa equipe pelo WhatsApp.</p>
-            <div style="display:flex;flex-direction:column;gap:12px;">
-              <button type="button" class="btn btn-primary" id="dupWhats" style="justify-content:center;">Chamar suporte no WhatsApp</button>
-              <button type="button" class="btn btn-sec" id="dupClose" style="justify-content:center;">Fechar</button>
+            <h2 id="duplicateTitle">Telefone já encontrado</h2>
+            <p>Esse número aparece em um cadastro anterior. Confira se é seu antes de continuar.</p>
+            <div class="duplicate-card">
+              ${escapeHtml(registrationLabel)}
+              <strong>${escapeHtml(participantName)}</strong>
+              <span>${escapeHtml(previousEvent || 'Evento não informado')}</span>
             </div>
+            <p>Você quer usar esse cadastro para se inscrever no <strong style="color:#ffffff;">${escapeHtml(currentEvent)}</strong>?</p>
+            <div class="duplicate-actions">
+              <button type="button" class="btn btn-primary" id="dupUse">
+                <span>Usar este cadastro</span>
+                <small>Inscrever neste encontro reaproveitando as informações já salvas.</small>
+              </button>
+              <button type="button" class="btn btn-sec" id="dupEdit">
+                <span>Sou eu e quero atualizar os dados</span>
+                <small>Continuar preenchendo o formulário antes de enviar.</small>
+              </button>
+              <button type="button" class="btn btn-sec" id="dupDifferent">
+                <span>Não sou eu; continuar com este telefone</span>
+                <small>Permite o cadastro e marca alerta de telefone duplicado no painel.</small>
+              </button>
+              <button type="button" class="btn" id="dupClose" style="justify-content:center;">Voltar e corrigir telefone</button>
+            </div>
+            <p class="duplicate-note">Quando a terceira opção for escolhida, a inscrição segue normalmente e o painel recebe a marcação de duplicidade para conferência.</p>
           </div>`;
         document.body.appendChild(ov);
-        const whatsappUrl = 'https://wa.me/5513997832766?text=Olá! Estou com dúvidas sobre minha inscrição no Encontro UP.';
         const close = ()=>{
           ov.classList.add('hide');
           setTimeout(()=>{ if(ov.parentNode) ov.remove(); }, 250);
         };
+        const continueWithDecision = (decision)=>{
+          setPhoneConflictDecision(decision, match, phone);
+          close();
+          if(current === 0){
+            showStep(1);
+          }
+          if(decision === 'edit_existing'){
+            setStatus('Certo. Atualize os dados que desejar e finalize sua inscrição.', 'info');
+          }
+          if(decision === 'different_person'){
+            setStatus('Tudo bem. Vamos seguir e sinalizar a duplicidade no painel.', 'info');
+          }
+        };
         ov.addEventListener('click', e=>{ if(e.target === ov) close(); });
         ov.querySelector('#dupClose').addEventListener('click', close);
-        ov.querySelector('#dupWhats').addEventListener('click', ()=>{
-          window.open(whatsappUrl, '_blank','noopener');
-          close();
+        ov.querySelector('#dupEdit').addEventListener('click', ()=> continueWithDecision('edit_existing'));
+        ov.querySelector('#dupDifferent').addEventListener('click', ()=> continueWithDecision('different_person'));
+        ov.querySelector('#dupUse').addEventListener('click', async ()=>{
+          setPhoneConflictDecision('reuse_existing', match, phone);
+          const buttons = Array.from(ov.querySelectorAll('button'));
+          buttons.forEach(btn => { btn.disabled = true; });
+          const useBtn = ov.querySelector('#dupUse span');
+          if(useBtn) useBtn.textContent = 'Enviando inscrição...';
+          const payload = collectStepData();
+          const completed = await finalizeSubmission(payload, phone);
+          if(completed){
+            close();
+          } else {
+            buttons.forEach(btn => { btn.disabled = false; });
+            if(useBtn) useBtn.textContent = 'Usar este cadastro';
+          }
         });
       }
       try{
