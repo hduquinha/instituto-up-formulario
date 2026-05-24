@@ -845,6 +845,50 @@
     return (phone || '').replace(/\D+/g,'');
   }
 
+  function normalizeText(value){
+    return String(value ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  function toTitleCase(value){
+    const lowercaseWords = new Set(['da', 'de', 'do', 'das', 'dos', 'e']);
+    return normalizeText(value)
+      .toLowerCase()
+      .split(' ')
+      .filter(Boolean)
+      .map((word, index) => {
+        if(index > 0 && lowercaseWords.has(word)) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+  }
+
+  function normalizeUf(value){
+    return normalizeText(value).replace(/[^a-zA-Z]/g, '').slice(0, 2).toUpperCase();
+  }
+
+  function normalizePayloadValues(payload){
+    const normalized = { ...payload };
+    ['nome', 'indicacao', 'acompanhante_nome'].forEach(key => {
+      if(typeof normalized[key] === 'string') normalized[key] = toTitleCase(normalized[key]);
+    });
+    ['cidade'].forEach(key => {
+      if(typeof normalized[key] === 'string') normalized[key] = toTitleCase(normalized[key]);
+    });
+    ['profissao_area'].forEach(key => {
+      if(typeof normalized[key] === 'string') normalized[key] = normalizeText(normalized[key]);
+    });
+    ['estado'].forEach(key => {
+      if(typeof normalized[key] === 'string') normalized[key] = normalizeUf(normalized[key]);
+    });
+    ['telefone', 'contato_emergencia', 'acompanhante_telefone'].forEach(key => {
+      if(typeof normalized[key] === 'string') normalized[key] = normalizePhone(normalized[key]);
+    });
+    if(normalized.cidade && normalized.estado){
+      normalized.cidade_estado = `${normalized.cidade} - ${normalized.estado}`;
+    }
+    return normalized;
+  }
+
   function getRegisteredPhones(){
     try{
       const raw = localStorage.getItem(PHONE_STORAGE_KEY);
@@ -1268,6 +1312,11 @@
             payload[f] = (f in allData) ? allData[f] : null;
           }
         });
+        Object.assign(payload, normalizePayloadValues(payload));
+        Object.assign(allData, normalizePayloadValues(allData));
+        try{
+          sessionStorage.setItem('up:formData', JSON.stringify(allData));
+        }catch{}
         // Metadados / tracking
         payload._step = current + 1;
         payload.clientId = clientId;
