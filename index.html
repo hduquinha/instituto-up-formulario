@@ -306,6 +306,11 @@
                     <div class="error" data-for="cidade"></div>
                   </div>
                   <div class="field">
+                    <label for="estado">Estado (UF)</label>
+                    <input id="estado" name="estado" type="text" inputmode="text" maxlength="2" placeholder="SP" required />
+                    <div class="error" data-for="estado"></div>
+                  </div>
+                  <div class="field">
                     <label for="telefone">Telefone</label>
                     <input id="telefone" name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" required />
                     <div class="error" data-for="telefone"></div>
@@ -663,7 +668,7 @@
 
       // Campos esperados para padronizar o payload (ordem e existência estável)
       const EXPECTED_FIELDS = [
-        'nome','cidade','telefone','idade',
+        'nome','cidade','estado','telefone','idade',
         'ansiedade','sono','vida_financeira','saude_fisica','relacionamentos_familiares','relacionamento','areas_melhoria',
         'profissao_area','gatilhos_ansiedade',
         'sintomas_fisicos','sintomas_emocionais',
