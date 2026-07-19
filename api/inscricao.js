@@ -404,6 +404,19 @@ function shouldCopyIncomingValue(key, value) {
   return true;
 }
 
+// Campos que definem DE QUAL formulario/produto o cadastro e (ver
+// docs/cartilha-formularios-produtos.md na raiz do repositorio). Ao reaproveitar
+// um cadastro existente da mesma pessoa, esses campos NAO podem ser herdados:
+// cada evento carrega a identidade do formulario onde nasceu. Herda-los e o que
+// criava blocos/datas fantasma no dashboard (ex.: origem "Aula Exclusiva" com
+// data_treinamento ISO do Encontro Online).
+const FORM_IDENTITY_FIELDS = [
+  'origem', 'nome_evento', 'evento', 'modalidade', 'local', 'escola', 'data',
+  'treinamento', 'treinamento_nome', 'training_name', 'training_option',
+  'data_treinamento', 'dataTreinamento', 'data_evento', 'training_date', 'event_date',
+  'unidade_negocio', 'landing_page_grupo', 'form_name', 'campaign_name',
+];
+
 function mergeExistingRegistrationPayload(existingPayload, incomingPayload) {
   const existing = existingPayload && typeof existingPayload === 'object' && !Array.isArray(existingPayload)
     ? existingPayload
@@ -412,6 +425,10 @@ function mergeExistingRegistrationPayload(existingPayload, incomingPayload) {
     ? incomingPayload
     : {};
   const merged = { ...existing };
+
+  for (const field of FORM_IDENTITY_FIELDS) {
+    delete merged[field];
+  }
 
   for (const [key, value] of Object.entries(incoming)) {
     if (shouldCopyIncomingValue(key, value)) {
