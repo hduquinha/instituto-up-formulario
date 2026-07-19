@@ -3,7 +3,7 @@
    carimbado em todos os repos por tools/set-clarity-id.sh na raiz do monorepo.
    Enquanto o placeholder não for substituído, este arquivo é um no-op. */
 (function () {
-  var CLARITY_ID = "__CLARITY_ID__";
+  var CLARITY_ID = "xonuuydq5e";
   if (!CLARITY_ID || CLARITY_ID.indexOf("__") === 0) return;
 
   (function (c, l, a, r, i, t, y) {
