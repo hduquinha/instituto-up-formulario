@@ -39,7 +39,38 @@ Criar `.env.local`:
 DATABASE_URL=postgres://<readonly-user>:<readonly-password>@<host>:<port>/<database>?sslmode=require
 AUTH_SECRET=<gere-um-segredo-longo-e-aleatorio>
 AUTH_TRUST_HOST=true
+CUPONS_ENCONTRO_ONLINE=<codigos-de-cortesia-separados-por-virgula>
 ```
+
+### Cupons de cortesia (`CUPONS_ENCONTRO_ONLINE`)
+
+Na última etapa do formulário o inscrito escolhe entre "tenho cupom" e "não
+tenho cupom". Sem cupom (ou com cupom recusado) ele vai para o link de pagamento
+da Asaas definido em `checkout-config.js`; com cupom aceito vai para
+`checkout.html`, a tela de cortesia com o valor zerado.
+
+Todo cupom aceito é **cortesia integral** — não existe cupom parcial, porque a
+tela de cortesia não cobra diferença. Formato de cada código:
+
+```
+CODIGO                 # sem limite de uso, sem validade
+CODIGO:10              # no máximo 10 usos
+CODIGO:10:2026-08-11   # 10 usos e válido até 11/08/2026 (inclusive)
+CODIGO::2026-08-11     # sem limite de uso, válido até a data
+```
+
+Exemplo: `CUPONS_ENCONTRO_ONLINE=CORTESIA2026:30:2026-08-11,PARCEIRO-XYZ:5`
+
+Regras que não podem ser quebradas:
+
+- **Os códigos nunca vão para o front-end.** A página é pública; um código no
+  HTML/JS vira entrada gratuita para qualquer visitante que abra o código-fonte.
+  Quem decide se o cupom vale é sempre `api/inscricao.js`, no servidor.
+- **Códigos curtos são adivinháveis.** O endpoint de conferência responde na
+  hora, então prefira códigos longos e use o limite de usos para reduzir o
+  estrago de um código vazado.
+- Sem a variável configurada, nenhum cupom é aceito e todo mundo segue para o
+  pagamento — o formulário continua funcionando normalmente.
 > **Importante:** nunca commitar segredos reais em `README`, `.env`, prints ou issues. Se algum segredo real já foi exposto, faça a rotação imediatamente.
 >
 > **Nota:** o Aiven exige SSL. Sempre prefira um usuário readonly dedicado ao dashboard.

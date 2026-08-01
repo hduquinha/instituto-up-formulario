@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Cupom aplicado — Encontro UP | Instituto UP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script defer src="/clarity.js"></script>
+    <script src="/checkout-config.js"></script>
+    <style>
+      :root{
+        --primary:#27abb6;
+        --primary-rgb:39,171,182;
+        --text:#ffffff;
+        --muted:#d1d5d8;
+      }
+      *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+      html{font-size:18px}
+      @media (max-width:900px){ html{font-size:17px} }
+      @media (max-width:600px){ html{font-size:16px} }
+      html,body{height:100%}
+      body{
+        margin:0; font-family:'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        color:var(--text); line-height:1.5;
+        background:linear-gradient(145deg,#000000,#061112 55%,#082024);
+        display:flex; align-items:center; justify-content:center; padding:24px 18px;
+      }
+      .card{
+        width:100%; max-width:560px; background:#0f1718; border:1px solid #204044;
+        border-radius:26px; padding:38px 34px 34px;
+        box-shadow:0 12px 56px -10px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);
+      }
+      @media (max-width:600px){ .card{padding:30px 22px 28px; border-radius:22px} }
+      .brand{font-size:.68rem; letter-spacing:2.4px; text-transform:uppercase; color:#7ea5a9; font-weight:700; margin:0 0 20px}
+      .badge{
+        display:inline-flex; align-items:center; gap:8px; background:rgba(var(--primary-rgb),.14);
+        border:1px solid #226b73; color:#7fe4ec; border-radius:40px; padding:8px 16px;
+        font-size:.7rem; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:18px;
+      }
+      h1{margin:0 0 12px; font-size:1.65rem; line-height:1.15; letter-spacing:.3px; color:var(--primary)}
+      .lead{margin:0 0 24px; font-size:.95rem; color:#d0e5e8; line-height:1.55}
+      .summary{background:#122325; border:1px solid #21484d; border-radius:18px; padding:18px 20px; margin:0 0 24px}
+      .summary-title{font-size:.68rem; letter-spacing:1.6px; text-transform:uppercase; color:#7ea5a9; font-weight:700; margin:0 0 12px}
+      .line{display:flex; justify-content:space-between; align-items:baseline; gap:14px; font-size:.88rem; color:#c0dee1; padding:9px 0}
+      /* `display:flex` vence o `[hidden]{display:none}` do navegador: sem esta
+         regra as linhas de preço apareceriam vazias quando não há preço. */
+      .line[hidden]{display:none}
+      .line + .line{border-top:1px solid #1b3a3e}
+      .line .label{color:#9dc3c7}
+      .line .value{font-weight:700; color:#e7f6f7; text-align:right}
+      .line.discount .value{color:#7fe4ec}
+      .line.total{border-top:1px solid #2a5a60; margin-top:5px; padding-top:14px}
+      /* Sem preço configurado o total fica sozinho — a borda viraria um traço solto. */
+      .summary[data-single] .line.total{border-top:none; margin-top:0; padding-top:0}
+      .line.total .label{font-size:1rem; font-weight:800; color:#fff; letter-spacing:.3px}
+      .line.total .value{color:var(--primary); font-size:1.7rem; letter-spacing:.5px}
+      .strike{text-decoration:line-through; color:#7b9a9e; font-weight:600}
+      .event{background:#101c1e; border:1px solid #1f3b3f; border-radius:14px; padding:14px 16px; margin:0 0 20px}
+      .event strong{display:block; color:#fff; font-size:.95rem; margin-bottom:3px}
+      .event span{display:block; color:#9dc3c7; font-size:.8rem}
+      .btn{
+        appearance:none; width:100%; border:2px solid var(--primary); background:var(--primary); color:#002b30;
+        padding:16px 22px; border-radius:14px; cursor:pointer; font-weight:800; letter-spacing:.6px;
+        font-size:.95rem; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        text-decoration:none; transition:.25s; text-shadow:0 1px 0 rgba(255,255,255,.25);
+      }
+      .btn:hover{background:#1e919b; border-color:#1e919b; color:#e6feff}
+      .btn:focus-visible{outline:none; box-shadow:0 0 0 4px rgba(var(--primary-rgb),.55)}
+      .btn-sec{background:#173337; border-color:#1f4d52; color:#b8dadd; font-weight:700; text-shadow:none; margin-top:12px}
+      .btn-sec:hover{background:#1d4045; border-color:#2d5f65; color:#fff}
+      .note{margin:20px 0 0; font-size:.75rem; color:#8fb8bc; line-height:1.55; text-align:center}
+      .state-ok, .state-loading, .state-invalid{display:none}
+      body[data-state="loading"] .state-loading{display:block}
+      body[data-state="ok"] .state-ok{display:block}
+      body[data-state="invalid"] .state-invalid{display:block}
+      .spinner{
+        width:34px; height:34px; border-radius:50%; margin:10px auto 18px;
+        border:3px solid #1f3b3f; border-top-color:var(--primary); animation:spin .8s linear infinite;
+      }
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @media (prefers-reduced-motion: reduce){ .spinner{animation-duration:2.4s} }
+    </style>
+  </head>
+  <body data-state="loading">
+    <main class="card">
+      <p class="brand">Instituto UP · Encontro Online</p>
+
+      <!-- Enquanto o servidor confere o código informado na URL -->
+      <section class="state-loading" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <h1>Conferindo seu cupom...</h1>
+        <p class="lead">Só um instante.</p>
+      </section>
+
+      <!-- Cupom aceito pelo servidor -->
+      <section class="state-ok" aria-live="polite">
+        <span class="badge">Cupom aplicado</span>
+        <h1 id="okTitle">Sua inscrição está confirmada</h1>
+        <p class="lead">
+          O cupom <strong id="okCode" style="color:#7fe4ec"></strong> cobre 100% do valor do encontro.
+          Não há nada a pagar — sua vaga já está garantida.
+        </p>
+
+        <div class="event">
+          <strong id="eventTitle">Encontro Online — Instituto UP</strong>
+          <span id="eventWhen"></span>
+        </div>
+
+        <div class="summary">
+          <p class="summary-title">Resumo</p>
+          <div class="line" id="linePrice" hidden>
+            <span class="label">Encontro Online</span>
+            <span class="value strike" id="priceValue"></span>
+          </div>
+          <div class="line discount" id="lineDiscount" hidden>
+            <span class="label">Desconto do cupom <span id="discountCode"></span></span>
+            <span class="value" id="discountValue"></span>
+          </div>
+          <div class="line total">
+            <span class="label">Total a pagar</span>
+            <span class="value">R$ 0,00</span>
+          </div>
+        </div>
+
+        <a class="btn" id="whatsBtn" href="#" target="_blank" rel="noopener">CONFIRMAR PRESENÇA NO WHATSAPP</a>
+        <p class="note">
+          Guarde esta tela. As orientações do encontro também chegam pelo WhatsApp cadastrado.
+        </p>
+      </section>
+
+      <!-- Nenhum cupom válido: não afirmamos nada sobre inscrição -->
+      <section class="state-invalid" aria-live="polite">
+        <h1>Cupom não encontrado</h1>
+        <p class="lead" id="invalidMsg">
+          Não localizamos um cupom válido para este link. Se você já preencheu o formulário,
+          é só concluir o pagamento para garantir sua vaga.
+        </p>
+        <a class="btn" id="payBtn" href="#">IR PARA O PAGAMENTO</a>
+        <a class="btn btn-sec" href="/">VOLTAR PARA O FORMULÁRIO</a>
+      </section>
+    </main>
+
+    <script>
+      (function(){
+        const config = window.CHECKOUT_CONFIG || {};
+        const body = document.body;
+
+        function money(value){
+          return Number(value).toLocaleString('pt-BR', {
+            style: 'currency', currency: 'BRL', minimumFractionDigits: 2
+          });
+        }
+
+        function setState(state){ body.setAttribute('data-state', state); }
+
+        function readStoredCoupon(){
+          try{
+            const raw = sessionStorage.getItem('up:cupomAplicado');
+            return raw ? JSON.parse(raw) : null;
+          }catch{
+            return null;
+          }
+        }
+
+        const params = new URLSearchParams(location.search);
+        const stored = readStoredCoupon();
+        const codigo = (params.get('cupom') || (stored && stored.codigo) || '').trim();
+
+        // A data da turma vem do TRAINING_CONFIG do formulário, via querystring:
+        // duplicá-la aqui criaria um segundo lugar para esquecer de atualizar.
+        const quando = (params.get('quando') || '').trim().slice(0, 80);
+        const eventWhen = document.getElementById('eventWhen');
+        if(eventWhen) eventWhen.textContent = quando || 'Você receberá a data e o link no WhatsApp cadastrado.';
+
+        const payBtn = document.getElementById('payBtn');
+        if(payBtn) payBtn.href = config.asaasUrl || '/';
+
+        const whatsBtn = document.getElementById('whatsBtn');
+        if(whatsBtn && config.whatsappUrl) whatsBtn.href = config.whatsappUrl;
+
+        if(!codigo){
+          setState('invalid');
+          return;
+        }
+
+        // Confere no servidor em vez de confiar na URL: assim ninguém abre
+        // /checkout.html?cupom=QUALQUERCOISA e sai com uma tela de inscrição
+        // confirmada na mão. É `consultarCupom` (e não `validarCupom`) porque
+        // a inscrição já foi gravada — reconferir o limite de usos aqui
+        // reprovaria quem acabou de ocupar a última vaga do cupom.
+        fetch('/api/inscricao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ _action: 'consultarCupom', cupom: codigo })
+        })
+          .then((res)=> res.json())
+          .then((data)=>{
+            const cupom = data && data.cupom;
+            if(!cupom || !cupom.aplicado){
+              const msg = document.getElementById('invalidMsg');
+              if(msg && cupom && cupom.motivo === 'expirado'){
+                msg.textContent = 'Este cupom expirou. Para garantir sua vaga, conclua o pagamento.';
+              } else if(msg && cupom && cupom.motivo === 'esgotado'){
+                msg.textContent = 'Este cupom já atingiu o limite de usos. Para garantir sua vaga, conclua o pagamento.';
+              }
+              setState('invalid');
+              return;
+            }
+
+            document.getElementById('okCode').textContent = cupom.codigo;
+            document.getElementById('discountCode').textContent = cupom.codigo;
+
+            const nome = (stored && stored.nome ? String(stored.nome).trim().split(/\s+/)[0] : '');
+            if(nome){
+              document.getElementById('okTitle').textContent = nome + ', sua inscrição está confirmada';
+            }
+
+            // Sem preço configurado a tela mostra só o total zerado — melhor do
+            // que exibir um valor "de R$ X" que não é o preço real do encontro.
+            const preco = Number(config.precoOriginal);
+            if(Number.isFinite(preco) && preco > 0){
+              document.getElementById('priceValue').textContent = money(preco);
+              document.getElementById('linePrice').hidden = false;
+              document.getElementById('discountValue').textContent = '− ' + money(preco);
+              document.getElementById('lineDiscount').hidden = false;
+            } else {
+              document.querySelector('.summary').setAttribute('data-single', '1');
+            }
+
+            setState('ok');
+          })
+          .catch(()=> setState('invalid'));
+      })();
+    </script>
+  </body>
+</html>

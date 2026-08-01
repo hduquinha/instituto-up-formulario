@@ -537,6 +537,146 @@ function getPublicStatusCode(err) {
   return isDatabaseConfigurationError(err) ? 503 : 500;
 }
 
+// =====================================================================
+// Cupons de cortesia do Encontro Online
+// ---------------------------------------------------------------------
+// Os codigos ficam na variavel de ambiente CUPONS_ENCONTRO_ONLINE (na
+// Vercel), nunca no codigo do formulario: a pagina e publica e qualquer
+// visitante leria os codigos no fonte, virando entrada gratuita.
+//
+// Formato aceito (separado por virgula, ponto-e-virgula ou quebra de linha):
+//   CODIGO                 -> sem limite de uso, sem validade
+//   CODIGO:10              -> no maximo 10 usos
+//   CODIGO:10:2026-08-11   -> 10 usos e valido ate 11/08/2026 (inclusive)
+//   CODIGO::2026-08-11     -> sem limite de uso, valido ate a data
+//
+// Todo cupom aceito e cortesia integral (zera o valor). E o unico tipo que
+// existe hoje porque a tela de cupom aplicado nao cobra diferenca — um
+// cupom parcial deixaria a pessoa sem para onde ir.
+// =====================================================================
+const COUPON_ENV_VAR = 'CUPONS_ENCONTRO_ONLINE';
+const MAX_COUPON_LENGTH = 40;
+const MIN_COUPON_LENGTH = 3;
+// Marcas de acentuacao soltas depois do normalize('NFD') (U+0300..U+036F).
+const COMBINING_MARKS = new RegExp('[\\u0300-\\u036f]', 'g');
+
+function normalizeCouponCode(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(COMBINING_MARKS, '')
+    .replace(/[^a-zA-Z0-9._-]/g, '')
+    .toUpperCase()
+    .slice(0, MAX_COUPON_LENGTH);
+}
+
+function parseCouponCatalog() {
+  const catalog = new Map();
+
+  String(process.env[COUPON_ENV_VAR] || '')
+    .split(/[,;\n]+/)
+    .forEach((entry) => {
+      const parts = String(entry || '').split(':');
+      const code = normalizeCouponCode(parts[0]);
+      if (code.length < MIN_COUPON_LENGTH) return;
+
+      const maxUses = Number.parseInt(String(parts[1] || '').trim(), 10);
+      const validUntil = String(parts[2] || '').trim();
+
+      catalog.set(code, {
+        code,
+        maxUses: Number.isFinite(maxUses) && maxUses > 0 ? maxUses : null,
+        validUntil: /^\d{4}-\d{2}-\d{2}$/.test(validUntil) ? validUntil : null,
+      });
+    });
+
+  return catalog;
+}
+
+// O cupom vale ate o fim do dia informado, no horario de Brasilia (UTC-3,
+// sem horario de verao desde 2019).
+function isCouponExpired(validUntil) {
+  if (!validUntil) return false;
+  const brasilia = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  return brasilia > validUntil;
+}
+
+async function countCouponUses(pg, code) {
+  const result = await pg.query(
+    `SELECT COUNT(*)::int AS total
+       FROM inscricoes.inscricoes
+      WHERE payload->>'cupom_codigo' = $1
+        AND payload->>'cupom_aplicado' = 'true'`,
+    [code]
+  );
+  return Number(result.rows[0]?.total || 0);
+}
+
+// Decide se o cupom informado vale. NUNCA confie no que o navegador manda:
+// o formulario chama isto ao digitar so para dar feedback imediato, mas quem
+// carimba `cupom_aplicado` no lead e sempre esta funcao, no servidor, no
+// momento do INSERT. `pg` pode vir nulo no caminho de fallback (banco fora):
+// ali o limite de usos nao tem como ser conferido e o cupom passa.
+// `checarLimite: false` pula só a conferencia de quantidade de usos. Serve
+// para a tela de cortesia, que consulta o cupom DEPOIS de a inscricao ja ter
+// sido gravada: conferir o limite de novo ali reprovaria justamente quem
+// acabou de ocupar a ultima vaga do cupom.
+async function evaluateCoupon(pg, rawCode, options) {
+  const checarLimite = !options || options.checarLimite !== false;
+  const codigo = normalizeCouponCode(rawCode);
+
+  if (!codigo) {
+    return { informado: false, aplicado: false, codigo: '', motivo: '' };
+  }
+
+  const coupon = parseCouponCatalog().get(codigo);
+  if (!coupon) {
+    return { informado: true, aplicado: false, codigo, motivo: 'invalido' };
+  }
+
+  if (isCouponExpired(coupon.validUntil)) {
+    return { informado: true, aplicado: false, codigo, motivo: 'expirado' };
+  }
+
+  if (coupon.maxUses !== null && pg && checarLimite) {
+    try {
+      if ((await countCouponUses(pg, codigo)) >= coupon.maxUses) {
+        return { informado: true, aplicado: false, codigo, motivo: 'esgotado' };
+      }
+    } catch (err) {
+      // Falha ao contar usos nao pode barrar uma inscricao legitima.
+      console.error('Falha ao contar usos do cupom:', err);
+    }
+  }
+
+  return { informado: true, aplicado: true, codigo, motivo: '' };
+}
+
+// Carimba o resultado no payload que vai para o banco. Estes campos NAO sao
+// identidade de formulario (ver FORM_IDENTITY_FIELDS): sao sempre reescritos,
+// inclusive quando o cadastro reaproveita um telefone ja existente, para que
+// um cupom de uma inscricao antiga nunca seja herdado por uma nova.
+function applyCouponToPayload(payload, coupon) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return payload;
+  }
+
+  delete payload.cupom;
+  delete payload.tem_cupom;
+
+  payload.cupom_informado = Boolean(coupon.informado);
+  payload.cupom_aplicado = Boolean(coupon.aplicado);
+  payload.cupom_codigo = coupon.informado ? coupon.codigo : null;
+  payload.cupom_status = coupon.informado ? (coupon.aplicado ? 'aplicado' : coupon.motivo) : 'sem-cupom';
+  payload.checkout_destino = coupon.aplicado ? 'cortesia-cupom' : 'asaas';
+
+  return payload;
+}
+
+async function handleCouponCheck(pg, payload, res, options) {
+  const cupom = await evaluateCoupon(pg, payload && payload.cupom, options);
+  res.status(200).json({ ok: true, cupom });
+}
+
 function buildFallbackPayload(payload, clientId) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return payload;
@@ -634,10 +774,25 @@ async function handler(req, res) {
       return;
     }
 
+    if (action === 'validarCupom') {
+      await handleCouponCheck(pg, payload, res);
+      return;
+    }
+
+    // Usada pela tela de cortesia (checkout.html) para nao exibir "inscricao
+    // confirmada" a partir de um codigo qualquer digitado na URL. Ali a
+    // inscricao ja foi gravada, entao o limite de usos nao se aplica.
+    if (action === 'consultarCupom') {
+      await handleCouponCheck(pg, payload, res, { checarLimite: false });
+      return;
+    }
+
     if (action) {
       res.status(400).json({ ok: false, error: 'Acao invalida.' });
       return;
     }
+
+    const cupom = await evaluateCoupon(pg, payload.cupom);
 
     if (clientId) {
       const existing = await pg.query(
@@ -646,16 +801,18 @@ async function handler(req, res) {
       );
 
       if (existing.rowCount) {
-        res.status(200).json({ ok: true, deduped: true, clientId });
+        // Reenvio do mesmo cadastro: nao insere de novo, mas o navegador
+        // ainda precisa saber para onde ir (cortesia ou pagamento).
+        res.status(200).json({ ok: true, deduped: true, clientId, cupom });
         return;
       }
     }
 
-    const payloadToInsert = await preparePayloadForInsert(pg, payload);
+    const payloadToInsert = applyCouponToPayload(await preparePayloadForInsert(pg, payload), cupom);
 
     await pg.query('INSERT INTO inscricoes.inscricoes (payload) VALUES ($1)', [payloadToInsert]);
 
-    res.status(200).json({ ok: true });
+    res.status(200).json({ ok: true, cupom });
   } catch (err) {
     console.error('Erro ao processar inscricao:', err);
 
@@ -668,8 +825,13 @@ async function handler(req, res) {
       return;
     }
 
-    if (await tryFallbackSave(payload, clientId)) {
-      res.status(200).json({ ok: true, fallback: true });
+    // Banco fora do ar: sem `pg` o limite de usos nao tem como ser conferido,
+    // mas o codigo em si continua sendo validado no servidor e a pessoa nao
+    // fica sem destino no fim do formulario.
+    const cupom = await evaluateCoupon(null, payload && payload.cupom);
+
+    if (await tryFallbackSave(applyCouponToPayload(payload, cupom), clientId)) {
+      res.status(200).json({ ok: true, fallback: true, cupom });
       return;
     }
 

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Microsoft Clarity (mapa de calor/gravacoes) — ver clarity.js na raiz -->
     <script defer src="/clarity.js"></script>
+    <!-- Link de pagamento e valor do Encontro Online — ver checkout-config.js -->
+    <script src="/checkout-config.js"></script>
   <title>Encontro UP | Construindo Uma Vida Mais Leve</title>
   <meta name="description" content="Inscreva-se na Encontro de Inteligência Emocional com dinâmica de alto impacto e exercício guiado para controlar a ansiedade. Conduzida por Rodrigo Damaceno. 71% das vagas preenchidas." />
     <!-- Favicons / App Icons -->
@@ -102,6 +104,36 @@
   .duplicate-actions .btn small{display:block;font-size:.68rem;color:#8fb8bc;font-weight:600;letter-spacing:.2px;margin-top:4px;line-height:1.35;text-shadow:none}
   .duplicate-actions .btn-primary small{color:#06464d}
   .duplicate-note{margin:14px 0 0!important;font-size:.72rem!important;color:#8fb8bc!important}
+  /* Etapa de cupom */
+  .coupon-choice{display:grid; gap:12px; margin-top:10px}
+  .coupon-option{display:flex; align-items:flex-start; gap:12px; background:#101c1e; border:2px solid #1f3b3f; border-radius:16px; padding:16px 18px; cursor:pointer; transition:.2s; margin:0}
+  .coupon-option:hover{border-color:#2d5f65; background:#122225}
+  .coupon-option:has(input:checked){border-color:var(--primary); background:rgba(var(--primary-rgb),.10); box-shadow:0 0 0 1px rgba(var(--primary-rgb),.35)}
+  .coupon-option input{margin:3px 0 0; accent-color:var(--primary); width:18px; height:18px; flex:0 0 auto}
+  .coupon-option-body{display:block}
+  .coupon-option-body strong{display:block; font-size:.95rem; font-weight:700; color:#fff; letter-spacing:.2px}
+  .coupon-option-body small{display:block; font-size:.75rem; color:#8fb8bc; margin-top:3px; line-height:1.4}
+  .coupon-input-row{display:flex; gap:10px; align-items:stretch; margin-top:8px}
+  .coupon-input-row input{flex:1 1 auto; min-width:0; text-transform:uppercase; letter-spacing:1.5px; font-weight:700}
+  .coupon-input-row .btn{flex:0 0 auto; padding-left:20px; padding-right:20px; font-size:.85rem}
+  .coupon-feedback{margin-top:10px; border-radius:12px; padding:12px 14px; font-size:.82rem; line-height:1.45; font-weight:600; border:1px solid transparent}
+  .coupon-feedback.is-ok{background:rgba(var(--primary-rgb),.12); border-color:#1f6a72; color:#7fe4ec}
+  .coupon-feedback.is-err{background:rgba(255,86,86,.10); border-color:#6d2b2b; color:#ff9b9b}
+  .coupon-feedback.is-loading{background:#152528; border-color:#254a4f; color:#9fc4c8}
+  @media (max-width:520px){
+    .coupon-input-row{flex-direction:column}
+    .coupon-input-row .btn{justify-content:center}
+  }
+  /* Resumo do checkout (modal de pagamento e tela de cortesia) */
+  .checkout-summary{background:#122325; border:1px solid #21484d; border-radius:16px; padding:16px 18px; margin:18px 0; text-align:left}
+  .checkout-line{display:flex; justify-content:space-between; align-items:baseline; gap:14px; font-size:.85rem; color:#c0dee1; padding:7px 0}
+  .checkout-line + .checkout-line{border-top:1px solid #1b3a3e}
+  .checkout-line .checkout-label{color:#9dc3c7}
+  .checkout-line.is-discount{color:#7fe4ec}
+  .checkout-line.is-total{border-top:1px solid #2a5a60; margin-top:4px; padding-top:12px; font-size:1.05rem; font-weight:800; color:#fff}
+  .checkout-line.is-total .checkout-value{color:var(--primary); font-size:1.5rem; letter-spacing:.5px}
+  .checkout-strike{text-decoration:line-through; color:#7b9a9e}
+  .coupon-badge{display:inline-flex; align-items:center; gap:7px; background:rgba(var(--primary-rgb),.14); border:1px solid #226b73; color:#7fe4ec; border-radius:40px; padding:7px 15px; font-size:.72rem; font-weight:800; letter-spacing:1px; text-transform:uppercase}
   .prep-list{list-style:none; margin:14px 0 24px; padding:0; display:grid; gap:10px}
   .prep-list li{background:#132628; border:1px solid #21484d; padding:12px 14px 12px 48px; border-radius:14px; font-size:.8rem; position:relative; font-weight:500; letter-spacing:.3px; color:#c0dee1}
   .prep-list li:before{content:'✔'; position:absolute; left:16px; top:50%; transform:translateY(-50%); background:#1d4348; width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:.9rem; color:var(--primary); font-weight:700; box-shadow:0 0 0 1px #29666d inset}
@@ -126,6 +158,10 @@
       .form-step{display:none}
       .form-step.active{display:block}
       .field{display:flex; flex-direction:column; gap:8px; margin-bottom:18px}
+      /* O `display:flex` acima vence o `[hidden]{display:none}` do navegador,
+         então esconder um .field por atributo precisa desta regra (usado pelo
+         campo de código de cupom, que só aparece para quem diz ter um). */
+      .field[hidden]{display:none}
       .field label{font-size:1rem; color:var(--text); font-weight:600; letter-spacing:.3px}
       .field input,.field textarea,.field select{background:#0b1213; color:var(--text); border:2px solid #1c2a2c; border-radius:14px; padding:15px 16px; outline:none; font-size:1rem; line-height:1.3; font-weight:500; transition:.25s}
       .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--primary); box-shadow:var(--focus-ring)}
@@ -238,6 +274,7 @@
                 <div class="dot" data-step="12">13</div>
                 <div class="dot" data-step="13">14</div>
                 <div class="dot" data-step="14">15</div>
+                <div class="dot" data-step="15">16</div>
               </div>
               <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 15</div>
 
@@ -560,6 +597,47 @@
                   <div class="note">Obrigado! Suas respostas nos ajudam a personalizar o acompanhamento após o encontro.</div>
                   <div class="actions">
                     <button type="button" class="btn" data-back>VOLTAR</button>
+                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+                  </div>
+                </div>
+
+                <!-- Etapa 16: Cupom de desconto -->
+                <div class="form-step" data-step="15">
+                  <div class="field">
+                    <label>Você tem um cupom de desconto?</label>
+                    <div class="coupon-choice">
+                      <label class="coupon-option">
+                        <input type="radio" name="tem_cupom" value="Sim" />
+                        <span class="coupon-option-body">
+                          <strong>Sim, tenho um cupom</strong>
+                          <small>Vou informar o código agora</small>
+                        </span>
+                      </label>
+                      <label class="coupon-option">
+                        <input type="radio" name="tem_cupom" value="Não" />
+                        <span class="coupon-option-body">
+                          <strong>Não tenho cupom</strong>
+                          <small>Seguir direto para o pagamento</small>
+                        </span>
+                      </label>
+                    </div>
+                    <div class="error" data-for="tem_cupom"></div>
+                  </div>
+
+                  <div class="field" id="couponField" hidden>
+                    <label for="cupom">Código do cupom</label>
+                    <div class="coupon-input-row">
+                      <input id="cupom" name="cupom" type="text" placeholder="DIGITE O CÓDIGO"
+                             autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" />
+                      <button type="button" class="btn btn-primary" id="couponApply">APLICAR</button>
+                    </div>
+                    <div class="coupon-feedback" id="couponFeedback" role="status" aria-live="polite" hidden></div>
+                    <div class="error" data-for="cupom"></div>
+                  </div>
+
+                  <div class="note" id="checkoutNote">Após finalizar, você será levado para a etapa de pagamento.</div>
+                  <div class="actions">
+                    <button type="button" class="btn" data-back>VOLTAR</button>
                     <button type="submit" class="btn btn-primary">FINALIZAR</button>
                   </div>
                 </div>
@@ -631,6 +709,10 @@
         'sintomas_fisicos','sintomas_emocionais',
         'tentativas_anteriores',
         'como_conheceu','comentarios_adicionais',
+        // Etapa de checkout: o servidor troca estes dois pelos campos oficiais
+        // (cupom_codigo, cupom_aplicado, cupom_status, checkout_destino) antes
+        // de gravar — quem decide se o cupom vale nunca é o navegador.
+        'tem_cupom','cupom',
         // Campos de tracking e segmentação
         'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment',
         'data_treinamento'
@@ -1352,22 +1434,26 @@
             const txt = await res.text().catch(()=>res.statusText);
             console.warn('Resposta não OK do endpoint', res.status, txt);
             setStatus('Falha ('+res.status+') ao enviar sua inscrição', 'err');
-            return false;
+            return null;
           }
           setStatus('Inscrição enviada com sucesso!', 'ok');
-          return true;
+          // Devolve o corpo inteiro: é nele que vem a decisão do servidor
+          // sobre o cupom, que define para onde o visitante vai em seguida.
+          let body = null;
+          try{ body = await res.json(); }catch{}
+          return body || {};
         }catch(err){
           console.warn('Falha ao enviar inscrição:', err);
           setStatus('Erro ao enviar sua inscrição', 'err');
-          return false;
+          return null;
         }
       }
 
       async function finalizeSubmission(payload, phone){
         applyPhoneConflictToPayload(payload);
         payload._final = true;
-        const ok = await sendFinalSubmission(payload);
-        if(!ok){
+        const result = await sendFinalSubmission(payload);
+        if(!result){
           setStatus('Não foi possível confirmar o envio. Tente novamente.', 'err');
           return false;
         }
@@ -1383,7 +1469,118 @@
         }
 
         enterSuccessState();
-        showFinalModal();
+        showCheckoutHandoff(result.cupom);
+        return true;
+      }
+
+      // ================= Etapa de cupom =================
+      // O botão "APLICAR" existe só para o visitante ver na hora se o código
+      // existe — é conveniência de tela. A validação que conta é a do servidor
+      // no envio final (api/inscricao.js), então nada do que é guardado aqui
+      // libera cortesia sozinho.
+      (function initCouponStep(){
+        const field = document.getElementById('couponField');
+        const input = document.getElementById('cupom');
+        const applyBtn = document.getElementById('couponApply');
+        const feedback = document.getElementById('couponFeedback');
+        if(!field || !input || !applyBtn || !feedback) return;
+
+        const nota = document.getElementById('checkoutNote');
+        const NOTA_PAGAMENTO = 'Após finalizar, você será levado para a etapa de pagamento.';
+        const NOTA_CORTESIA = 'Com o cupom aplicado, sua inscrição fica confirmada ao finalizar — sem pagamento.';
+
+        function setFeedback(msg, kind){
+          // A nota do rodapé promete pagamento; com cupom aceito isso deixa de
+          // ser verdade, então ela acompanha o estado do cupom.
+          if(nota) nota.textContent = kind === 'ok' ? NOTA_CORTESIA : NOTA_PAGAMENTO;
+
+          if(!msg){
+            feedback.hidden = true;
+            feedback.textContent = '';
+            feedback.className = 'coupon-feedback';
+            return;
+          }
+          feedback.hidden = false;
+          feedback.textContent = msg;
+          feedback.className = 'coupon-feedback is-' + kind;
+        }
+
+        document.querySelectorAll('input[name="tem_cupom"]').forEach(radio=>{
+          radio.addEventListener('change', ()=>{
+            const querCupom = radio.checked && radio.value === 'Sim';
+            field.hidden = !querCupom;
+            const erro = document.querySelector('.error[data-for="cupom"]');
+            if(erro) erro.textContent = '';
+            if(querCupom){
+              input.focus();
+            } else {
+              input.value = '';
+              setFeedback('', '');
+            }
+          });
+        });
+
+        input.addEventListener('input', ()=> setFeedback('', ''));
+
+        input.addEventListener('keydown', (e)=>{
+          if(e.key !== 'Enter') return;
+          // Sem isto o listener do <form> submeteria a inscrição inteira antes
+          // de o visitante conferir o cupom (esta é a última etapa).
+          e.preventDefault();
+          e.stopPropagation();
+          conferirCupom();
+        });
+
+        applyBtn.addEventListener('click', conferirCupom);
+
+        async function conferirCupom(){
+          const codigo = input.value.trim();
+          if(!codigo){
+            setFeedback('Digite o código do cupom.', 'err');
+            return;
+          }
+
+          applyBtn.disabled = true;
+          setFeedback('Verificando cupom...', 'loading');
+
+          try{
+            const res = await fetch(getEndpoint(), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ _action: 'validarCupom', cupom: codigo })
+            });
+            const body = await res.json();
+            const cupom = body && body.cupom;
+
+            if(cupom && cupom.aplicado){
+              input.value = cupom.codigo;
+              setFeedback('Cupom ' + cupom.codigo + ' válido! Sua inscrição fica sem custo — é só finalizar.', 'ok');
+            } else {
+              setFeedback(couponMessage(cupom && cupom.motivo), 'err');
+            }
+          }catch(err){
+            console.warn('Falha ao validar cupom:', err);
+            setFeedback('Não foi possível verificar agora. Pode finalizar mesmo assim — conferimos o cupom no envio.', 'err');
+          } finally {
+            applyBtn.disabled = false;
+          }
+        }
+      })();
+
+      // O código só é obrigatório para quem disse ter cupom; "Não tenho cupom"
+      // segue direto. O <input> não pode ser `required` por causa disso.
+      function validateCouponStep(){
+        const escolha = document.querySelector('input[name="tem_cupom"]:checked');
+        if(!escolha || escolha.value !== 'Sim') return true;
+
+        const input = document.getElementById('cupom');
+        const erro = document.querySelector('.error[data-for="cupom"]');
+        if(!input || !input.value.trim()){
+          if(erro) erro.textContent = 'Digite o código do cupom ou escolha "Não tenho cupom".';
+          setStatus('Informe o código do cupom', 'err');
+          return false;
+        }
+        if(erro) erro.textContent = '';
         return true;
       }
 
@@ -1444,6 +1641,9 @@
             setStatus('Preencha os campos obrigatórios', 'err');
             return;
           }
+          if(!validateCouponStep()){
+            return;
+          }
           const payload = collectStepData();
           const phone = payload.telefone || allData.telefone || '';
           const canSubmit = await ensurePhoneDecision(payload);
@@ -1487,6 +1687,13 @@
             }
           });
         });
+      })();
+      // restoreFields marca os radios por JS, o que não dispara 'change' — quem
+      // já tinha escolhido "Sim" precisa ver o campo de código reaberto.
+      (function syncCouponField(){
+        const escolha = document.querySelector('input[name="tem_cupom"]:checked');
+        const field = document.getElementById('couponField');
+        if(field) field.hidden = !(escolha && escolha.value === 'Sim');
       })();
       function showPhoneDuplicateModal(match = {}, context = {}){
         const existingOverlay = document.getElementById('duplicateOverlay');
@@ -1575,30 +1782,88 @@
       }catch{}
 
 
-      function showFinalModal(){
+      // ================= Encaminhamento para o checkout =================
+      // Com o cadastro já salvo, o visitante vai para o pagamento — ou para a
+      // tela de cortesia, quando o SERVIDOR aceitou o cupom. Quem decide aqui
+      // é só `cupom.aplicado` da resposta da API: o que foi digitado na tela
+      // ou aprovado pelo botão "APLICAR" não vale nada neste ponto.
+      function showCheckoutHandoff(cupom){
+        const config = window.CHECKOUT_CONFIG || {};
+
+        if(cupom && cupom.aplicado && cupom.codigo){
+          try{
+            sessionStorage.setItem('up:cupomAplicado', JSON.stringify({
+              codigo: cupom.codigo,
+              nome: allData.nome || '',
+              em: new Date().toISOString()
+            }));
+          }catch{}
+          const pagina = config.paginaCupom || 'checkout.html';
+          const quando = `${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}`;
+          window.location.href = pagina
+            + '?cupom=' + encodeURIComponent(cupom.codigo)
+            + '&quando=' + encodeURIComponent(quando);
+          return;
+        }
+
+        showPaymentModal(cupom);
+      }
+
+      function couponMessage(motivo){
+        if(motivo === 'expirado') return 'Este cupom expirou.';
+        if(motivo === 'esgotado') return 'Este cupom já atingiu o limite de usos.';
+        return 'Cupom não encontrado. Confira o código.';
+      }
+
+      function showPaymentModal(cupom){
         if(document.getElementById('finalOverlay')) return;
+        const config = window.CHECKOUT_CONFIG || {};
+        const asaasUrl = config.asaasUrl || '';
+        const delay = Math.max(0, Number(config.redirectDelaySeconds) || 0);
+        const recusado = Boolean(cupom && cupom.informado && !cupom.aplicado);
+
         const ov = document.createElement('div');
         ov.className = 'final-overlay';
         ov.id = 'finalOverlay';
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-            <h2 id="modalTitle">Primeira fase da inscrição finalizada</h2>
-            <p style="margin:6px 0 18px;font-size:.85rem;color:#c0dee1;line-height:1.55;">Sua inscrição foi registrada. Para garantir a vaga no encontro de <strong style="color:#ffffff;">${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}</strong>, finalize falando com nossa representante pelo WhatsApp.</p>
-            <button type="button" class="btn btn-primary" id="finalWhats" style="width:100%;justify-content:center;">Falar com a representante</button>
-            <p style="margin:18px 0 0;font-size:.75rem;color:#8fb8bc;line-height:1.5;">Ao clicar no botão, uma nova aba será aberta com a mensagem pronta. Envie para confirmar sua participação.</p>
+            <h2 id="modalTitle">Inscrição registrada</h2>
+            ${recusado ? `<div class="coupon-feedback is-err" style="margin:0 0 16px;">${escapeHtml(couponMessage(cupom.motivo))} Seguindo para o pagamento normal.</div>` : ''}
+            <p>Falta garantir sua vaga no encontro de <strong style="color:#ffffff;">${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}</strong>. Você será levado para a página de pagamento.</p>
+            <button type="button" class="btn btn-primary" id="finalPay" style="width:100%;justify-content:center;">IR PARA O PAGAMENTO</button>
+            <p class="duplicate-note" id="redirectNote"></p>
           </div>`;
         document.body.appendChild(ov);
-        const whatsappUrl = 'https://wa.me/5513997832766?text=Olá! Acabei de me inscrever no Encontro UP e quero confirmar minha vaga.';
-        function closeOverlay(){
-          ov.classList.add('hide');
-          setTimeout(()=>{ ov.remove(); location.reload(); }, 300);
+
+        const note = ov.querySelector('#redirectNote');
+        let timer = null;
+        let ticker = null;
+
+        function irParaPagamento(){
+          if(timer) clearTimeout(timer);
+          if(ticker) clearInterval(ticker);
+          if(asaasUrl) window.location.href = asaasUrl;
         }
-        ov.addEventListener('click', e=>{ if(e.target === ov) closeOverlay(); });
-        const whatsBtn = ov.querySelector('#finalWhats');
-        whatsBtn.addEventListener('click', ()=>{
-          window.open(whatsappUrl, '_blank','noopener');
-          closeOverlay();
-        });
+
+        ov.querySelector('#finalPay').addEventListener('click', irParaPagamento);
+
+        if(!asaasUrl){
+          // Sem link configurado é melhor travar aqui do que mandar o visitante
+          // para lugar nenhum — o valor certo está em checkout-config.js.
+          if(note) note.textContent = 'Link de pagamento não configurado. Fale com nossa equipe pelo WhatsApp.';
+          return;
+        }
+
+        if(delay > 0){
+          let restante = delay;
+          if(note) note.textContent = `Redirecionando em ${restante}s...`;
+          ticker = setInterval(()=>{
+            restante -= 1;
+            if(note) note.textContent = restante > 0 ? `Redirecionando em ${restante}s...` : 'Redirecionando...';
+            if(restante <= 0) clearInterval(ticker);
+          }, 1000);
+          timer = setTimeout(irParaPagamento, delay * 1000);
+        }
       }
 
 
