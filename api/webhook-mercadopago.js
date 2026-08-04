@@ -114,7 +114,13 @@ async function handler(req, res) {
 
   if (!assinatura.valido) {
     console.warn('Webhook do Mercado Pago recusado:', assinatura.motivo);
-    res.status(401).json({ ok: false });
+    // O motivo vai TAMBEM na resposta, de proposito: e a unica forma de
+    // conferir de fora se MERCADOPAGO_WEBHOOK_SECRET chegou no ambiente
+    // (os logs de runtime do Vercel duram pouco e somem). Nao ha o que
+    // vazar: nenhum destes valores ajuda a forjar uma assinatura, e
+    // "segredo_nao_configurado" so conta que o endpoint esta recusando
+    // tudo — o que um atacante descobriria na primeira tentativa.
+    res.status(401).json({ ok: false, motivo: assinatura.motivo });
     return;
   }
 

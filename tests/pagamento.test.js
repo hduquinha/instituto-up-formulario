@@ -204,6 +204,7 @@ function checar(nome, condicao, detalhe){
     body: {}
   }, res);
   checar('assinatura forjada é recusada', res._status === 401, res._status);
+  checar('diz o motivo da recusa', res._json && res._json.motivo === 'assinatura_invalida', res._json);
   checar('nada é gravado com assinatura inválida', updates.length === 0, updates);
 
   resetBanco();
@@ -215,6 +216,27 @@ function checar(nome, condicao, detalhe){
     body: {}
   }, res);
   checar('sem assinatura nenhuma é recusado', res._status === 401, res._status);
+  checar('motivo é "assinatura_ausente"', res._json && res._json.motivo === 'assinatura_ausente', res._json);
+
+  // Sem MERCADOPAGO_WEBHOOK_SECRET no ambiente, o endpoint tem que recusar
+  // tudo E dizer isso — é o que permite diagnosticar a configuração de fora.
+  resetBanco();
+  // A assinatura é calculada ANTES de remover a variável: o teste é sobre o
+  // servidor sem segredo, não sobre o cliente sem segredo.
+  const assinaturaValida = assinar('PAY-9', 'req-1', ts);
+  const segredoOriginal = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+  delete process.env.MERCADOPAGO_WEBHOOK_SECRET;
+  res = fakeRes();
+  await webhook({
+    method: 'POST',
+    headers: { 'x-signature': assinaturaValida, 'x-request-id': 'req-1' },
+    query: { 'data.id': 'PAY-9', type: 'payment' },
+    body: {}
+  }, res);
+  checar('sem segredo configurado, recusa e avisa',
+    res._status === 401 && res._json.motivo === 'segredo_nao_configurado', res._json);
+  checar('sem segredo, nada é gravado', updates.length === 0, updates);
+  process.env.MERCADOPAGO_WEBHOOK_SECRET = segredoOriginal;
 
   resetBanco();
   respostaMP = { status: 200, body: { id: 'PAY-8', external_reference: 'outra-coisa', status: 'approved' } };
