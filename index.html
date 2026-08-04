@@ -266,22 +266,13 @@
                 <div class="dot" data-step="4">5</div>
                 <div class="dot" data-step="5">6</div>
                 <div class="dot" data-step="6">7</div>
-                <div class="dot" data-step="7">8</div>
-                <div class="dot" data-step="8">9</div>
-                <div class="dot" data-step="9">10</div>
-                <div class="dot" data-step="10">11</div>
-                <div class="dot" data-step="11">12</div>
-                <div class="dot" data-step="12">13</div>
-                <div class="dot" data-step="13">14</div>
-                <div class="dot" data-step="14">15</div>
-                <div class="dot" data-step="15">16</div>
               </div>
-              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 15</div>
+              <div id="progressText" style="text-align:center;font-size:12px;color:#8aa0ff;margin:-4px 0 12px;">Etapa 1 de 7</div>
 
               <div id="formSuccess" class="success-state" hidden role="status" aria-live="polite">
                 <div class="success-icon" aria-hidden="true">✅</div>
                 <h3>Cadastro confirmado!</h3>
-                <p>Recebemos suas informações. Você receberá as orientações oficiais no WhatsApp e no e-mail informado.</p>
+                <p>Recebemos suas informações. Você receberá as orientações oficiais no WhatsApp informado.</p>
                 <p class="success-tip">Não é necessário enviar novamente. Caso precise ajustar os dados, clique no botão abaixo.</p>
                 <button type="button" class="btn btn-primary" id="successReset" style="justify-content:center;">Preciso editar os dados</button>
               </div>
@@ -295,6 +286,11 @@
                     <div class="error" data-for="nome"></div>
                   </div>
                   <div class="field">
+                    <label for="telefone">Telefone (WhatsApp)</label>
+                    <input id="telefone" name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" required />
+                    <div class="error" data-for="telefone"></div>
+                  </div>
+                  <div class="field">
                     <label for="cidade">Cidade</label>
                     <input id="cidade" name="cidade" type="text" placeholder="Sua cidade" required />
                     <div class="error" data-for="cidade"></div>
@@ -305,9 +301,9 @@
                     <div class="error" data-for="estado"></div>
                   </div>
                   <div class="field">
-                    <label for="telefone">Telefone</label>
-                    <input id="telefone" name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" required />
-                    <div class="error" data-for="telefone"></div>
+                    <label for="idade">Idade</label>
+                    <input id="idade" name="idade" type="number" min="0" max="120" placeholder="Sua idade" required />
+                    <div class="error" data-for="idade"></div>
                   </div>
                   <div class="actions">
                     <span></span>
@@ -315,21 +311,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 2: Informações Adicionais -->
+                <!-- Etapa 2: Nível de Ansiedade -->
                 <div class="form-step" data-step="1">
-                  <div class="field">
-                    <label for="idade">Idade</label>
-                    <input id="idade" name="idade" type="number" min="0" max="120" placeholder="Sua idade" required />
-                    <div class="error" data-for="idade"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 3: Nível de Ansiedade -->
-                <div class="form-step" data-step="2">
                   <div class="field">
                     <label>Como está seu nível de ansiedade?</label>
                     <label><input type="radio" name="ansiedade" value="Muito ansioso" required /> Muito ansioso</label>
@@ -347,8 +330,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 4: Qualidade do Sono -->
-                <div class="form-step" data-step="3">
+                <!-- Etapa 3: Qualidade do Sono -->
+                <div class="form-step" data-step="2">
                   <div class="field">
                     <label>Como está sua qualidade do sono?</label>
                     <label><input type="radio" name="sono" value="Muito Boa" required /> Muito Boa</label>
@@ -366,86 +349,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 5: Vida Financeira -->
-                <div class="form-step" data-step="4">
-                  <div class="field">
-                    <label>Como está sua vida financeira?</label>
-                    <label><input type="radio" name="vida_financeira" value="Muito Boa" required /> Muito Boa</label>
-                    <label><input type="radio" name="vida_financeira" value="Boa" /> Boa</label>
-                    <label><input type="radio" name="vida_financeira" value="Regular" /> Regular</label>
-                    <label><input type="radio" name="vida_financeira" value="Ruim" /> Ruim</label>
-                    <label><input type="radio" name="vida_financeira" value="Muito ruim" /> Muito ruim</label>
-                    <label><input type="radio" name="vida_financeira" value="Não sei" /> Não sei</label>
-                    <label><input type="radio" name="vida_financeira" value="Não quero responder" /> Não quero responder</label>
-                    <div class="error" data-for="vida_financeira"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 6: Saúde Física -->
-                <div class="form-step" data-step="5">
-                  <div class="field">
-                    <label>Como está sua saúde física?</label>
-                    <label><input type="radio" name="saude_fisica" value="Muito Boa" required /> Muito Boa</label>
-                    <label><input type="radio" name="saude_fisica" value="Boa" /> Boa</label>
-                    <label><input type="radio" name="saude_fisica" value="Regular" /> Regular</label>
-                    <label><input type="radio" name="saude_fisica" value="Ruim" /> Ruim</label>
-                    <label><input type="radio" name="saude_fisica" value="Muito ruim" /> Muito ruim</label>
-                    <label><input type="radio" name="saude_fisica" value="Não sei" /> Não sei</label>
-                    <label><input type="radio" name="saude_fisica" value="Não quero responder" /> Não quero responder</label>
-                    <div class="error" data-for="saude_fisica"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 7: Relacionamentos Familiares -->
-                <div class="form-step" data-step="6">
-                  <div class="field">
-                    <label>Como está a qualidade dos seus relacionamentos familiares?</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Muito Boa" required /> Muito Boa</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Boa" /> Boa</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Regular" /> Regular</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Ruim" /> Ruim</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Muito ruim" /> Muito ruim</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Não tenho família próxima" /> Não tenho família próxima</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Não sei" /> Não sei</label>
-                    <label><input type="radio" name="relacionamentos_familiares" value="Não quero responder" /> Não quero responder</label>
-                    <div class="error" data-for="relacionamentos_familiares"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 8: Relacionamento Amoroso -->
-                <div class="form-step" data-step="7">
-                  <div class="field">
-                    <label>Como está seu relacionamento amoroso?</label>
-                    <label><input type="radio" name="relacionamento" value="Muito Bom" required /> Muito Bom</label>
-                    <label><input type="radio" name="relacionamento" value="Bom" /> Bom</label>
-                    <label><input type="radio" name="relacionamento" value="Regular" /> Regular</label>
-                    <label><input type="radio" name="relacionamento" value="Ruim" /> Ruim</label>
-                    <label><input type="radio" name="relacionamento" value="Muito ruim" /> Muito ruim</label>
-                    <label><input type="radio" name="relacionamento" value="Não tenho" /> Não tenho</label>
-                    <label><input type="radio" name="relacionamento" value="Não sei" /> Não sei</label>
-                    <label><input type="radio" name="relacionamento" value="Não quero responder" /> Não quero responder</label>
-                    <div class="error" data-for="relacionamento"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 9: Áreas para Melhorar -->
-                <div class="form-step" data-step="8">
+                <!-- Etapa 4: Áreas para Melhorar -->
+                <div class="form-step" data-step="3">
                   <div class="field">
                     <label>Quais áreas você quer melhorar? (marque quantas desejar)</label>
                     <label><input type="checkbox" name="areas_melhoria" value="Saúde emocional" data-required-group="areas_melhoria" /> Saúde emocional</label>
@@ -469,90 +374,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 10: Trabalho ou Profissão -->
-                <div class="form-step" data-step="9">
-                  <div class="field">
-                    <label for="profissao_area">Qual é o seu trabalho ou profissão?</label>
-                    <input id="profissao_area" name="profissao_area" type="text" placeholder="Ex.: Professor(a), Empreendedor(a), Analista, Estudante" required />
-                    <div class="note">Se preferir não informar, escolha uma das opções abaixo.</div>
-                    <div class="option-shortcuts" data-target="profissao_area">
-                      <button type="button" class="fill-option" data-target="profissao_area" data-value="Não sei">Não sei</button>
-                      <button type="button" class="fill-option" data-target="profissao_area" data-value="Não quero responder">Não quero responder</button>
-                    </div>
-                    <div class="error" data-for="profissao_area"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 11: Gatilhos Principais -->
-                <div class="form-step" data-step="10">
-                  <div class="field">
-                    <label>Quais situações mais disparam sua ansiedade ou estresse? (marque todas)</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Pressão no trabalho" data-required-group="gatilhos_ansiedade" /> Pressão no trabalho</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Demandas familiares" data-required-group="gatilhos_ansiedade" /> Demandas familiares</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Questões financeiras" data-required-group="gatilhos_ansiedade" /> Questões financeiras</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Saúde física" data-required-group="gatilhos_ansiedade" /> Saúde física</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Relacionamentos amorosos" data-required-group="gatilhos_ansiedade" /> Relacionamentos amorosos</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Autocobrança e perfeccionismo" data-required-group="gatilhos_ansiedade" /> Autocobrança e perfeccionismo</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Incertezas sobre o futuro" data-required-group="gatilhos_ansiedade" /> Incertezas sobre o futuro</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Não sei" data-required-group="gatilhos_ansiedade" /> Não sei</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Não quero responder" data-required-group="gatilhos_ansiedade" /> Não quero responder</label>
-                    <label><input type="checkbox" name="gatilhos_ansiedade" value="Outros" data-required-group="gatilhos_ansiedade" /> Outros</label>
-                    <div class="error" data-for="gatilhos_ansiedade"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 12: Sintomas Físicos -->
-                <div class="form-step" data-step="11">
-                  <div class="field">
-                    <label>Quais sintomas físicos sente com mais frequência? (marque todas)</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Tensão muscular" data-required-group="sintomas_fisicos" /> Tensão muscular</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Alterações no sono" data-required-group="sintomas_fisicos" /> Alterações no sono</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Taquicardia" data-required-group="sintomas_fisicos" /> Taquicardia</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Falta de ar" data-required-group="sintomas_fisicos" /> Falta de ar</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Queda de energia" data-required-group="sintomas_fisicos" /> Queda de energia</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Problemas digestivos" data-required-group="sintomas_fisicos" /> Problemas digestivos</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Não sei" data-required-group="sintomas_fisicos" /> Não sei</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Não quero responder" data-required-group="sintomas_fisicos" /> Não quero responder</label>
-                    <label><input type="checkbox" name="sintomas_fisicos" value="Outros" data-required-group="sintomas_fisicos" /> Outros</label>
-                    <div class="error" data-for="sintomas_fisicos"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 13: Sintomas Emocionais -->
-                <div class="form-step" data-step="12">
-                  <div class="field">
-                    <label>Quais sinais emocionais percebe em você? (marque todas)</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Ansiedade constante" data-required-group="sintomas_emocionais" /> Ansiedade constante</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Oscilação de humor" data-required-group="sintomas_emocionais" /> Oscilação de humor</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Irritabilidade" data-required-group="sintomas_emocionais" /> Irritabilidade</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Sensação de impotência" data-required-group="sintomas_emocionais" /> Sensação de impotência</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Desânimo / falta de motivação" data-required-group="sintomas_emocionais" /> Desânimo / falta de motivação</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Dificuldade de concentração" data-required-group="sintomas_emocionais" /> Dificuldade de concentração</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Não sei" data-required-group="sintomas_emocionais" /> Não sei</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Não quero responder" data-required-group="sintomas_emocionais" /> Não quero responder</label>
-                    <label><input type="checkbox" name="sintomas_emocionais" value="Outros" data-required-group="sintomas_emocionais" /> Outros</label>
-                    <div class="error" data-for="sintomas_emocionais"></div>
-                  </div>
-                  <div class="actions">
-                    <button type="button" class="btn" data-back>VOLTAR</button>
-                    <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
-                  </div>
-                </div>
-
-                <!-- Etapa 14: O que já tentou -->
-                <div class="form-step" data-step="13">
+                <!-- Etapa 5: O que já tentou -->
+                <div class="form-step" data-step="4">
                   <div class="field">
                     <label>O que já tentou para lidar com isso? (marque todas)</label>
                     <label><input type="checkbox" name="tentativas_anteriores" value="Psicoterapia" data-required-group="tentativas_anteriores" /> Psicoterapia</label>
@@ -572,8 +395,8 @@
                   </div>
                 </div>
 
-                <!-- Etapa 15: Observações Finais -->
-                <div class="form-step" data-step="14">
+                <!-- Etapa 6: Origem e Profissão -->
+                <div class="form-step" data-step="5">
                   <div class="field">
                     <label>Como conheceu o Instituto UP?</label>
                     <label><input type="radio" name="como_conheceu" value="Instagram" required /> Instagram</label>
@@ -585,24 +408,23 @@
                     <div class="error" data-for="como_conheceu"></div>
                   </div>
                   <div class="field">
-                    <label for="comentarios_adicionais">Expectativas ou comentários adicionais</label>
-                    <textarea id="comentarios_adicionais" name="comentarios_adicionais" rows="3" placeholder="Compartilhe expectativas, dúvidas ou contexto." required></textarea>
-                    <div class="note">Se não quiser detalhar, clique em uma das opções rápidas abaixo.</div>
-                    <div class="option-shortcuts" data-target="comentarios_adicionais">
-                      <button type="button" class="fill-option" data-target="comentarios_adicionais" data-value="Nenhuma observação no momento">Nenhuma observação</button>
-                      <button type="button" class="fill-option" data-target="comentarios_adicionais" data-value="Não quero responder">Não quero responder</button>
+                    <label for="profissao_area">Qual é o seu trabalho ou profissão?</label>
+                    <input id="profissao_area" name="profissao_area" type="text" placeholder="Ex.: Professor(a), Empreendedor(a), Analista, Estudante" required />
+                    <div class="note">Se preferir não informar, escolha uma das opções abaixo.</div>
+                    <div class="option-shortcuts" data-target="profissao_area">
+                      <button type="button" class="fill-option" data-target="profissao_area" data-value="Não sei">Não sei</button>
+                      <button type="button" class="fill-option" data-target="profissao_area" data-value="Não quero responder">Não quero responder</button>
                     </div>
-                    <div class="error" data-for="comentarios_adicionais"></div>
+                    <div class="error" data-for="profissao_area"></div>
                   </div>
-                  <div class="note">Obrigado! Suas respostas nos ajudam a personalizar o acompanhamento após o encontro.</div>
                   <div class="actions">
                     <button type="button" class="btn" data-back>VOLTAR</button>
                     <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
                   </div>
                 </div>
 
-                <!-- Etapa 16: Cupom de desconto -->
-                <div class="form-step" data-step="15">
+                <!-- Etapa 7: Cupom de desconto -->
+                <div class="form-step" data-step="6">
                   <div class="field">
                     <label>Você tem um cupom de desconto?</label>
                     <div class="coupon-choice">
@@ -702,13 +524,18 @@
       const REDIRECT_DELAY = 3200;
 
       // Campos esperados para padronizar o payload (ordem e existência estável)
+      // Enxugado em 2026-08-04: o formulário passou de 16 para 7 etapas. As
+      // perguntas de anamnese que saíram (vida_financeira, saude_fisica,
+      // relacionamentos_familiares, relacionamento, gatilhos_ansiedade,
+      // sintomas_fisicos, sintomas_emocionais, comentarios_adicionais) NÃO
+      // podem voltar para esta lista sem voltarem também como etapa: um campo
+      // aqui sem pergunta na tela grava null em todo lead novo e polui a ficha
+      // no dashboard. Leads antigos continuam com esses campos no payload.
       const EXPECTED_FIELDS = [
         'nome','cidade','estado','telefone','idade',
-        'ansiedade','sono','vida_financeira','saude_fisica','relacionamentos_familiares','relacionamento','areas_melhoria',
-        'profissao_area','gatilhos_ansiedade',
-        'sintomas_fisicos','sintomas_emocionais',
+        'ansiedade','sono','areas_melhoria',
         'tentativas_anteriores',
-        'como_conheceu','comentarios_adicionais',
+        'como_conheceu','profissao_area',
         // Etapa de checkout: o servidor troca estes dois pelos campos oficiais
         // (cupom_codigo, cupom_aplicado, cupom_status, checkout_destino) antes
         // de gravar — quem decide se o cupom vale nunca é o navegador.
@@ -717,7 +544,7 @@
         'traffic_source','from_bio','is_whatsapp_traffic','is_bio_traffic','audience_segment',
         'data_treinamento'
       ];
-      const ARRAY_FIELDS = new Set(['areas_melhoria','gatilhos_ansiedade','sintomas_fisicos','sintomas_emocionais','tentativas_anteriores']);
+      const ARRAY_FIELDS = new Set(['areas_melhoria','tentativas_anteriores']);
       // Se true: quando usuário apaga conteúdo de um campo texto/number, enviamos null (limpa no acumulado)
       // Se false: ignoramos campo vazio e preservamos valor anterior já capturado
       const NULLIFY_ON_EMPTY = false;
