@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node tests/pagamento.test.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

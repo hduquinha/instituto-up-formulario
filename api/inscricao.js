@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { Pool } = require('pg');
 
 const SSL_QUERY_KEYS = [
@@ -667,7 +668,11 @@ function applyCouponToPayload(payload, coupon) {
   payload.cupom_aplicado = Boolean(coupon.aplicado);
   payload.cupom_codigo = coupon.informado ? coupon.codigo : null;
   payload.cupom_status = coupon.informado ? (coupon.aplicado ? 'aplicado' : coupon.motivo) : 'sem-cupom';
-  payload.checkout_destino = coupon.aplicado ? 'cortesia-cupom' : 'asaas';
+  // `checkout_destino` grava PARA ONDE a pessoa foi mandada, entao ele muda
+  // junto com a casa de pagamento: ate 2026-08-04 o valor era 'asaas', dai em
+  // diante e 'mercado-pago'. Quem for contar pagamentos por esse campo precisa
+  // aceitar os dois valores — os cadastros antigos continuam com 'asaas'.
+  payload.checkout_destino = coupon.aplicado ? 'cortesia-cupom' : 'mercado-pago';
 
   return payload;
 }
@@ -675,6 +680,14 @@ function applyCouponToPayload(payload, coupon) {
 async function handleCouponCheck(pg, payload, res, options) {
   const cupom = await evaluateCoupon(pg, payload && payload.cupom, options);
   res.status(200).json({ ok: true, cupom });
+}
+
+// Segredo curto que acompanha a inscricao ate a pagina de pagamento.
+// Sem ele, /pagamento.html?ref=124 deixaria qualquer visitante abrir a
+// cobranca de OUTRA pessoa so trocando o numero na URL — e criar Orders
+// no Mercado Pago contra inscricoes que nao sao dele.
+function criarTokenDePagamento() {
+  return crypto.randomBytes(16).toString('hex');
 }
 
 function buildFallbackPayload(payload, clientId) {
@@ -796,23 +809,47 @@ async function handler(req, res) {
 
     if (clientId) {
       const existing = await pg.query(
-        "SELECT 1 FROM inscricoes.inscricoes WHERE payload->>'clientId' = $1 LIMIT 1",
+        `SELECT id, payload->>'pagamento_token' AS pagamento_token
+           FROM inscricoes.inscricoes
+          WHERE payload->>'clientId' = $1
+          LIMIT 1`,
         [clientId]
       );
 
       if (existing.rowCount) {
         // Reenvio do mesmo cadastro: nao insere de novo, mas o navegador
-        // ainda precisa saber para onde ir (cortesia ou pagamento).
-        res.status(200).json({ ok: true, deduped: true, clientId, cupom });
+        // ainda precisa saber para onde ir (cortesia ou pagamento) e com
+        // qual identificacao — senao um F5 na ultima etapa deixaria a
+        // pessoa cadastrada e sem como pagar.
+        res.status(200).json({
+          ok: true,
+          deduped: true,
+          clientId,
+          cupom,
+          inscricaoId: existing.rows[0].id,
+          pagamentoToken: existing.rows[0].pagamento_token || '',
+        });
         return;
       }
     }
 
     const payloadToInsert = applyCouponToPayload(await preparePayloadForInsert(pg, payload), cupom);
+    // Depois do merge, de proposito: cadastro reaproveitado por telefone
+    // nao pode herdar o token de pagamento de uma inscricao anterior.
+    const pagamentoToken = criarTokenDePagamento();
+    payloadToInsert.pagamento_token = pagamentoToken;
 
-    await pg.query('INSERT INTO inscricoes.inscricoes (payload) VALUES ($1)', [payloadToInsert]);
+    const inserido = await pg.query(
+      'INSERT INTO inscricoes.inscricoes (payload) VALUES ($1) RETURNING id',
+      [payloadToInsert]
+    );
 
-    res.status(200).json({ ok: true, cupom });
+    res.status(200).json({
+      ok: true,
+      cupom,
+      inscricaoId: inserido.rows[0].id,
+      pagamentoToken,
+    });
   } catch (err) {
     console.error('Erro ao processar inscricao:', err);
 

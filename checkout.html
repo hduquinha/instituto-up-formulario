@@ -138,7 +138,7 @@
           Não localizamos um cupom válido para este link. Se você já preencheu o formulário,
           é só concluir o pagamento para garantir sua vaga.
         </p>
-        <a class="btn" id="payBtn" href="#">IR PARA O PAGAMENTO</a>
+        <a class="btn" id="payBtn" href="#" target="_blank" rel="noopener">FALAR COM A EQUIPE NO WHATSAPP</a>
         <a class="btn btn-sec" href="/">VOLTAR PARA O FORMULÁRIO</a>
       </section>
     </main>
@@ -175,8 +175,12 @@
         const eventWhen = document.getElementById('eventWhen');
         if(eventWhen) eventWhen.textContent = quando || 'Você receberá a data e o link no WhatsApp cadastrado.';
 
+        // Sem cupom válido não dá para montar a cobrança daqui: a página de
+        // pagamento precisa do id da inscrição e do token, que só existem no
+        // fluxo do formulário. Quem cai neste estado (link digitado à mão,
+        // cupom expirado) vai para o atendimento humano.
         const payBtn = document.getElementById('payBtn');
-        if(payBtn) payBtn.href = config.asaasUrl || '/';
+        if(payBtn) payBtn.href = config.whatsappUrl || '/';
 
         const whatsBtn = document.getElementById('whatsBtn');
         if(whatsBtn && config.whatsappUrl) whatsBtn.href = config.whatsappUrl;

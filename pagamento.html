@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Pagamento — Encontro UP | Instituto UP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script defer src="/clarity.js"></script>
+    <script src="/checkout-config.js"></script>
+    <!-- SDK do Mercado Pago: é ele que coleta e tokeniza o cartão dentro de
+         um iframe do próprio MP. O número do cartão NUNCA passa pelo nosso
+         servidor nem fica no nosso HTML — é isso que mantém a integração
+         fora do escopo pesado de PCI. -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <style>
+      :root{
+        --primary:#27abb6;
+        --primary-rgb:39,171,182;
+        --text:#ffffff;
+      }
+      *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+      html{font-size:18px}
+      @media (max-width:900px){ html{font-size:17px} }
+      @media (max-width:600px){ html{font-size:16px} }
+      body{
+        margin:0; min-height:100%; font-family:'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        color:var(--text); line-height:1.5;
+        background:linear-gradient(145deg,#000000,#061112 55%,#082024);
+        display:flex; align-items:flex-start; justify-content:center; padding:24px 18px 60px;
+      }
+      .card{
+        width:100%; max-width:560px; background:#0f1718; border:1px solid #204044;
+        border-radius:26px; padding:34px 30px 30px;
+        box-shadow:0 12px 56px -10px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);
+      }
+      @media (max-width:600px){ .card{padding:26px 18px 24px; border-radius:22px} }
+      .brand{font-size:.68rem; letter-spacing:2.4px; text-transform:uppercase; color:#7ea5a9; font-weight:700; margin:0 0 18px}
+      .badge{
+        display:inline-flex; align-items:center; gap:8px; background:rgba(var(--primary-rgb),.14);
+        border:1px solid #226b73; color:#7fe4ec; border-radius:40px; padding:8px 16px;
+        font-size:.7rem; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:16px;
+      }
+      h1{margin:0 0 12px; font-size:1.5rem; line-height:1.2; letter-spacing:.3px; color:var(--primary)}
+      .lead{margin:0 0 22px; font-size:.92rem; color:#d0e5e8; line-height:1.55}
+      .summary{background:#122325; border:1px solid #21484d; border-radius:18px; padding:16px 18px; margin:0 0 22px}
+      .line{display:flex; justify-content:space-between; align-items:baseline; gap:14px; font-size:.88rem; color:#c0dee1; padding:8px 0}
+      .line .label{color:#9dc3c7}
+      .line.total{border-top:1px solid #2a5a60; margin-top:4px; padding-top:12px}
+      .line.total .label{font-size:1rem; font-weight:800; color:#fff}
+      .line.total .value{color:var(--primary); font-size:1.55rem; font-weight:800; letter-spacing:.5px}
+      .btn{
+        appearance:none; width:100%; border:2px solid var(--primary); background:var(--primary); color:#002b30;
+        padding:15px 20px; border-radius:14px; cursor:pointer; font-weight:800; letter-spacing:.6px;
+        font-size:.92rem; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        text-decoration:none; transition:.25s;
+      }
+      .btn:hover{background:#1e919b; border-color:#1e919b; color:#e6feff}
+      .btn:focus-visible{outline:none; box-shadow:0 0 0 4px rgba(var(--primary-rgb),.55)}
+      .btn-sec{background:#173337; border-color:#1f4d52; color:#b8dadd; font-weight:700; margin-top:12px}
+      .btn-sec:hover{background:#1d4045; border-color:#2d5f65; color:#fff}
+      .note{margin:18px 0 0; font-size:.75rem; color:#8fb8bc; line-height:1.55; text-align:center}
+      .aviso{
+        background:rgba(255,107,107,.1); border:1px solid #7a2f2f; color:#ffb4b4;
+        border-radius:12px; padding:12px 14px; font-size:.82rem; margin:0 0 18px;
+      }
+      .aviso.ok{background:rgba(var(--primary-rgb),.12); border-color:#226b73; color:#8fe6ee}
+      .pix-qr{display:block; width:210px; height:210px; margin:6px auto 16px; background:#fff; border-radius:14px; padding:8px}
+      .pix-code{
+        width:100%; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.72rem;
+        background:#0b1516; border:1px solid #21484d; color:#cfe9ec; border-radius:12px;
+        padding:12px; resize:none; height:88px; word-break:break-all;
+      }
+      .state{display:none}
+      body[data-state="carregando"] .state-carregando,
+      body[data-state="form"] .state-form,
+      body[data-state="pix"] .state-pix,
+      body[data-state="boleto"] .state-boleto,
+      body[data-state="aprovado"] .state-aprovado,
+      body[data-state="invalido"] .state-invalido{display:block}
+      .spinner{
+        width:34px; height:34px; border-radius:50%; margin:10px auto 18px;
+        border:3px solid #1f3b3f; border-top-color:var(--primary); animation:spin .8s linear infinite;
+      }
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @media (prefers-reduced-motion: reduce){ .spinner{animation-duration:2.4s} }
+    </style>
+  </head>
+  <body data-state="carregando">
+    <main class="card">
+      <p class="brand">Instituto UP · Encontro Online</p>
+
+      <section class="state state-carregando" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <h1>Preparando seu pagamento...</h1>
+        <p class="lead">Só um instante.</p>
+      </section>
+
+      <section class="state state-form">
+        <h1 id="formTitulo">Falta só o pagamento</h1>
+        <p class="lead">Sua inscrição já está registrada. Escolha como prefere pagar para garantir a vaga.</p>
+
+        <div class="aviso" id="avisoCupom" hidden></div>
+        <div class="aviso" id="avisoErro" hidden></div>
+
+        <div class="summary">
+          <div class="line total">
+            <span class="label">Total</span>
+            <span class="value" id="valorTotal">—</span>
+          </div>
+        </div>
+
+        <div id="brickContainer"></div>
+        <p class="note">Pagamento processado pelo Mercado Pago. Seus dados de cartão são enviados direto para eles — não passam pelo nosso servidor.</p>
+      </section>
+
+      <section class="state state-pix" aria-live="polite">
+        <span class="badge">Pix gerado</span>
+        <h1>Escaneie para pagar</h1>
+        <p class="lead">Abra o app do seu banco, escaneie o código e a confirmação chega em segundos. Esta tela avisa sozinha quando o pagamento cair.</p>
+        <img class="pix-qr" id="pixQr" alt="QR Code do Pix" />
+        <p class="note" style="margin:0 0 8px; text-align:left; color:#9dc3c7">Ou copie o código:</p>
+        <textarea class="pix-code" id="pixCodigo" readonly aria-label="Código Pix copia e cola"></textarea>
+        <button type="button" class="btn btn-sec" id="pixCopiar">COPIAR CÓDIGO</button>
+        <p class="note" id="pixStatus">Aguardando o pagamento...</p>
+      </section>
+
+      <section class="state state-boleto" aria-live="polite">
+        <span class="badge">Boleto gerado</span>
+        <h1>Seu boleto está pronto</h1>
+        <p class="lead">
+          Atenção ao prazo: boleto compensa em até 3 dias úteis. Se o encontro for antes disso,
+          prefira Pix ou cartão para garantir a vaga a tempo.
+        </p>
+        <a class="btn" id="boletoLink" href="#" target="_blank" rel="noopener">ABRIR O BOLETO</a>
+        <p class="note">Assim que o pagamento for compensado, sua vaga é confirmada automaticamente.</p>
+      </section>
+
+      <section class="state state-aprovado" aria-live="polite">
+        <span class="badge">Pagamento aprovado</span>
+        <h1>Vaga garantida!</h1>
+        <p class="lead">Recebemos seu pagamento. As orientações do encontro chegam no WhatsApp que você cadastrou.</p>
+        <a class="btn" id="whatsAprovado" href="#" target="_blank" rel="noopener">FALAR COM A EQUIPE NO WHATSAPP</a>
+      </section>
+
+      <section class="state state-invalido" aria-live="polite">
+        <h1 id="invalidoTitulo">Link inválido</h1>
+        <p class="lead" id="invalidoMsg">
+          Não localizamos essa inscrição. Se você já preencheu o formulário, fale com a nossa equipe
+          que a gente confirma sua vaga.
+        </p>
+        <a class="btn btn-sec" href="/">VOLTAR PARA O FORMULÁRIO</a>
+      </section>
+    </main>
+
+    <script>
+      (function(){
+        const config = window.CHECKOUT_CONFIG || {};
+        const body = document.body;
+        const params = new URLSearchParams(location.search);
+
+        // `ref` é o id da inscrição e `t` é o token gerado no momento do
+        // cadastro. Os dois juntos: sem o token, trocar o número na URL
+        // abriria a cobrança de outra pessoa.
+        const ref = (params.get('ref') || '').trim();
+        const token = (params.get('t') || '').trim();
+        const motivoCupom = (params.get('cupom') || '').trim();
+
+        function estado(nome){ body.setAttribute('data-state', nome); }
+
+        function moeda(valor){
+          const n = Number(valor);
+          if(!Number.isFinite(n)) return '—';
+          return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+        }
+
+        function mostrarErro(msg){
+          const el = document.getElementById('avisoErro');
+          if(!el) return;
+          el.hidden = !msg;
+          el.textContent = msg || '';
+        }
+
+        function invalido(titulo, msg){
+          if(titulo) document.getElementById('invalidoTitulo').textContent = titulo;
+          if(msg) document.getElementById('invalidoMsg').textContent = msg;
+          estado('invalido');
+        }
+
+        async function api(corpo){
+          const res = await fetch('/api/pagamento', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(corpo)
+          });
+          const json = await res.json().catch(()=>null);
+          if(!json) throw new Error('resposta invalida');
+          return { ok: res.ok, ...json };
+        }
+
+        const whats = config.whatsappUrl || '';
+        const whatsBtn = document.getElementById('whatsAprovado');
+        if(whatsBtn && whats) whatsBtn.href = whats;
+
+        // Mensagem de cupom recusado, herdada do formulário.
+        if(motivoCupom){
+          const el = document.getElementById('avisoCupom');
+          const textos = {
+            invalido: 'Cupom não encontrado. Confira o código com quem te enviou — por enquanto, o valor é o normal.',
+            expirado: 'Esse cupom expirou. Seguindo com o valor normal.',
+            esgotado: 'Esse cupom já atingiu o limite de usos. Seguindo com o valor normal.'
+          };
+          if(el && textos[motivoCupom]){
+            el.hidden = false;
+            el.textContent = textos[motivoCupom];
+          }
+        }
+
+        // ---------------- Acompanhamento do Pix ----------------
+        // Pix aprova depois que a pessoa sai daqui, então a tela pergunta
+        // ao servidor de tempos em tempos. Quem grava o "aprovado" é o
+        // webhook; esta consulta só lê o resultado.
+        let timerPix = null;
+        function acompanharPagamento(){
+          if(timerPix) clearInterval(timerPix);
+          let tentativas = 0;
+          timerPix = setInterval(async ()=>{
+            tentativas += 1;
+            // 5s x 120 = 10 minutos. Depois disso a pessoa provavelmente
+            // fechou a tela; o webhook confirma de qualquer jeito.
+            if(tentativas > 120){ clearInterval(timerPix); return; }
+            try{
+              const r = await api({ _action:'resumo', ref, token });
+              if(r.statusPagamento === 'aprovado'){
+                clearInterval(timerPix);
+                estado('aprovado');
+              }
+            }catch{}
+          }, 5000);
+        }
+
+        function mostrarResultado(pagamento){
+          if(pagamento.status === 'aprovado'){
+            estado('aprovado');
+            return;
+          }
+
+          if(pagamento.metodoTipo === 'bank_transfer' || pagamento.metodoId === 'pix'){
+            const img = document.getElementById('pixQr');
+            const codigo = document.getElementById('pixCodigo');
+            if(pagamento.pixQrBase64) img.src = 'data:image/png;base64,' + pagamento.pixQrBase64;
+            if(codigo) codigo.value = pagamento.pixCopiaECola || '';
+            estado('pix');
+            acompanharPagamento();
+            return;
+          }
+
+          if(pagamento.metodoTipo === 'ticket'){
+            const link = document.getElementById('boletoLink');
+            if(link && pagamento.boletoUrl) link.href = pagamento.boletoUrl;
+            estado('boleto');
+            return;
+          }
+
+          // Cartão recusado ou pendente de análise: volta para o formulário
+          // com o motivo. O Brick continua montado, então dá para tentar
+          // outro cartão sem recarregar a página.
+          estado('form');
+          mostrarErro(
+            pagamento.status === 'recusado'
+              ? 'Pagamento não aprovado. Confira os dados ou tente outro cartão / outro meio de pagamento.'
+              : 'Pagamento em análise. Assim que o Mercado Pago confirmar, sua vaga é liberada.'
+          );
+        }
+
+        const btnCopiar = document.getElementById('pixCopiar');
+        if(btnCopiar){
+          btnCopiar.addEventListener('click', async ()=>{
+            const codigo = document.getElementById('pixCodigo');
+            if(!codigo || !codigo.value) return;
+            try{
+              await navigator.clipboard.writeText(codigo.value);
+              btnCopiar.textContent = 'CÓDIGO COPIADO!';
+            }catch{
+              // Clipboard bloqueado (http, permissão): selecionar já ajuda.
+              codigo.select();
+              btnCopiar.textContent = 'SELECIONADO — USE CTRL+C';
+            }
+            setTimeout(()=>{ btnCopiar.textContent = 'COPIAR CÓDIGO'; }, 2500);
+          });
+        }
+
+        // ---------------- Início ----------------
+        (async function iniciar(){
+          if(!ref || !token){
+            invalido('Link incompleto', 'Este link não tem os dados da inscrição. Preencha o formulário novamente ou fale com a nossa equipe.');
+            return;
+          }
+
+          let resumo;
+          try{
+            resumo = await api({ _action:'resumo', ref, token });
+          }catch{
+            invalido('Não conseguimos carregar', 'Tente recarregar a página. Se continuar assim, fale com a nossa equipe pelo WhatsApp.');
+            return;
+          }
+
+          if(!resumo.ok){
+            invalido();
+            return;
+          }
+
+          // Cortesia por cupom não passa por aqui.
+          if(resumo.cortesia){
+            window.location.href = (config.paginaCupom || 'checkout.html');
+            return;
+          }
+
+          if(resumo.statusPagamento === 'aprovado'){
+            estado('aprovado');
+            return;
+          }
+
+          const valor = Number(resumo.valor);
+          document.getElementById('valorTotal').textContent = moeda(valor);
+          if(resumo.nome){
+            document.getElementById('formTitulo').textContent = `${resumo.nome}, falta só o pagamento`;
+          }
+
+          const publicKey = config.mercadoPagoPublicKey || '';
+          if(!publicKey || typeof MercadoPago !== 'function'){
+            // Sem chave configurada é melhor dizer isso do que mostrar uma
+            // caixa de pagamento quebrada. O valor certo está em
+            // checkout-config.js.
+            invalido('Pagamento indisponível', 'A forma de pagamento não está configurada no momento. Fale com a nossa equipe pelo WhatsApp que confirmamos sua vaga.');
+            return;
+          }
+
+          estado('form');
+
+          const mp = new MercadoPago(publicKey, { locale: 'pt-BR' });
+          const bricks = mp.bricks();
+
+          await bricks.create('payment', 'brickContainer', {
+            initialization: {
+              amount: valor
+            },
+            customization: {
+              visual: { style: { theme: 'dark' } },
+              paymentMethods: {
+                creditCard: 'all',
+                debitCard: 'all',
+                bankTransfer: 'all',   // Pix
+                ticket: 'all',         // boleto
+                // Venda à vista: uma parcela só (decisão de negócio).
+                maxInstallments: 1
+              }
+            },
+            callbacks: {
+              onReady: () => {},
+              onSubmit: ({ selectedPaymentMethod, formData }) => {
+                mostrarErro('');
+                return api({
+                  ref,
+                  token,
+                  metodo: selectedPaymentMethod,
+                  formData
+                }).then((r)=>{
+                  if(!r.ok || !r.pagamento){
+                    if(r.jaPago){ estado('aprovado'); return; }
+                    mostrarErro(r.error || 'Não foi possível processar o pagamento. Tente novamente.');
+                    return;
+                  }
+                  mostrarResultado(r.pagamento);
+                }).catch(()=>{
+                  mostrarErro('Falha de conexão ao enviar o pagamento. Tente novamente.');
+                });
+              },
+              onError: (erro) => {
+                console.warn('Erro no Payment Brick:', erro);
+                mostrarErro('Confira os dados informados e tente novamente.');
+              }
+            }
+          });
+        })();
+      })();
+    </script>
+  </body>
+</html>

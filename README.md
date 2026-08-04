@@ -40,14 +40,17 @@ DATABASE_URL=postgres://<readonly-user>:<readonly-password>@<host>:<port>/<datab
 AUTH_SECRET=<gere-um-segredo-longo-e-aleatorio>
 AUTH_TRUST_HOST=true
 CUPONS_ENCONTRO_ONLINE=<codigos-de-cortesia-separados-por-virgula>
+MERCADOPAGO_ACCESS_TOKEN=<access token da aplicacao no Mercado Pago>
+MERCADOPAGO_WEBHOOK_SECRET=<assinatura secreta do painel de webhooks>
+PRECO_ENCONTRO_ONLINE=297.00
 ```
 
 ### Cupons de cortesia (`CUPONS_ENCONTRO_ONLINE`)
 
 Na última etapa do formulário o inscrito escolhe entre "tenho cupom" e "não
 tenho cupom". Sem cupom (ou com cupom recusado) ele vai para o link de pagamento
-da Asaas definido em `checkout-config.js`; com cupom aceito vai para
-`checkout.html`, a tela de cortesia com o valor zerado.
+do Mercado Pago definido em `checkout-config.js` (campo `linkPagamento`); com
+cupom aceito vai para `checkout.html`, a tela de cortesia com o valor zerado.
 
 Todo cupom aceito é **cortesia integral** — não existe cupom parcial, porque a
 tela de cortesia não cobra diferença. Formato de cada código:
@@ -75,6 +78,73 @@ Regras que não podem ser quebradas:
 >
 > **Nota:** o Aiven exige SSL. Sempre prefira um usuário readonly dedicado ao dashboard.
 Adicionar `.env.example` com placeholders.
+
+## Pagamento — Checkout Transparente do Mercado Pago
+
+Quem não tem cupom vai para `pagamento.html`, **nossa** página, com o Payment
+Brick do Mercado Pago dentro. Não há mais redirecionamento para link externo.
+
+### Peças
+
+| Arquivo | Papel |
+|---|---|
+| `pagamento.html` | a tela; monta o Payment Brick (Pix, crédito, débito, boleto) |
+| `api/pagamento.js` | `_action: 'resumo'` devolve o valor; sem `_action`, cria a Order |
+| `api/webhook-mercadopago.js` | recebe a confirmação do MP e carimba o pagamento no lead |
+| `lib/mercadopago.js` | tudo que fala com a API do MP (Orders + assinatura do webhook) |
+| `lib/db.js` | conexão com o Postgres usada pelas duas rotas acima |
+
+### Como o dinheiro é protegido
+
+1. **O valor sai de `PRECO_ENCONTRO_ONLINE`, no servidor.** O navegador manda o
+   meio de pagamento e o token do cartão; o preço que ele mandar é ignorado.
+   Sem isso, qualquer visitante pagaria R$ 1,00 pelo Encontro.
+2. **O `MERCADOPAGO_ACCESS_TOKEN` nunca vai para o front-end.** Só a *public
+   key* (em `checkout-config.js`) é pública — ela apenas tokeniza cartão.
+3. **A URL de pagamento exige o par `?ref=<id>&t=<token>`.** O token nasce no
+   INSERT da inscrição. Sem ele, trocar o número na URL abriria a cobrança de
+   outra pessoa.
+4. **O webhook confere a assinatura `x-signature`** e, mesmo assim, não confia
+   no conteúdo da notificação: ele reconsulta o status na API do MP. `data.id`
+   alfanumérico entra no manifesto **em minúsculas** — é o que o MP assina.
+
+### Configuração passo a passo
+
+1. Criar a aplicação em **Mercado Pago > Suas integrações > Criar aplicação**,
+   produto *Pagamentos online > Checkout Transparente*.
+2. Copiar as credenciais de **teste** primeiro:
+   - *Public key* → `mercadoPagoPublicKey` em `checkout-config.js`
+   - *Access token* → `MERCADOPAGO_ACCESS_TOKEN` na Vercel
+   As duas precisam ser do MESMO ambiente. Public key de teste com access
+   token de produção falha com erro genérico, difícil de diagnosticar.
+3. Em **Webhooks > Configurar notificações**, cadastrar a URL
+   `https://<dominio>/api/webhook-mercadopago`, marcar os eventos
+   **Pagamentos** e **Pedidos**, e copiar a *Assinatura secreta* para
+   `MERCADOPAGO_WEBHOOK_SECRET` na Vercel.
+4. Testar com os cartões de teste do MP (a documentação lista números que
+   forçam aprovação e recusa) e com um Pix de teste.
+5. Trocar as credenciais pelas de **produção** (public key `APP_USR-...`) e
+   refazer o webhook no ambiente de produção — a assinatura secreta é outra.
+
+### Rodar os testes
+
+```
+npm test
+```
+
+Exercita `api/pagamento.js` e `api/webhook-mercadopago.js` com o Postgres e o
+Mercado Pago simulados: não precisa de credencial, não toca em dado real.
+Cobre valor definido no servidor, token inválido, cobrança dupla, cortesia,
+assinatura de webhook forjada e Pix pendente.
+
+### O que ainda é manual
+
+- **Boleto compensa em até 3 dias úteis.** Para turma com data próxima, isso
+  aprova depois do encontro. Se virar problema, desligar `ticket` em
+  `customization.paymentMethods` (`pagamento.html`).
+- **Reembolso e chargeback não são tratados.** O webhook marca
+  `pagamento_status: recusado` quando o MP informa estorno, mas não devolve
+  vaga nem avisa ninguém.
 
 ## Fluxo da Aplicação
 - `/login`: fluxo de autenticação do provedor escolhido (magic link, SSO ou credencial forte com MFA).

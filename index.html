@@ -1296,7 +1296,7 @@
         }
 
         enterSuccessState();
-        showCheckoutHandoff(result.cupom);
+        showCheckoutHandoff(result);
         return true;
       }
 
@@ -1614,8 +1614,9 @@
       // tela de cortesia, quando o SERVIDOR aceitou o cupom. Quem decide aqui
       // é só `cupom.aplicado` da resposta da API: o que foi digitado na tela
       // ou aprovado pelo botão "APLICAR" não vale nada neste ponto.
-      function showCheckoutHandoff(cupom){
+      function showCheckoutHandoff(resposta){
         const config = window.CHECKOUT_CONFIG || {};
+        const cupom = resposta && resposta.cupom;
 
         if(cupom && cupom.aplicado && cupom.codigo){
           try{
@@ -1633,7 +1634,30 @@
           return;
         }
 
-        showPaymentModal(cupom);
+        // Sem cortesia: vai para a NOSSA página de pagamento, levando o id da
+        // inscrição e o token que a API acabou de gerar. É esse par que
+        // permite cobrar a pessoa certa sem expor a inscrição de ninguém.
+        const ref = resposta && resposta.inscricaoId;
+        const token = resposta && resposta.pagamentoToken;
+
+        if(!ref || !token){
+          // Acontece quando o banco caiu e a inscrição foi salva pelo
+          // fallback: existe cadastro, mas não existe id para cobrar.
+          showPaymentUnavailable();
+          return;
+        }
+
+        let url = (config.paginaPagamento || 'pagamento.html')
+          + '?ref=' + encodeURIComponent(ref)
+          + '&t=' + encodeURIComponent(token);
+
+        // Cupom recusado não impede o pagamento, mas a pessoa precisa saber
+        // por que o desconto não entrou — o aviso viaja para a outra tela.
+        if(cupom && cupom.informado && !cupom.aplicado && cupom.motivo){
+          url += '&cupom=' + encodeURIComponent(cupom.motivo);
+        }
+
+        window.location.href = url;
       }
 
       function couponMessage(motivo){
@@ -1642,12 +1666,13 @@
         return 'Cupom não encontrado. Confira o código.';
       }
 
-      function showPaymentModal(cupom){
+      // Cadastro salvo, mas sem como abrir a cobrança (banco fora do ar, com a
+      // inscrição gravada pelo fallback). Mandar para o WhatsApp é melhor do
+      // que uma tela de erro: a vaga não se perde, só a automação.
+      function showPaymentUnavailable(){
         if(document.getElementById('finalOverlay')) return;
         const config = window.CHECKOUT_CONFIG || {};
-        const asaasUrl = config.asaasUrl || '';
-        const delay = Math.max(0, Number(config.redirectDelaySeconds) || 0);
-        const recusado = Boolean(cupom && cupom.informado && !cupom.aplicado);
+        const whats = config.whatsappUrl || '';
 
         const ov = document.createElement('div');
         ov.className = 'final-overlay';
@@ -1655,42 +1680,10 @@
         ov.innerHTML = `
           <div class="final-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h2 id="modalTitle">Inscrição registrada</h2>
-            ${recusado ? `<div class="coupon-feedback is-err" style="margin:0 0 16px;">${escapeHtml(couponMessage(cupom.motivo))} Seguindo para o pagamento normal.</div>` : ''}
-            <p>Falta garantir sua vaga no encontro de <strong style="color:#ffffff;">${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}</strong>. Você será levado para a página de pagamento.</p>
-            <button type="button" class="btn btn-primary" id="finalPay" style="width:100%;justify-content:center;">IR PARA O PAGAMENTO</button>
-            <p class="duplicate-note" id="redirectNote"></p>
+            <p>Recebemos seu cadastro, mas não conseguimos abrir a tela de pagamento agora. Fale com a nossa equipe que garantimos sua vaga no encontro de <strong style="color:#ffffff;">${TRAINING_CONFIG.dateDisplay} • ${TRAINING_CONFIG.timeRange}</strong>.</p>
+            ${whats ? `<a class="btn btn-primary" href="${escapeHtml(whats)}" target="_blank" rel="noopener" style="width:100%;justify-content:center;">FALAR NO WHATSAPP</a>` : ''}
           </div>`;
         document.body.appendChild(ov);
-
-        const note = ov.querySelector('#redirectNote');
-        let timer = null;
-        let ticker = null;
-
-        function irParaPagamento(){
-          if(timer) clearTimeout(timer);
-          if(ticker) clearInterval(ticker);
-          if(asaasUrl) window.location.href = asaasUrl;
-        }
-
-        ov.querySelector('#finalPay').addEventListener('click', irParaPagamento);
-
-        if(!asaasUrl){
-          // Sem link configurado é melhor travar aqui do que mandar o visitante
-          // para lugar nenhum — o valor certo está em checkout-config.js.
-          if(note) note.textContent = 'Link de pagamento não configurado. Fale com nossa equipe pelo WhatsApp.';
-          return;
-        }
-
-        if(delay > 0){
-          let restante = delay;
-          if(note) note.textContent = `Redirecionando em ${restante}s...`;
-          ticker = setInterval(()=>{
-            restante -= 1;
-            if(note) note.textContent = restante > 0 ? `Redirecionando em ${restante}s...` : 'Redirecionando...';
-            if(restante <= 0) clearInterval(ticker);
-          }, 1000);
-          timer = setTimeout(irParaPagamento, delay * 1000);
-        }
       }
 
 
