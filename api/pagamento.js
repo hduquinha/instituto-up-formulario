@@ -20,6 +20,7 @@ const {
   getPrecoEncontro,
   criarOrder,
   dadosParaOCliente,
+  diagnosticoDoErro,
   primeiroPagamento,
 } = require('../lib/mercadopago');
 
@@ -260,6 +261,7 @@ async function criarPagamento(pg, corpo, res) {
     res.status(502).json({
       ok: false,
       error: 'Nao foi possivel processar o pagamento agora. Tente novamente em instantes.',
+      diagnostico: diagnosticoDoErro(err),
     });
     return;
   }

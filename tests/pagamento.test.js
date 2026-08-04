@@ -141,6 +141,29 @@ function checar(nome, condicao, detalhe){
   checar('Pix tem prazo de expiração', ultimaChamada.body.transactions.payments[0].expiration_time === 'PT30M');
   checar('QR não é gravado no banco', !updates.some(u => JSON.stringify(u.campos).includes('iVBORw0K')));
 
+  // Falha ao falar com o MP: a resposta tem que dizer POR QUE, senao todo
+  // problema de configuracao vira "tente novamente em instantes".
+  resetBanco();
+  respostaMP = { status: 400, body: { error: 'bad_request', cause: [{ code: 'invalid_token' }] } };
+  res = fakeRes();
+  await pagamento(req({ ref: 10, token: TOKEN_BOM, metodo: 'credit_card',
+    formData: { token: 'x', payment_method_id: 'master', payer: { email: 'a@b.com' } } }), res);
+  checar('erro do MP vira 502 com diagnóstico', res._status === 502 && res._json.diagnostico, res._json);
+  checar('diagnóstico traz o erro do MP', res._json.diagnostico.mpErro === 'bad_request', res._json.diagnostico);
+  checar('diagnóstico traz a causa', res._json.diagnostico.mpCausa === 'invalid_token', res._json.diagnostico);
+  checar('diagnóstico diz o ambiente do token', res._json.diagnostico.ambienteDoToken === 'teste', res._json.diagnostico);
+
+  resetBanco();
+  const tokenOriginal = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  delete process.env.MERCADOPAGO_ACCESS_TOKEN;
+  res = fakeRes();
+  await pagamento(req({ ref: 10, token: TOKEN_BOM, metodo: 'credit_card',
+    formData: { token: 'x', payment_method_id: 'master', payer: { email: 'a@b.com' } } }), res);
+  checar('sem access token, diz "access_token_ausente"',
+    res._json.diagnostico && res._json.diagnostico.codigo === 'access_token_ausente', res._json.diagnostico);
+  process.env.MERCADOPAGO_ACCESS_TOKEN = tokenOriginal;
+  respostaMP = null;
+
   resetBanco();
   res = fakeRes();
   await pagamento(req({ ref: 12, token: TOKEN_BOM, metodo: 'credit_card', formData: { payer: { email: 'a@b.com' } } }), res);
