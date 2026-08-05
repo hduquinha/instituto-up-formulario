@@ -183,6 +183,81 @@ cortesia). `api/pagamento.js` devolve 409 se alguém com cortesia tentar pagar.
 
 ---
 
+## 5.1 Contrato das chamadas
+
+### Nossa API — `POST /api/pagamento`
+
+**Resumo do pedido** (a página chama ao abrir):
+```json
+{ "_action": "resumo", "ref": 2188, "token": "<pagamento_token>" }
+→ 200 { "ok": true, "cortesia": false, "nome": "Maria",
+        "valor": "297.00", "statusPagamento": "nenhum" }
+→ 200 { "ok": true, "cortesia": true }        // cupom de cortesia: desvia
+→ 404 { "ok": false, "error": "Inscricao nao encontrada." }
+```
+
+**Criação do pagamento** (o Payment Brick chama no submit):
+```json
+{ "ref": 2188, "token": "<pagamento_token>",
+  "metodo": "credit_card" | "debit_card" | "bank_transfer" | "ticket",
+  "formData": { /* o que o Brick devolve no onSubmit */ } }
+→ 200 { "ok": true, "pagamento": { "status": "aprovado"|"pendente"|"recusado",
+        "orderId", "metodoId", "metodoTipo",
+        "pixCopiaECola", "pixQrBase64", "boletoUrl" } }
+→ 409 já pago / cortesia · 422 meio inválido ou sem e-mail
+→ 502 { "ok": false, "diagnostico": { codigo, ambienteDoToken, status, mpErro, mpCausa } }
+```
+
+### O que mandamos ao Mercado Pago — `POST /v1/orders`
+
+Headers: `Authorization: Bearer <ACCESS_TOKEN>`, `Content-Type: application/json`,
+`X-Idempotency-Key: <chave>`.
+
+Cartão:
+```json
+{ "type": "online", "processing_mode": "automatic",
+  "total_amount": "297.00", "external_reference": "inscricao-2188",
+  "payer": { "email": "...", "first_name": "...", "last_name": "...",
+             "identification": { "type": "CPF", "number": "..." } },
+  "transactions": { "payments": [ { "amount": "297.00",
+      "payment_method": { "id": "master", "type": "credit_card",
+                          "token": "<token do Brick>", "installments": 1 } } ] } }
+```
+
+Pix (idem, trocando o `payment_method`):
+```json
+"payment_method": { "id": "pix", "type": "bank_transfer" },
+"expiration_time": "PT30M"
+```
+
+Boleto: `{ "id": "bolbradesco", "type": "ticket" }`, `expiration_time: "P3D"`.
+
+**Onde vem o QR do Pix na resposta:**
+`transactions.payments[0].payment_method.qr_code` (copia-e-cola),
+`.qr_code_base64` (imagem) e `.ticket_url`.
+
+**`external_reference`** é sempre `inscricao-<id>` — o webhook usa esse prefixo
+para achar o lead. Limite do MP: 64 caracteres, só letras, números e hífen.
+
+### Comandos de diagnóstico (funcionam de fora, sem credencial)
+
+```bash
+P=https://<preview>
+
+# a rota do webhook está viva e o segredo está configurado?
+curl -s -X POST -d '{}' -H 'Content-Type: application/json' $P/api/webhook-mercadopago
+#   {"ok":false,"motivo":"segredo_nao_configurado"}  -> falta a env
+#   {"ok":false,"motivo":"assinatura_ausente"}       -> env ok, recusou por falta de assinatura
+#   {"ok":false,"motivo":"assinatura_invalida"}      -> env ok, segredo errado
+
+# o banco responde? (404 = código e DATABASE_URL ok)
+curl -s -X POST -H 'Content-Type: application/json' \
+  -d '{"_action":"resumo","ref":999999,"token":"x"}' $P/api/pagamento
+
+# a public key subiu?
+curl -s $P/checkout-config.js | grep mercadoPagoPublicKey
+```
+
 ## 6. Regras de segurança — NÃO AFROUXAR
 
 Estas quatro decisões são o que impede fraude. Qualquer alteração precisa
