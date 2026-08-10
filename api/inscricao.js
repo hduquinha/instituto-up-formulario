@@ -540,11 +540,20 @@ function getPublicStatusCode(err) {
 // =====================================================================
 // Cupons de cortesia do Encontro Online
 // ---------------------------------------------------------------------
-// Os codigos ficam na variavel de ambiente CUPONS_ENCONTRO_ONLINE (na
-// Vercel), nunca no codigo do formulario: a pagina e publica e qualquer
-// visitante leria os codigos no fonte, virando entrada gratuita.
+// A fonte da verdade e a tabela `dashboard.coupons`, gerenciada na tela
+// /cupons do CRM. Ate 2026-08-10 os codigos so existiam na variavel de
+// ambiente CUPONS_ENCONTRO_ONLINE: criar uma cortesia exigia editar a
+// variavel na Vercel e redeployar, e nao havia como ver quantas pessoas ja
+// tinham usado. A variavel continua funcionando como reserva (ver
+// loadCouponCatalog) para que nenhum codigo em circulacao pare de valer no
+// dia do corte.
 //
-// Formato aceito (separado por virgula, ponto-e-virgula ou quebra de linha):
+// Em NENHUM dos dois caminhos os codigos chegam ao navegador: a pagina e
+// publica e um codigo no fonte vira entrada gratuita para qualquer visitante.
+// Quem decide se o cupom vale e sempre este arquivo, no servidor.
+//
+// Formato de cada entrada da variavel de ambiente (separado por virgula,
+// ponto-e-virgula ou quebra de linha):
 //   CODIGO                 -> sem limite de uso, sem validade
 //   CODIGO:10              -> no maximo 10 usos
 //   CODIGO:10:2026-08-11   -> 10 usos e valido ate 11/08/2026 (inclusive)
@@ -592,6 +601,63 @@ function parseCouponCatalog() {
   return catalog;
 }
 
+// Formata a coluna DATE que o driver devolve como objeto Date.
+function couponDateToIso(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  const text = String(value);
+  return /^\d{4}-\d{2}-\d{2}/.test(text) ? text.slice(0, 10) : null;
+}
+
+/**
+ * Catalogo efetivo: variavel de ambiente por baixo, tabela do CRM por cima.
+ *
+ * A ordem importa e nao e simetrica. Um cupom cadastrado no CRM SUBSTITUI a
+ * entrada de mesmo codigo da variavel — inclusive para tirar o codigo de
+ * circulacao: desativar o cupom na tela remove ele do catalogo mesmo que a
+ * variavel antiga ainda o liste. Sem isso, "desativar" no CRM nao desativaria
+ * nada enquanto ninguem editasse a Vercel.
+ *
+ * Se a consulta falhar (tabela ainda nao criada, banco fora), o catalogo cai
+ * inteiro para a variavel de ambiente. Uma cortesia legitima nao pode ser
+ * recusada por causa de indisponibilidade nossa.
+ */
+async function loadCouponCatalog(pg) {
+  const catalog = parseCouponCatalog();
+  if (!pg) return catalog;
+
+  try {
+    // O filtro por produto nao e decorativo: a cartilha proibe cupom de um
+    // produto valer em outro, e este arquivo atende SO o Encontro Online.
+    const result = await pg.query(
+      `SELECT code, max_uses, valid_until, active
+         FROM dashboard.coupons
+        WHERE product = 'encontro-online'`
+    );
+
+    result.rows.forEach((row) => {
+      const code = normalizeCouponCode(row.code);
+      if (code.length < MIN_COUPON_LENGTH) return;
+
+      if (!row.active) {
+        catalog.delete(code);
+        return;
+      }
+
+      const maxUses = Number.parseInt(String(row.max_uses ?? ''), 10);
+      catalog.set(code, {
+        code,
+        maxUses: Number.isFinite(maxUses) && maxUses > 0 ? maxUses : null,
+        validUntil: couponDateToIso(row.valid_until),
+      });
+    });
+  } catch (err) {
+    console.error('Falha ao ler cupons do banco; usando ' + COUPON_ENV_VAR + ':', err);
+  }
+
+  return catalog;
+}
+
 // O cupom vale ate o fim do dia informado, no horario de Brasilia (UTC-3,
 // sem horario de verao desde 2019).
 function isCouponExpired(validUntil) {
@@ -628,7 +694,7 @@ async function evaluateCoupon(pg, rawCode, options) {
     return { informado: false, aplicado: false, codigo: '', motivo: '' };
   }
 
-  const coupon = parseCouponCatalog().get(codigo);
+  const coupon = (await loadCouponCatalog(pg)).get(codigo);
   if (!coupon) {
     return { informado: true, aplicado: false, codigo, motivo: 'invalido' };
   }
