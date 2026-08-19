@@ -1549,7 +1549,7 @@
             <div class="duplicate-actions">
               <button type="button" class="btn btn-primary" id="dupUse">
                 <span>Usar este cadastro</span>
-                <small>Inscrever neste encontro reaproveitando as informações já salvas.</small>
+                <small>Reaproveita as informações já salvas; falta só responder sobre o cupom.</small>
               </button>
               <button type="button" class="btn btn-sec" id="dupEdit">
                 <span>Sou eu e quero atualizar os dados</span>
@@ -1585,20 +1585,18 @@
         ov.querySelector('#dupClose').addEventListener('click', close);
         ov.querySelector('#dupEdit').addEventListener('click', ()=> continueWithDecision('edit_existing'));
         ov.querySelector('#dupDifferent').addEventListener('click', ()=> continueWithDecision('different_person'));
-        ov.querySelector('#dupUse').addEventListener('click', async ()=>{
+        // Reaproveitar o cadastro pula as ETAPAS DE DADOS — o servidor completa
+        // o que falta a partir da inscrição anterior — mas nunca a etapa do
+        // cupom. Até 19/08/2026 este botão enviava a inscrição na hora: quem
+        // já tinha cadastro ia direto para o pagamento sem que ninguém
+        // perguntasse do desconto, e a inscrição nascia com
+        // cupom_status "sem-cupom" mesmo quando a pessoa tinha um cupom. A
+        // pergunta do cupom vale para todo mundo, cadastro novo ou não.
+        ov.querySelector('#dupUse').addEventListener('click', ()=>{
           setPhoneConflictDecision('reuse_existing', match, phone);
-          const buttons = Array.from(ov.querySelectorAll('button'));
-          buttons.forEach(btn => { btn.disabled = true; });
-          const useBtn = ov.querySelector('#dupUse span');
-          if(useBtn) useBtn.textContent = 'Enviando inscrição...';
-          const payload = collectStepData();
-          const completed = await finalizeSubmission(payload, phone);
-          if(completed){
-            close();
-          } else {
-            buttons.forEach(btn => { btn.disabled = false; });
-            if(useBtn) useBtn.textContent = 'Usar este cadastro';
-          }
+          close();
+          showStep(steps.length - 1);
+          setStatus('Cadastro reaproveitado. Falta só responder sobre o cupom para finalizar.', 'info');
         });
       }
       try{
